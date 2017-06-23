@@ -3070,9 +3070,19 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             return nil if capacityRatioCooling.nil?
             hvac.CapacityRatioCooling = capacityRatioCooling.split(",").map(&:to_f)
             
-            fanspeed_ratio = get_unit_feature(runner, unit, Constants.SizingInfoHVACFanspeedRatioCooling, 'string')
-            return nil if fanspeed_ratio.nil?
-            hvac.FanspeedRatioCooling = fanspeed_ratio.split(",").map(&:to_f)
+            if not clg_equip.designSpecificationMultispeedObject.is_initialized
+              runner.registerError("DesignSpecificationMultispeedObject not set for #{clg_equip.name.to_s}.")
+              return nil
+            end
+            perf = clg_equip.designSpecificationMultispeedObject.get
+            hvac.FanspeedRatioCooling = []
+            perf.supplyAirflowRatioFields.each do |airflowRatioField|
+              if not airflowRatioField.coolingRatio.is_initialized
+                runner.registerError("Cooling airflow ratio not set for #{perf.name.to_s}")
+                return nil
+              end
+              hvac.FanspeedRatioCooling << airflowRatioField.coolingRatio.get
+            end
                 
             curves = []
             hvac.SHRRated = []
@@ -4197,14 +4207,6 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         airLoopHVACUnitarySystem.setSupplyAirFlowRateDuringCoolingOperation(clg_airflow)
         airLoopHVACUnitarySystem.setSupplyAirFlowRateMethodDuringHeatingOperation("SupplyAirFlowRate")
         airLoopHVACUnitarySystem.setSupplyAirFlowRateDuringHeatingOperation(htg_airflow)
-        
-        # FIXME
-        #perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
-        #airLoopHVACUnitarySystem.setDesignSpecificationMultispeedObject(perf)
-        #perf.setSingleModeOperation("No")
-        #for speed in 1..hvac.NumSpeedsCooling
-        #  perf.addSupplyAirflowRatioField(FIXME, FIXME)
-        #end
         
         fanonoff = airLoopHVACUnitarySystem.supplyFan.get.to_FanOnOff.get
         fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * OpenStudio.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s").get)

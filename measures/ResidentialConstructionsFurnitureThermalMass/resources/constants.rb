@@ -979,9 +979,6 @@ class Constants
   def self.SizingInfoHVACCoolingCFMs
     return self.SizingInfo(__method__.to_s)
   end
-  def self.SizingInfoHVACFanspeedRatioCooling
-    return self.SizingInfo(__method__.to_s)
-  end
   def self.SizingInfoHVACHeatingCapacityOffset
     return self.SizingInfo(__method__.to_s)
   end
