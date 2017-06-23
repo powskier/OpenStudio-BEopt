@@ -4198,6 +4198,14 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         airLoopHVACUnitarySystem.setSupplyAirFlowRateMethodDuringHeatingOperation("SupplyAirFlowRate")
         airLoopHVACUnitarySystem.setSupplyAirFlowRateDuringHeatingOperation(htg_airflow)
         
+        # FIXME
+        #perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)
+        #airLoopHVACUnitarySystem.setDesignSpecificationMultispeedObject(perf)
+        #perf.setSingleModeOperation("No")
+        #for speed in 1..hvac.NumSpeedsCooling
+        #  perf.addSupplyAirflowRatioField(FIXME, FIXME)
+        #end
+        
         fanonoff = airLoopHVACUnitarySystem.supplyFan.get.to_FanOnOff.get
         fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * OpenStudio.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s").get)
     end
@@ -4406,7 +4414,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                     ground_heat_exch_vert.setNumberofBoreHoles(unit_final.GSHP_Bore_Holes.to_i)
                     ground_heat_exch_vert.setBoreHoleLength(OpenStudio::convert(unit_final.GSHP_Bore_Depth,"ft","m").get)
                     ground_heat_exch_vert.removeAllGFunctions
-                    for i in 0..(unit_final.GSHP_G_Functions.size-1)
+                    for i in 0..(unit_final.GSHP_G_Functions[0].size-1)
                       ground_heat_exch_vert.addGFunction(unit_final.GSHP_G_Functions[0][i], unit_final.GSHP_G_Functions[1][i])
                     end
                     

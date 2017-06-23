@@ -4073,11 +4073,10 @@ class ProcessHVACSizingTest < MiniTest::Test
             end
             
         elsif beopt_key.start_with?('GroundHeatExchanger:Vertical_Pair') and beopt_key.end_with?('GFNC')
-            ensure_num_objects(model.getGroundHeatExchangerVerticals, beopt_key)
+            ensure_num_objects(model.getGroundHeatExchangerVerticals, beopt_key, 1)
             pair_num = beopt_key.gsub('GroundHeatExchanger:Vertical_Pair','').gsub('GFNC','').to_i
-            # TODO: Cannot currently get gFunction value for comparison, so skipping.
-            #       See https://github.com/NREL/OpenStudio/issues/2591
-            next
+            gfunction = model.getGroundHeatExchangerVerticals[0].gFunctions
+            os_val = gfunction[pair_num-1].gValue
            
         else
             puts "WARNING: Unhandled key: #{beopt_key}."
