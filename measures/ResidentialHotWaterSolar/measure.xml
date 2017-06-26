@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>residential_hot_water_solar</name>
   <uid>b969f216-f3c0-4301-9b85-34ce2b45f551</uid>
-  <version_id>56447aac-97fd-41a0-8234-32410b621cda</version_id>
-  <version_modified>20170623T205740Z</version_modified>
+  <version_id>2a7c3e30-a0f0-405b-90b1-a27dee444b0c</version_id>
+  <version_modified>20170626T144155Z</version_modified>
   <xml_checksum>F33F6E26</xml_checksum>
   <class_name>ResidentialHotWaterSolar</class_name>
   <display_name>Set Residential Solar Water Heating</display_name>
-  <description>This measure...</description>
-  <modeler_description>This measure...</modeler_description>
+  <description>Adds (or replaces) residential solar water heating to the model based on user inputs. For both single-family detached and multifamily buildings, the added storage tank and collector plate provide pre-heated water to the (existing) conventional water heater.</description>
+  <modeler_description>Any supply or demand components, including collector plate surface, are removed along with corresponding plant loop. A stratified storage tank demand branch, flat plate collector supply branch, and constant speed pump are added to a new plant loop. The existing water heater is added to the outlet node of the storage tank. A differential thermostat, with collector plate outlet as the hot node and storage tank outlet as the cold node, represents the availability manager on the plant loop.</modeler_description>
   <arguments>
     <argument>
       <name>collector_area</name>
@@ -285,16 +285,16 @@
       <checksum>2F718B18</checksum>
     </file>
     <file>
-      <filename>residential_hot_water_solar_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>B1FEC432</checksum>
-    </file>
-    <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>301CF563</checksum>
+    </file>
+    <file>
+      <filename>residential_hot_water_solar_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>542E84DB</checksum>
     </file>
     <file>
       <version>
@@ -305,7 +305,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>8B0AD76B</checksum>
+      <checksum>86469934</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>B1972E06</checksum>
     </file>
   </files>
 </measure>

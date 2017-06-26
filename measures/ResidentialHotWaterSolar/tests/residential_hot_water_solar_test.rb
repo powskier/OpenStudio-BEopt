@@ -33,7 +33,15 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     expected_num_new_objects = {"ShadingSurfaceGroup"=>1, "ShadingSurface"=>1, "SizingPlant"=>1, "PumpConstantSpeed"=>1, "AvailabilityManagerDifferentialThermostat"=>1, "WaterHeaterStratified"=>1, "SetpointManagerScheduled"=>1, "SolarCollectorFlatPlateWater"=>1, "PlantLoop"=>1, "SolarCollectorPerformanceFlatPlate"=>1}
     expected_values = {"TankVolume"=>args_hash["storage_vol"].to_f, "Heater1Setpoint"=>120, "Heater2Setpoint"=>125, "CollectorArea"=>40, "CollectorFlowRate"=>0.0000568724330873, "GlycolFrac"=>0.5}
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
-  end  
+  end
+  
+  def test_faces_south_tankless
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ShadingSurfaceGroup"=>1, "ShadingSurface"=>1, "SizingPlant"=>1, "PumpConstantSpeed"=>1, "AvailabilityManagerDifferentialThermostat"=>1, "WaterHeaterStratified"=>1, "SetpointManagerScheduled"=>1, "SolarCollectorFlatPlateWater"=>1, "PlantLoop"=>1, "SolarCollectorPerformanceFlatPlate"=>1}
+    expected_values = {"TankVolume"=>60, "Heater1Setpoint"=>125, "Heater2Setpoint"=>125, "CollectorArea"=>40, "CollectorFlowRate"=>0.0000568724330873, "GlycolFrac"=>0.5}
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
+  end
   
   def test_fluid_type_water
     args_hash = {}

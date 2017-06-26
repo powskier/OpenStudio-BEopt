@@ -35,12 +35,12 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "This measure..."
+    return "Adds (or replaces) residential solar water heating to the model based on user inputs. For both single-family detached and multifamily buildings, the added storage tank and collector plate provide pre-heated water to the (existing) conventional water heater."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "This measure..."
+    return "Any supply or demand components, including collector plate surface, are removed along with corresponding plant loop. A stratified storage tank demand branch, flat plate collector supply branch, and constant speed pump are added to a new plant loop. The existing water heater is added to the outlet node of the storage tank. A differential thermostat, with collector plate outlet as the hot node and storage tank outlet as the cold node, represents the availability manager on the plant loop."
   end
 
   # define the arguments that the user will input
