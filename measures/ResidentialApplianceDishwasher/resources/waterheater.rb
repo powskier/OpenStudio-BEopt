@@ -7,6 +7,18 @@ require "#{File.dirname(__FILE__)}/schedules"
 
 class Waterheater
 
+    def self.get_shw_storage_tank(model, unit)
+        model.getPlantLoops.each do |plant_loop|
+          next unless plant_loop.name.to_s == Constants.PlantLoopSolarHotWater(unit.name.to_s)
+          (plant_loop.supplyComponents + plant_loop.demandComponents).each do |component|
+            if component.to_WaterHeaterStratified.is_initialized
+              return component.to_WaterHeaterStratified.get
+            end
+          end
+        end
+        return nil
+    end
+  
     def self.get_plant_loop_from_string(plant_loops, plantloop_s, spaces, unit_num, runner=nil)
         if plantloop_s == Constants.Auto
             return self.get_plant_loop_for_spaces(plant_loops, spaces, unit_num, runner)

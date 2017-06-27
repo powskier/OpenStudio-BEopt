@@ -260,8 +260,6 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
               water_heater = supply_component.to_WaterHeaterStratified.get
               setpoint_schedule_one = water_heater.heater1SetpointTemperatureSchedule
               setpoint_schedule_two = water_heater.heater2SetpointTemperatureSchedule
-            elsif supply_component.to_WaterHeaterHeatPump.is_initialized
-              water_heater = supply_component.to_WaterHeaterHeatPump.get
             end
           end
           break

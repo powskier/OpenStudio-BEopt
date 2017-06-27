@@ -39,6 +39,22 @@ class ResidentialHotWaterHeaterTanklessFuelTest < MiniTest::Test
     return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless.osm"
   end
 
+  def osm_geo_beds_loc_hpwh
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH.osm"
+  end
+  
+  def osm_geo_beds_loc_tank_electric_shw
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_SHW.osm"
+  end
+  
+  def osm_geo_beds_loc_tankless_electric_shw
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless_SHW.osm"
+  end  
+  
+  def osm_geo_beds_loc_hpwh_shw
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH_SHW.osm"
+  end
+  
   def test_new_construction_standard
     args_hash = {}
     args_hash["fuel_type"] = Constants.FuelTypeGas
@@ -149,6 +165,42 @@ class ResidentialHotWaterHeaterTanklessFuelTest < MiniTest::Test
     _test_measure(osm_geo_beds_loc_tankless_electric, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
+  # def test_retrofit_replace_hpwh
+    # args_hash = {}
+    # args_hash["fuel_type"] = Constants.FuelTypeGas
+    # expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>2, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1}
+    # expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    # expected_values = {"TankVolume"=>40, "InputCapacity"=>11.72, "ThermalEfficiency"=>0.773, "TankUA"=>7.88, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "FuelType"=>Constants.FuelTypeGas, "SkinLossFrac"=>0.64}
+    # _test_measure(osm_geo_beds_loc_hpwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+  # end
+  
+  def test_retrofit_replace_tank_electric_shw
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypeGas
+    expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    expected_values = {"InputCapacity"=>29307107, "ThermalEfficiency"=>0.754, "Setpoint"=>125, "OnCycle"=>7.38, "OffCycle"=>7.38, "FuelType"=>Constants.FuelTypeGas}
+    _test_measure(osm_geo_beds_loc_tank_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+  end  
+  
+  def test_retrofit_replace_tankless_electric_shw
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypeGas
+    expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    expected_values = {"InputCapacity"=>29307107, "ThermalEfficiency"=>0.754, "Setpoint"=>125, "OnCycle"=>7.38, "OffCycle"=>7.38, "FuelType"=>Constants.FuelTypeGas}
+    _test_measure(osm_geo_beds_loc_tankless_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+  end  
+  
+  # def test_retrofit_replace_hpwh_shw
+    # args_hash = {}
+    # args_hash["fuel_type"] = Constants.FuelTypeGas
+    # expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>2, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1}
+    # expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    # expected_values = {"TankVolume"=>40, "InputCapacity"=>11.72, "ThermalEfficiency"=>0.773, "TankUA"=>7.88, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "FuelType"=>Constants.FuelTypeGas, "SkinLossFrac"=>0.64}
+    # _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+  # end
+  
   def test_argument_error_setpoint_lt_0
     args_hash = {}
     args_hash["setpoint_temp"] = -10
@@ -371,7 +423,7 @@ class ResidentialHotWaterHeaterTanklessFuelTest < MiniTest::Test
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
-            if obj_type == "WaterHeaterMixed" or obj_type == "WaterHeaterStratified" or obj_type == "WaterHeaterHeatPump"
+            if obj_type == "WaterHeaterMixed" or obj_type == "WaterHeaterStratified"
                 actual_values["TankVolume"] += OpenStudio.convert(new_object.tankVolume.get, "m^3", "gal").get
                 actual_values["InputCapacity"] += OpenStudio.convert(new_object.heaterMaximumCapacity.get, "W", "kW").get
                 actual_values["ThermalEfficiency"] += new_object.heaterThermalEfficiency.get
