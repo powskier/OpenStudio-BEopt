@@ -234,14 +234,14 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     _test_measure(osm_geo_beds_loc_tankless_propane, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
-  # def test_retrofit_replace_hpwh
-    # args_hash = {}
-    # args_hash["fuel_type"] = Constants.FuelTypeGas
-    # expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>2, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1}
-    # expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    # expected_values = {"TankVolume"=>40, "InputCapacity"=>11.72, "ThermalEfficiency"=>0.773, "TankUA"=>7.88, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "FuelType"=>Constants.FuelTypeGas, "SkinLossFrac"=>0.64}
-    # _test_measure(osm_geo_beds_loc_hpwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
-  # end
+  def test_retrofit_replace_hpwh
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypeGas
+    expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
+    expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    _test_measure(osm_geo_beds_loc_hpwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+  end
   
   def test_retrofit_replace_tank_electric_shw
     args_hash = {}
@@ -259,14 +259,14 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     _test_measure(osm_geo_beds_loc_tankless_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
   end  
   
-  # def test_retrofit_replace_hpwh_shw
-    # args_hash = {}
-    # args_hash["fuel_type"] = Constants.FuelTypeGas
-    # expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>2, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1}
-    # expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    # expected_values = {"TankVolume"=>40, "InputCapacity"=>11.72, "ThermalEfficiency"=>0.773, "TankUA"=>7.88, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "FuelType"=>Constants.FuelTypeGas, "SkinLossFrac"=>0.64}
-    # _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
-  # end
+  def test_retrofit_replace_hpwh_shw
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypeGas
+    expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
+    expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
+  end
   
   def test_argument_error_tank_volume_invalid_str
     args_hash = {}
