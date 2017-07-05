@@ -417,6 +417,9 @@ class HVAC
           air_loop.supplyComponents.each do |supply_component|
             next unless supply_component.to_AirLoopHVACUnitarySystem.is_initialized
             air_loop_unitary = supply_component.to_AirLoopHVACUnitarySystem.get
+            if air_loop_unitary.supplyAirFlowRateDuringCoolingOperation.is_initialized
+              next if air_loop_unitary.supplyAirFlowRateDuringCoolingOperation.get < 0.001
+            end
             next unless air_loop_unitary.coolingCoil.is_initialized
             clg_coil = air_loop_unitary.coolingCoil.get
             next unless clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized
@@ -574,6 +577,9 @@ class HVAC
           air_loop.supplyComponents.each do |supply_component|
             next unless supply_component.to_AirLoopHVACUnitarySystem.is_initialized
             air_loop_unitary = supply_component.to_AirLoopHVACUnitarySystem.get
+            if air_loop_unitary.supplyAirFlowRateDuringCoolingOperation.is_initialized
+              next if air_loop_unitary.supplyAirFlowRateDuringCoolingOperation.get < 0.001
+            end
             next unless air_loop_unitary.coolingCoil.is_initialized
             clg_coil = air_loop_unitary.coolingCoil.get
             next unless clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized
