@@ -159,24 +159,6 @@ class ProcessFurnaceFuel < OpenStudio::Measure::ModelMeasure
           air_loop_unitary.setCoolingCoil(clg_coil)
         else
           air_loop_unitary.setSupplyAirFlowRateDuringCoolingOperation(0.0000001) # this is when there is no cooling present
-          cOOL_CAP_FT_SPEC = [[3.670270705, -0.098652414, 0.000955906, 0.006552414, -0.0000156, -0.000131877]]
-          cOOL_EIR_FT_SPEC = [[-3.302695861, 0.137871531, -0.001056996, -0.012573945, 0.000214638, -0.000145054]]
-          cOOL_CAP_FFLOW_SPEC = [[0.718605468, 0.410099989, -0.128705457]]
-          cOOL_EIR_FFLOW_SPEC = [[1.32299905, -0.477711207, 0.154712157]]
-          cOOL_CLOSS_FPLR_SPEC = [[0, 0, 0]]
-          cool_cap_ft_curve = HVAC.create_curve_biquadratic(model, HVAC.convert_curve_biquadratic(cOOL_CAP_FT_SPEC[0], HVAC), "Cool-Cap-fT#{0+1}", 13.88, 23.88, 18.33, 51.66)
-          cool_eir_ft_curve = HVAC.create_curve_biquadratic(model, HVAC.convert_curve_biquadratic(cOOL_EIR_FT_SPEC[0], HVAC), "Cool-EIR-fT#{0+1}", 13.88, 23.88, 18.33, 51.66)
-          cool_plf_fplr_curve = HVAC.create_curve_quadratic(model, cOOL_CLOSS_FPLR_SPEC[0], "Cool-PLF-fPLR#{0+1}", 0, 1, 0.7, 1)
-          cool_cap_fff_curve = HVAC.create_curve_quadratic(model, cOOL_CAP_FFLOW_SPEC[0], "Cool-Cap-fFF#{0+1}", 0, 2, 0, 2)
-          cool_eir_fff_curve = HVAC.create_curve_quadratic(model, cOOL_EIR_FFLOW_SPEC[0], "Cool-EIR-fFF#{0+1}", 0, 2, 0, 2)
-          clg_coil_stage_data = HVAC.calc_coil_stage_data_cooling(model, 0, 1, 0, 0, cOOL_CAP_FT_SPEC, cOOL_EIR_FT_SPEC, cOOL_CLOSS_FPLR_SPEC, cOOL_CAP_FFLOW_SPEC, cOOL_EIR_FFLOW_SPEC)          
-          clg_coil = OpenStudio::Model::CoilCoolingDXSingleSpeed.new(model, model.alwaysOffDiscreteSchedule, clg_coil_stage_data[0].totalCoolingCapacityFunctionofTemperatureCurve, clg_coil_stage_data[0].totalCoolingCapacityFunctionofFlowFractionCurve, clg_coil_stage_data[0].energyInputRatioFunctionofTemperatureCurve, clg_coil_stage_data[0].energyInputRatioFunctionofFlowFractionCurve, clg_coil_stage_data[0].partLoadFractionCorrelationCurve)
-          clg_coil.setRatedTotalCoolingCapacity(0.0000001)
-          clg_coil.setRatedAirFlowRate(0.0000001)
-          clg_coil.setRatedCOP(OpenStudio::OptionalDouble.new(0.0000001))
-          clg_coil.setRatedSensibleHeatRatio(1)
-          air_loop_unitary.setCoolingCoil(clg_coil)
-          clg_coil = nil
         end
         air_loop_unitary.setSupplyFan(fan)
         air_loop_unitary.setFanPlacement("BlowThrough")
