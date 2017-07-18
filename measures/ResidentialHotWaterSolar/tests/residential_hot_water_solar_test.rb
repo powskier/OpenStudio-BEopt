@@ -483,7 +483,7 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
               assert_in_epsilon(expected_values["Heater1Setpoint"], OpenStudio.convert(new_object.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get.value,"C","F").get, 0.01)
               assert_in_epsilon(expected_values["Heater2Setpoint"], OpenStudio.convert(new_object.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get.value,"C","F").get, 0.01)
               assert_in_epsilon(expected_values["CollectorFlowRate"], OpenStudio.convert(new_object.sourceSideDesignFlowRate.get,"","").get, 0.01)
-            elsif obj_type == "SolarCollectorPerformanceFlatPlate"
+            elsif obj_type == "ShadingSurface"
               assert_in_epsilon(expected_values["CollectorArea"], OpenStudio.convert(new_object.grossArea,"m^2","ft^2").get, 0.01)
             elsif obj_type == "PlantLoop"
               assert_in_epsilon(expected_values["GlycolFrac"], new_object.glycolConcentration * 0.01, 0.01)

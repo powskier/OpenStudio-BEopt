@@ -309,15 +309,15 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
         pump.setPumpControlType('Intermittent')
         pump.setRatedFlowRate(OpenStudio.convert(shw_system.coll_flow,"cfm","m^3/s").get) #
         pump.addToNode(plant_loop.supplyInletNode)
-        
-        panel_length = OpenStudio.convert(shw_system.collector_area ** 0.5,"ft^2","m^2").get
-        run = Math::cos(Math::atan(shw_tilt.abs)) * panel_length
+
+        panel_length = OpenStudio.convert(shw_system.collector_area,"ft^2","m^2").get ** 0.5
+        run = Math::cos(shw_tilt.abs * Math::PI / 180) * panel_length
         
         vertices = OpenStudio::Point3dVector.new
         vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get, OpenStudio.convert(100.0,"ft","m").get, 0)
         vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get + panel_length, OpenStudio.convert(100.0,"ft","m").get, 0)
-        vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get + panel_length, OpenStudio.convert(100.0,"ft","m").get + run, shw_tilt.abs * run)
-        vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get, OpenStudio::convert(100.0,"ft","m").get + run, shw_tilt.abs * run)
+        vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get + panel_length, OpenStudio.convert(100.0,"ft","m").get + run, (panel_length ** 2 - run ** 2) ** 0.5)
+        vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get, OpenStudio::convert(100.0,"ft","m").get + run, (panel_length ** 2 - run ** 2) ** 0.5)
         
         m = OpenStudio::Matrix.new(4,4,0)
         m[0,0] = Math::cos(-shw_azimuth.abs * Math::PI / 180.0)
