@@ -198,7 +198,11 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
     highest_roof_pitch = Geometry.get_roof_pitch(model.getSurfaces)
     roof_tilt = OpenStudio::convert(Math.atan(highest_roof_pitch),"rad","deg").get # tan(x) = opp/adj = highest_roof_pitch    
     
-    shw_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, model.getBuilding.northAxis)
+    if azimuth_type == Constants.CoordRelative
+      shw_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, 0, 0)
+    else
+      shw_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, 0, -model.getBuilding.northAxis)
+    end
     shw_tilt.abs = Geometry.get_abs_tilt(tilt_type, tilt, roof_tilt, @weather.header.Latitude)
     
     # Get building units
@@ -320,10 +324,10 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
         vertices << OpenStudio::Point3d.new(OpenStudio.convert(100.0,"ft","m").get, OpenStudio::convert(100.0,"ft","m").get + run, (panel_length ** 2 - run ** 2) ** 0.5)
         
         m = OpenStudio::Matrix.new(4,4,0)
-        m[0,0] = Math::cos(-shw_azimuth.abs * Math::PI / 180.0)
-        m[1,1] = Math::cos(-shw_azimuth.abs * Math::PI / 180.0)
-        m[0,1] = -Math::sin(-shw_azimuth.abs * Math::PI / 180.0)
-        m[1,0] = Math::sin(-shw_azimuth.abs * Math::PI / 180.0)
+        m[0,0] = Math::cos(-shw_azimuth.abs * Math::PI / 180)
+        m[1,1] = Math::cos(-shw_azimuth.abs * Math::PI / 180)
+        m[0,1] = -Math::sin(-shw_azimuth.abs * Math::PI / 180)
+        m[1,0] = Math::sin(-shw_azimuth.abs * Math::PI / 180)
         m[2,2] = 1
         m[3,3] = 1
         transformation = OpenStudio::Transformation.new(m)
@@ -335,6 +339,7 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
         shading_surface = OpenStudio::Model::ShadingSurface.new(vertices, model)
         shading_surface.setName(obj_name + " shading surface")
         shading_surface.setShadingSurfaceGroup(shading_surface_group)
+        puts shading_surface.outwardNormal
         
         collector_plate = OpenStudio::Model::SolarCollectorFlatPlateWater.new(model)
         collector_plate.setName(obj_name + " coll plate")
