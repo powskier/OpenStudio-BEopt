@@ -196,7 +196,7 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
     end
         
     highest_roof_pitch = Geometry.get_roof_pitch(model.getSurfaces)
-    roof_tilt = OpenStudio::convert(Math.atan(highest_roof_pitch),"rad","deg").get # tan(x) = opp/adj = highest_roof_pitch    
+    roof_tilt = OpenStudio::convert(Math.atan(highest_roof_pitch),"rad","deg").get # tan(x) = opp/adj = highest_roof_pitch  
     
     if azimuth_type == Constants.CoordRelative
       shw_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, 0, 0)
@@ -339,7 +339,6 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
         shading_surface = OpenStudio::Model::ShadingSurface.new(vertices, model)
         shading_surface.setName(obj_name + " shading surface")
         shading_surface.setShadingSurfaceGroup(shading_surface_group)
-        puts shading_surface.outwardNormal
         
         collector_plate = OpenStudio::Model::SolarCollectorFlatPlateWater.new(model)
         collector_plate.setName(obj_name + " coll plate")
