@@ -101,7 +101,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure performs HVAC sizing calculations via ACCA Manual J/S, as well as sizing calculations for ground source heat pumps and dehumidifiers."
+    return "This measure performs HVAC sizing calculations via ACCA Manual J/S, as well as sizing calculations for ground source heat pumps and dehumidifiers.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

@@ -13,7 +13,7 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the eaves for the building."
+    return "Sets the eaves for the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

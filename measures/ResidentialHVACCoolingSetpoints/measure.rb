@@ -23,7 +23,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules."
+    return "This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

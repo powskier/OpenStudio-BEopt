@@ -15,7 +15,7 @@ class ProcessConstructionsFoundationsFloorsCovering < OpenStudio::Measure::Model
   end
   
   def description
-    return "This measure assigns a covering to floors of above-grade finished spaces."
+    return "This measure assigns a covering to floors of above-grade finished spaces.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

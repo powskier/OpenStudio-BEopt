@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_hot_water_heater_tankless_electric</name>
   <uid>48b6c5e9-ed87-4761-afec-8aca2d6c372e</uid>
-  <version_id>fda04d87-577f-4ed7-b875-8700aeb5b240</version_id>
-  <version_modified>20170630T203948Z</version_modified>
+  <version_id>7c6e851a-9986-48bd-a91d-94f094d1b390</version_id>
+  <version_modified>20170726T225439Z</version_modified>
   <xml_checksum>9882CBDB</xml_checksum>
   <class_name>ResidentialHotWaterHeaterTanklessElectric</class_name>
   <display_name>Set Residential Electric Tankless Water Heater</display_name>
-  <description>This measure adds a new residential electric tankless water heater to the model based on user inputs. If there is already an existing residential water heater in the model, it is replaced. For multifamily buildings, the water heater can be set for all units of the building.</description>
+  <description>This measure adds a new residential electric tankless water heater to the model based on user inputs. If there is already an existing residential water heater in the model, it is replaced. For multifamily buildings, the water heater can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>The measure will create a new instance of the OS:WaterHeater:Mixed object representing a electric tankless water heater. The water heater will be placed on the plant loop 'Domestic Hot Water Loop'. If this loop already exists, any water heater on that loop will be removed and replaced with a water heater consistent with this measure. If it doesn't exist, it will be created.</modeler_description>
   <arguments>
     <argument>
@@ -186,12 +186,6 @@
       <checksum>0435122C</checksum>
     </file>
     <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1FE621AE</checksum>
-    </file>
-    <file>
       <filename>schedules.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -210,12 +204,6 @@
       <checksum>82976045</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C8CE4128</checksum>
-    </file>
-    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -226,17 +214,6 @@
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>52DD822A</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.4.1</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>3EE72B84</checksum>
     </file>
     <file>
       <filename>waterheater.rb</filename>
@@ -255,6 +232,29 @@
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
       <checksum>4B573D7C</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>BE79CE58</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>83B2AFF4</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.4.1</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>0B6AE49A</checksum>
     </file>
   </files>
 </measure>

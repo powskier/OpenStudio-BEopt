@@ -15,7 +15,7 @@ class ProcessConstructionsFoundationsFloorsSheathing < OpenStudio::Measure::Mode
 
   # human readable description
   def description
-    return "This measure assigns floor sheathing to floors of finished spaces, with the exception of foundation slabs."
+    return "This measure assigns floor sheathing to floors of finished spaces, with the exception of foundation slabs.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

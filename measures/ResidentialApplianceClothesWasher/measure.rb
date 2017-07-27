@@ -14,7 +14,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
   end
 
   def description
-    return "Adds (or replaces) a residential clothes washer with the specified efficiency, operation, and schedule. For multifamily buildings, the clothes washer can be set for all units of the building."
+    return "Adds (or replaces) a residential clothes washer with the specified efficiency, operation, and schedule. For multifamily buildings, the clothes washer can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

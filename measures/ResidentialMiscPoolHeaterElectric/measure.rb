@@ -10,7 +10,7 @@ class ResidentialPoolHeaterElec < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) a residential pool heater with the specified efficiency and schedule. The pool is assumed to be outdoors. For multifamily buildings, the pool heater is set for all units of the building."
+    return "Adds (or replaces) a residential pool heater with the specified efficiency and schedule. The pool is assumed to be outdoors. For multifamily buildings, the pool heater is set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

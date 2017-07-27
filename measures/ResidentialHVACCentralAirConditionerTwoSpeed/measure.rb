@@ -17,7 +17,7 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure removes any existing HVAC cooling components from the building and adds a two-speed central air conditioner along with an on/off supply fan to a unitary air loop. For multifamily buildings, the two-speed central air conditioner can be set for all units of the building."
+    return "This measure removes any existing HVAC cooling components from the building and adds a two-speed central air conditioner along with an on/off supply fan to a unitary air loop. For multifamily buildings, the two-speed central air conditioner can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

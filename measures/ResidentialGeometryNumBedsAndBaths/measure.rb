@@ -15,7 +15,7 @@ class AddResidentialBedroomsAndBathrooms < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the number of bedrooms and bathrooms in the building. For multifamily buildings, the bedrooms/bathrooms can be set for all units of the building."
+    return "Sets the number of bedrooms and bathrooms in the building. For multifamily buildings, the bedrooms/bathrooms can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

@@ -14,7 +14,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the basic geometry for the building."
+    return "Sets the basic geometry for the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

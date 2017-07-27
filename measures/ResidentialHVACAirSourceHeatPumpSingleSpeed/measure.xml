@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>process_single_speed_air_source_heat_pump</name>
   <uid>9f709cf6-cf55-4bb3-8087-7a5c5a98aa7c</uid>
-  <version_id>9ac5f4d0-b7d2-4879-84d4-60d4a1ed676e</version_id>
-  <version_modified>20170630T203949Z</version_modified>
+  <version_id>2fb05045-0519-43b0-851e-aa3171998c92</version_id>
+  <version_modified>20170726T225440Z</version_modified>
   <xml_checksum>0DA5C9E6</xml_checksum>
   <class_name>ProcessSingleSpeedAirSourceHeatPump</class_name>
   <display_name>Set Residential Single-Speed Air Source Heat Pump</display_name>
-  <description>This measure removes any existing HVAC components from the building and adds a single-speed air source heat pump along with an on/off supply fan to a unitary air loop. For multifamily buildings, the single-speed air source heat pump can be set for all units of the building.</description>
+  <description>This measure removes any existing HVAC components from the building and adds a single-speed air source heat pump along with an on/off supply fan to a unitary air loop. For multifamily buildings, the single-speed air source heat pump can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Any supply components or baseboard convective electrics/waters are removed from any existing air/plant loops or zones. Any existing air/plant loops are also removed. A heating DX coil, cooling DX coil, electric supplemental heating coil, and an on/off supply fan are added to a unitary air loop. The unitary air loop is added to the supply inlet node of the air loop. This air loop is added to a branch for the living zone. A diffuser is added to the branch for the living zone as well as for the finished basement if it exists.</modeler_description>
   <arguments>
     <argument>
@@ -393,6 +393,12 @@
       <checksum>BB1957EF</checksum>
     </file>
     <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>87C9A783</checksum>
+    </file>
+    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>1.11.5</identifier>
@@ -401,19 +407,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>5D0AE50B</checksum>
+      <checksum>7D0E4C86</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>C8CE4128</checksum>
-    </file>
-    <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>87C9A783</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

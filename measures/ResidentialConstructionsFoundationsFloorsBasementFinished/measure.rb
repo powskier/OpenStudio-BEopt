@@ -15,7 +15,7 @@ class ProcessConstructionsFoundationsFloorsBasementFinished < OpenStudio::Measur
   end
 
   def description
-    return "This measure assigns constructions to finished basement walls and floors."
+    return "This measure assigns constructions to finished basement walls and floors.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

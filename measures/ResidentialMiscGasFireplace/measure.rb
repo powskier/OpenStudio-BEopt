@@ -10,7 +10,7 @@ class ResidentialGasFireplace < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) a residential gas fireplace with the specified efficiency and schedule. For multifamily buildings, the fireplace can be set for all units of the building."
+    return "Adds (or replaces) a residential gas fireplace with the specified efficiency and schedule. For multifamily buildings, the fireplace can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

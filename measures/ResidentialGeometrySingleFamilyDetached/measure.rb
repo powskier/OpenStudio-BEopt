@@ -14,7 +14,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
 
   # human readable description
   def description
-    return "Sets the basic geometry for the building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building."
+    return "Sets the basic geometry for the building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

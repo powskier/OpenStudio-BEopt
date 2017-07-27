@@ -21,7 +21,7 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Sets (or replaces) the lighting energy use, based on fractions of CFLs, LFLs, and LEDs, for finished spaces, the garage, and outside. For multifamily buildings, the lighting can be set for all units of the building."
+    return "Sets (or replaces) the lighting energy use, based on fractions of CFLs, LFLs, and LEDs, for finished spaces, the garage, and outside. For multifamily buildings, the lighting can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

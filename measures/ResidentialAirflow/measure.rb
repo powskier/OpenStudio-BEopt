@@ -178,7 +178,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Adds (or replaces) all building components related to airflow: infiltration, mechanical ventilation, natural ventilation, and ducts."
+    return "Adds (or replaces) all building components related to airflow: infiltration, mechanical ventilation, natural ventilation, and ducts.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

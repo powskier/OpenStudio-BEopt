@@ -14,7 +14,7 @@ class ProcessConstructionsCeilingsRoofsRadiantBarrier < OpenStudio::Measure::Mod
 
   # human readable description
   def description
-    return "This measure assigns the radiant barrier material to all roof surfaces attached to unfinished space."
+    return "This measure assigns the radiant barrier material to all roof surfaces attached to unfinished space.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

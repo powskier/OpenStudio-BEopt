@@ -36,6 +36,43 @@ An example OpenStudio Workflow [(create-model-example.osw)](https://github.com/N
 
 This will apply the measures to the OpenStudio seed model specified in the .osw, run the EnergyPlus simulation, and produce output. 
 
+## Workflows
+
+These measures can be used in different workflows:
+* [Create Model](#workflow-create-model) - Build up a model from scratch.
+* [Modify Model](#workflow-modify-model) - Apply a measure to an existing model.
+* [Create Model from Geometry](#workflow-create-model-from-geometry) - Build up a model on top of an existing geometry.
+
+### Workflow: Create Model
+
+Status: **Available**
+
+![Create Model Diagram](https://cloud.githubusercontent.com/assets/5861765/25581277/308515a2-2e44-11e7-88c2-7f9bca55bb5c.png)
+
+The Create Model workflow allows building up a complete residential building model from an [empty seed](https://github.com/NREL/OpenStudio-BEopt/blob/master/seeds/EmptySeedModel.osm) and calling a series of measures. The measures should be applied according to the specified [measure order](#measure-order).
+
+This workflow includes simple geometry measures to quickly develop 3D building geometry from text-based inputs (floor area, foundation type, number of stories, etc.). These measures are not meant to replace more sophisticated geometry approaches.
+
+### Workflow: Modify Model
+
+Status: **Available**
+
+![Modify Model Workflow Diagram](https://cloud.githubusercontent.com/assets/5861765/25581274/2c469998-2e44-11e7-9ed0-d08eec6f6178.png)
+
+Most of these measures were written to be reusable for existing building retrofits. For example, while the dishwasher measure adds a dishwasher to a model without a dishwasher, the same measure will replace a dishwasher that already exists in an existing building model (rather than adding an additional dishwasher to the model). This could be used to evaluate an EnergyStar dishwasher replacement, for example.
+
+Note that some measures are dependent on others. For example, if the Clothes Washer measure were to be applied to the existing building model, such that the existing clothes washer is replaced, the Clothes Dryer measure would also need to be subsequently applied to the existing building model so that its energy use, as dependent on the clothes washer, is correct.
+
+While some of these measures may work on any user-created OpenStudio model, they have only been tested on, and are primarily intended to operate on, models created via one of the supported [Workflows](#workflows).
+
+### Workflow: Create Model From Geometry
+
+Status: **Not Yet Available**
+
+![Create Model From Geometry](https://cloud.githubusercontent.com/assets/5861765/25557648/f77be4e2-2cd2-11e7-9837-33840cadd369.png)
+
+Description pending.
+
 ### Measure Order
 
 The order in which these measures are called is important. For example, the Window Constructions measure must be called after windows have been added to the building. The table below documents the intended order of using these measures, and was automatically generated from a [JSON file](https://github.com/NREL/OpenStudio-BEopt/blob/master/workflows/measure-info.json).
@@ -106,49 +143,12 @@ The order in which these measures are called is important. For example, the Wind
 |10. Sizing|1. HVAC Sizing|(lots of measures...)|
 <!--- MEASURE_WORKFLOW_END -->
 
-## Workflows
-
-These measures can be used in different workflows:
-* [Create Model](#workflow-create-model) - Build up a model from scratch.
-* [Modify Model](#workflow-modify-model) - Apply a measure to an existing model.
-* [Create Model from Geometry](#workflow-create-model-from-geometry) - Build up a model on top of an existing geometry.
-
-### Workflow: Create Model
-
-Status: **Available**
-
-![Create Model Diagram](https://cloud.githubusercontent.com/assets/5861765/25581277/308515a2-2e44-11e7-88c2-7f9bca55bb5c.png)
-
-The Create Model workflow allows building up a complete residential building model from an [empty seed](https://github.com/NREL/OpenStudio-BEopt/blob/master/seeds/EmptySeedModel.osm) and calling a series of measures. The measures should be applied according to the specified [measure order](#measure-order).
-
-This workflow includes simple geometry measures to quickly develop 3D building geometry from text-based inputs (floor area, foundation type, number of stories, etc.). These measures are not meant to replace more sophisticated geometry approaches.
-
-### Workflow: Modify Model
-
-Status: **Available**
-
-![Modify Model Workflow Diagram](https://cloud.githubusercontent.com/assets/5861765/25581274/2c469998-2e44-11e7-9ed0-d08eec6f6178.png)
-
-Most of these measures were written to be reusable for existing building retrofits. For example, while the dishwasher measure adds a dishwasher to a model without a dishwasher, the same measure will replace a dishwasher that already exists in an existing building model (rather than adding an additional dishwasher to the model). This could be used to evaluate an EnergyStar dishwasher replacement, for example.
-
-Note that some measures are dependent on others. For example, if the Clothes Washer measure were to be applied to the existing building model, such that the existing clothes washer is replaced, the Clothes Dryer measure would also need to be subsequently applied to the existing building model so that its energy use, as dependent on the clothes washer, is correct.
-
-While some of these measures may work on any user-created OpenStudio model, they have only been tested on, and are primarily intended to operate on, models created via one of the supported [Workflows](#workflows).
-
-### Workflow: Create Model From Geometry
-
-Status: **Not Yet Available**
-
-![Create Model From Geometry](https://cloud.githubusercontent.com/assets/5861765/25557648/f77be4e2-2cd2-11e7-9837-33840cadd369.png)
-
-Description pending.
-
 ## Outputs
 
 These measures allow multiple outputs to be calculated:
 * [Simulation Results](#output-simulation-results) - Standard EnergyPlus annual and time series results by end use.
 * [Utility Bills](#output-utility-bills) - Simple of complex residential utility bills.
-* [Energy Rating Index (ERI)](#output-energy-rating-index-eri) - Calculation for the 301 Standard/HERS Index".
+* [Energy Rating Index (ERI)](#output-energy-rating-index-eri) - Calculation for the 301 Standard/HERS Index.
 
 ### Output: Simulation Results
 

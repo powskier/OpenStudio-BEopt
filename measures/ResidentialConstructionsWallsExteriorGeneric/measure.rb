@@ -15,7 +15,7 @@ class ProcessConstructionsWallsExteriorGeneric < OpenStudio::Measure::ModelMeasu
   end
   
   def description
-    return "This measure assigns a generic layered construction to above-grade exterior walls adjacent to finished space or attic walls under insulated roofs."
+    return "This measure assigns a generic layered construction to above-grade exterior walls adjacent to finished space or attic walls under insulated roofs.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

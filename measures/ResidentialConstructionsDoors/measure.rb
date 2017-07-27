@@ -20,7 +20,7 @@ class ProcessConstructionsDoors < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure assigns a construction to exterior doors adjacent to finished or unfinished space."
+    return "This measure assigns a construction to exterior doors adjacent to finished or unfinished space.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

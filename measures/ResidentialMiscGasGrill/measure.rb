@@ -10,7 +10,7 @@ class ResidentialGasGrill < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) a residential gas grill with the specified efficiency and schedule. The grill is assumed to be outdoors. For multifamily buildings, the grill is set for all units of the building."
+    return "Adds (or replaces) a residential gas grill with the specified efficiency and schedule. The grill is assumed to be outdoors. For multifamily buildings, the grill is set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

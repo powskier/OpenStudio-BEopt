@@ -1142,5 +1142,8 @@ class Constants
   def self.WaterHeaterTypeHeatPump
     return 'heatpump'
   end
+  def self.WorkflowDescription
+    return ' See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.'
+  end
     
 end

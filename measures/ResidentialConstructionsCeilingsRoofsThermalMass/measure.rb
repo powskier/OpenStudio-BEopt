@@ -15,7 +15,7 @@ class ProcessConstructionsCeilingsRoofsThermalMass < OpenStudio::Measure::ModelM
   end
   
   def description
-    return "This measure assigns thermal mass to ceilings adjacent to finished space."
+    return "This measure assigns thermal mass to ceilings adjacent to finished space.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

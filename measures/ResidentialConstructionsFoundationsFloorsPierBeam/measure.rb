@@ -14,7 +14,7 @@ class ProcessConstructionsFoundationsFloorsPierBeam < OpenStudio::Measure::Model
   end
   
   def description
-    return "This measure assigns a wood stud construction to the ceiling of the pier & beam space."
+    return "This measure assigns a wood stud construction to the ceiling of the pier & beam space.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

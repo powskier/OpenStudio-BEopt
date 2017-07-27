@@ -15,7 +15,7 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
   end
   
   def description
-    return "This measure assigns an uninsulated constructions to 1) exterior surfaces adjacent to unfinished space, 2) surfaces between two unfinished (or two finished) spaces, or 3) adiabatic surfaces."
+    return "This measure assigns an uninsulated constructions to 1) exterior surfaces adjacent to unfinished space, 2) surfaces between two unfinished (or two finished) spaces, or 3) adiabatic surfaces.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

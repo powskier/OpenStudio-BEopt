@@ -16,7 +16,7 @@ class AddResidentialOccupants < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the number of occupants in the building. For multifamily buildings, the people can be set for all units of the building."
+    return "Sets the number of occupants in the building. For multifamily buildings, the people can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

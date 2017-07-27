@@ -10,7 +10,7 @@ class ResidentialGasLighting < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) residential gas lighting with the specified efficiency and schedule. The lighting is assumed to be outdoors. For multifamily buildings, the lighting is set for all units of the building."
+    return "Adds (or replaces) residential gas lighting with the specified efficiency and schedule. The lighting is assumed to be outdoors. For multifamily buildings, the lighting is set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

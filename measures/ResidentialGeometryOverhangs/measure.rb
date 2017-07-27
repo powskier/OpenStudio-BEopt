@@ -14,7 +14,7 @@ class CreateResidentialOverhangs < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets presence/dimensions of overhangs for windows on the specified building facade(s)."
+    return "Sets presence/dimensions of overhangs for windows on the specified building facade(s).#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

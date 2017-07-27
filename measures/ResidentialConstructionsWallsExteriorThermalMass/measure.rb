@@ -15,7 +15,7 @@ class ProcessConstructionsWallsExteriorThermalMass < OpenStudio::Measure::ModelM
   end
   
   def description
-    return "This measure assigns wall mass to above-grade exterior walls adjacent to finished space."
+    return "This measure assigns wall mass to above-grade exterior walls adjacent to finished space.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

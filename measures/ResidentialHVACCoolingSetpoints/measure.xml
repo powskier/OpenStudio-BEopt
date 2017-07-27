@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>process_cooling_setpoints</name>
   <uid>2daa9d28-8891-4074-a1d1-bce3cb3d7ac6</uid>
-  <version_id>b6dbeff6-7aed-4b20-94d2-2d97128ea7e0</version_id>
-  <version_modified>20170630T203950Z</version_modified>
+  <version_id>9745ee42-fa34-4f83-9329-4ea32146bb0a</version_id>
+  <version_modified>20170726T225442Z</version_modified>
   <xml_checksum>356BE47F</xml_checksum>
   <class_name>ProcessCoolingSetpoints</class_name>
   <display_name>Set Residential Cooling Setpoints and Schedules</display_name>
-  <description>This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules.</description>
+  <description>This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>This measure creates residential cooling season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.</modeler_description>
   <arguments>
     <argument>
@@ -162,17 +162,6 @@
       <checksum>E4C6BC93</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.11.5</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>7AAB2BF4</checksum>
-    </file>
-    <file>
       <filename>process_cooling_setpoints_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
@@ -185,16 +174,27 @@
       <checksum>BB1957EF</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C8CE4128</checksum>
-    </file>
-    <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>87C9A783</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.11.5</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>2251C3EC</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_hot_water_heater_heat_pump</name>
   <uid>cfbe1e78-78db-4902-aba3-95d23310802e</uid>
-  <version_id>70f3ce7f-76d5-43fd-a62a-75f7b0954990</version_id>
-  <version_modified>20170630T203948Z</version_modified>
+  <version_id>7e6ec7ba-4d46-4bb1-8035-fb963b7ddcd2</version_id>
+  <version_modified>20170726T225439Z</version_modified>
   <xml_checksum>9882CBDB</xml_checksum>
   <class_name>ResidentialHotWaterHeaterHeatPump</class_name>
   <display_name>Set Residential Heat Pump Water Heater</display_name>
-  <description>This measure adds a new residential heat pump water heater to the model based on user inputs. If there is already an existing residential water heater in the model, it is replaced. For multifamily buildings, the water heater can be set for all units of the building.</description>
+  <description>This measure adds a new residential heat pump water heater to the model based on user inputs. If there is already an existing residential water heater in the model, it is replaced. For multifamily buildings, the water heater can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>The measure will create a new instance of the OS:WaterHeater:HeatPump:WrappedCondenser object representing a heat pump water heater and EMS code for the controls. The water heater will be placed on the plant loop 'Domestic Hot Water Loop'. If this loop already exists, any water heater on that loop will be removed and replaced with a water heater consistent with this measure. If it doesn't exist, it will be created.</modeler_description>
   <arguments>
     <argument>
@@ -266,12 +266,6 @@
       <checksum>0435122C</checksum>
     </file>
     <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1FE621AE</checksum>
-    </file>
-    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTankless.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -332,12 +326,6 @@
       <checksum>82976045</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C8CE4128</checksum>
-    </file>
-    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -348,17 +336,6 @@
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>52DD822A</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.4.1</identifier>
-        <min_compatible>1.13.1</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>3492AF89</checksum>
     </file>
     <file>
       <filename>waterheater.rb</filename>
@@ -377,6 +354,29 @@
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
       <checksum>A4CC71B4</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>BE79CE58</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>83B2AFF4</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.4.1</identifier>
+        <min_compatible>1.13.1</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>DA52CC41</checksum>
     </file>
   </files>
 </measure>

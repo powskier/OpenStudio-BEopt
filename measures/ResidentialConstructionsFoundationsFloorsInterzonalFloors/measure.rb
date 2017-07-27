@@ -14,7 +14,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
   end
   
   def description
-    return "This measure assigns a wood stud construction to floors between finished space and unfinished space or floors below cantilevered finished space."
+    return "This measure assigns a wood stud construction to floors between finished space and unfinished space or floors below cantilevered finished space.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

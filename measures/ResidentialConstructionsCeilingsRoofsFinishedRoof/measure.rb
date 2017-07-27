@@ -14,7 +14,7 @@ class ProcessConstructionsCeilingsRoofsFinishedRoof < OpenStudio::Measure::Model
   end
   
   def description
-    return "This measure assigns a construction to finished roofs."
+    return "This measure assigns a construction to finished roofs.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description
