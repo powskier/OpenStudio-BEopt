@@ -120,7 +120,7 @@ class CreateResidentialDoorArea < OpenStudio::Measure::ModelMeasure
                       corridor_walls << potential_corridor_surface
                   end
               end
-          end 
+          end
       end
 
       # Get subset of corridor walls on lowest story

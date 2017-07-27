@@ -91,7 +91,7 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
     garage_pos, garage_width, garage_depth, garage_protrusion = get_garage_dimensions(model.getSurfaces)
     inset_position = determine_inset_position(model.getSurfaces)
     top_floor_z = determine_top_floor_z(model.getSpaces)
-    num_floors = Geometry.get_building_stories(model.getSpaces)    
+    num_floors = Geometry.get_building_stories(model.getSpaces)
     
     surfaces_modified = false
     

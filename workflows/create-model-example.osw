@@ -1,5 +1,5 @@
 {
-   "created_at" : "20170717T194222Z",
+   "created_at" : "20170727T215437Z",
    "measure_paths" : [ "../measures" ],
    "seed_file" : "../seeds/EmptySeedModel.osm",
    "steps" : [
@@ -17,24 +17,12 @@
       },
       {
          "arguments" : {
-            "aspect_ratio" : "2",
-            "attic_type" : "unfinished attic",
-            "foundation_height" : "3",
-            "foundation_type" : "slab",
-            "garage_depth" : "20",
-            "garage_pos" : "Right",
-            "garage_protrusion" : "0",
-            "garage_width" : "0",
-            "living_height" : "8",
-            "num_floors" : "2",
-            "roof_pitch" : "6:12",
-            "roof_type" : "gable",
-            "total_ffa" : "2000"
+            "floorplan_path" : "C:/OpenStudio/OpenStudio-BEopt_space_types/measures/ResidentialGeometryFromEditor/tests/floorplan.json"
          },
-         "description" : "Sets the basic geometry for the building. Building is limited to one foundation type. Garage is tucked within the building, on the front left or front right corners of the building.",
-         "measure_dir_name" : "ResidentialGeometrySingleFamilyDetached",
-         "modeler_description" : "Gathers living space area, wall height per floor, number of floors, aspect ratio, garage width and depth, garage position, foundation type and wall height, attic and roof type, and roof pitch. Constructs building by calculating footprint and performing a series of affine transformations into living, foundation, and attic spaces.",
-         "name" : "Create Residential Single-Family Detached Geometry"
+         "description" : "Imports a floorplan JSON file written by the OpenStudio Geometry Editor.",
+         "measure_dir_name" : "ResidentialGeometryFromEditor",
+         "modeler_description" : "Currently this measure deletes the existing geometry and replaces it. In the future, a more advanced merge technique will be employed.",
+         "name" : "Residential Geometry from Editor"
       },
       {
          "arguments" : {
@@ -829,5 +817,5 @@
          "name" : "Set Residential HVAC Sizing"
       }
    ],
-   "updated_at" : "20170717T194225Z"
+   "updated_at" : "20170727T215440Z"
 }

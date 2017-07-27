@@ -228,6 +228,7 @@ class ProcessCeilingFan < OpenStudio::Measure::ModelMeasure
       schedules = Schedules.new
     
       # Determine geometry for spaces and zones that are unit specific
+      unit.living_zone = nil
       Geometry.get_thermal_zones_from_spaces(building_unit.spaces).each do |thermal_zone|
         if Geometry.is_living(thermal_zone)
           unit.living_zone = thermal_zone

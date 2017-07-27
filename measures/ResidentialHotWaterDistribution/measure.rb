@@ -119,6 +119,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
         tot_pump_e_ann = 0
         msgs = []
         units.each do |unit|
+
             # Get unit beds/baths
             nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
             if nbeds.nil? or nbaths.nil?
@@ -437,13 +438,13 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
             sch_s_temperatureSchedule = nil
             sch_b_temperatureSchedule = nil
             model.getWaterUseEquipments.each do |space_equipment|
-                if space_equipment.name.to_s == Constants.ObjectNameShower
+                if space_equipment.name.to_s == obj_name_sh
                     sch_sh_schedule = space_equipment.flowRateFractionSchedule.get
                     sch_sh_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
-                elsif space_equipment.name.to_s == Constants.ObjectNameSink
+                elsif space_equipment.name.to_s == obj_name_s
                     sch_s_schedule = space_equipment.flowRateFractionSchedule.get
                     sch_s_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
-                elsif space_equipment.name.to_s == Constants.ObjectNameBath
+                elsif space_equipment.name.to_s == obj_name_b
                     sch_b_schedule = space_equipment.flowRateFractionSchedule.get
                     sch_b_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
                 end

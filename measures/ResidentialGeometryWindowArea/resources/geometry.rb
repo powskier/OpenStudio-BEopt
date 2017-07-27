@@ -252,7 +252,7 @@ class Geometry
         bldg_min_z = 100000
         unit_spaces.each do |s|
             next if self.space_is_below_grade(s)
-            next if self.space_is_unfinished(s)
+            next if self.space_is_unfinished(s)      
             space_min_z = self.getSurfaceZValues(s.surfaces).min + OpenStudio::convert(s.zOrigin,"m","ft").get
             next if space_min_z >= bldg_min_z
             bldg_min_z = space_min_z
@@ -268,7 +268,7 @@ class Geometry
             end
         end
         if space.nil?
-            runner.registerError("Could not find a finished space for unit #{unit_num}.")
+            runner.registerError("Could not find a finished space for '#{unit_spaces[0].buildingUnit.get.name}'.")
         end
         return space
     end
@@ -398,11 +398,11 @@ class Geometry
     end
     
     def self.zone_is_finished(zone)
-        # TODO: Ugly hack until we can get finished zones from OS
-        if zone.name.to_s.start_with?(Constants.LivingZone) or zone.name.to_s.start_with?(Constants.FinishedBasementZone) or zone.name.to_s.start_with?(Constants.URBANoptFinishedZoneIdentifier)
-            return true
+        zone.spaces.each do |space|
+          unless self.space_is_finished(space)
+            return false
+          end
         end
-        return false
     end
     
     # Returns true if all spaces in zone are fully above grade
@@ -460,8 +460,12 @@ class Geometry
     end
     
     def self.space_is_finished(space)
-        if space.thermalZone.is_initialized
-            return self.zone_is_finished(space.thermalZone.get)
+        if space.spaceType.is_initialized
+          if space.spaceType.get.standardsSpaceType.is_initialized
+            if space.spaceType.get.standardsSpaceType.get == Constants.LivingSpaceType
+              return true
+            end
+          end
         end
         return false
     end
@@ -822,35 +826,93 @@ class Geometry
     end
     
     def self.is_living(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.LivingSpace) or space_or_zone.name.to_s.start_with?(Constants.LivingZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.LivingSpaceType)
     end
     
     def self.is_pier_beam(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.PierBeamSpace) or space_or_zone.name.to_s.start_with?(Constants.PierBeamZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.PierBeamSpaceType)
     end
     
     def self.is_crawl(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.CrawlSpace) or space_or_zone.name.to_s.start_with?(Constants.CrawlZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.CrawlSpaceType)
     end
     
     def self.is_finished_basement(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.FinishedBasementSpace) or space_or_zone.name.to_s.start_with?(Constants.FinishedBasementZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.LivingSpaceType) && self.is_basement(space_or_zone)
     end
     
     def self.is_unfinished_basement(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.UnfinishedBasementSpace) or space_or_zone.name.to_s.start_with?(Constants.UnfinishedBasementZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.BasementSpaceType)
     end
     
     def self.is_unfinished_attic(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.UnfinishedAtticSpace) or space_or_zone.name.to_s.start_with?(Constants.GarageAtticSpace) or space_or_zone.name.to_s.start_with?(Constants.UnfinishedAtticZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.AtticSpaceType)
     end
     
     def self.is_finished_attic(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.FinishedAtticSpace) or space_or_zone.name.to_s.start_with?(Constants.GarageFinishedAtticSpace) or space_or_zone.name.to_s.start_with?(Constants.FinishedAtticZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.LivingSpaceType) && self.is_attic(space_or_zone)
     end
     
     def self.is_garage(space_or_zone)
-        return true if space_or_zone.name.to_s.start_with?(Constants.GarageSpace) or space_or_zone.name.to_s.start_with?(Constants.GarageZone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.GarageSpaceType)
+    end
+    
+    def self.space_or_zone_is_of_type(space_or_zone, space_type)
+        if space_or_zone.is_a? OpenStudio::Model::Space
+          return self.space_is_of_type(space_or_zone, space_type)
+        elsif space_or_zone.is_a? OpenStudio::Model::ThermalZone
+          return self.zone_is_of_type(space_or_zone, space_type)
+        end
+    end
+    
+    def self.space_is_of_type(space, space_type)
+      if space.spaceType.is_initialized
+        if space.spaceType.get.standardsSpaceType.is_initialized          
+          return true if space.spaceType.get.standardsSpaceType.get == space_type
+        end
+      end
+      return nil
+    end
+    
+    def self.zone_is_of_type(zone, space_type)
+      zone.spaces.each do |space|
+        return self.space_is_of_type(space, space_type)
+      end
+    end
+    
+    def self.is_basement(space_or_zone)
+      if space_or_zone.respond_to?("to_Space")
+        return self.space_is_below_grade(space_or_zone)
+      elsif space_or_zone.respond_to?("to_ThermalZone")
+        space_or_zone.spaces.each do |space|
+          unless self.space_is_below_grade(space)
+            return false
+          end
+        end
+        return true
+      end
+    end
+    
+    def self.is_attic(space_or_zone)
+      if space_or_zone.respond_to?("to_Space")
+        space_or_zone.surfaces.each do |surface|
+          next unless surface.surfaceType.downcase.to_s == "roofceiling"
+          unless surface.outsideBoundaryCondition.downcase.to_s == "outdoors"
+            return false
+          end
+        end
+        return true
+      elsif space_or_zone.respond_to?("to_ThermalZone")
+        space_or_zone.spaces.each do |space|
+          space.surfaces.each do |surface|
+            next unless surface.surfaceType.downcase.to_s == "roofceiling"
+            unless surface.outsideBoundaryCondition.downcase.to_s == "outdoors"
+              return false
+            end
+          end
+        end
+        return true
+      end    
     end
     
     def self.get_crawl_spaces(spaces)

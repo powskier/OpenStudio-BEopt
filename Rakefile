@@ -410,7 +410,7 @@ def generate_example_osw_of_all_measures_in_order()
             if arg.hasDefaultValue
                 step.setArgument(arg.name, arg.defaultValueAsString)
             elsif arg.required
-                puts "Error: No default value provied for #{measure} argument '#{arg.name}'."
+                puts "Error: No default value provided for #{measure} argument '#{arg.name}'."
                 exit
             end
         end
