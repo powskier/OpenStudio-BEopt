@@ -1,26 +1,21 @@
 Residential OpenStudio Measures
 ===============
 
-**Unit Test Status:** [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt.svg?style=svg)](https://circleci.com/gh/NREL/OpenStudio-BEopt)
-
-**Code Coverage:** [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
-
 This project includes [OpenStudio measures](http://nrel.github.io/OpenStudio-user-documentation/getting_started/about_measures/) used to model residential buildings via the [EnergyPlus simulation engine](http://energyplus.net/).
 
-This project is a <b>work-in-progress</b>. The models are not fully completed nor tested. These measures will eventually be posted on the [Building Component Library](https://bcl.nrel.gov/).
+The latest official measures are available on the [Building Component Library](https://bcl.nrel.gov/search/site?f[0]=sm_og_group_ref%3Anode%3A83284).
 
-Progress is tracked in this [spreadsheet](https://docs.google.com/spreadsheets/d/1vIwgJtkB-sCFCV2Tnp1OqnjXgA9vTaxtWXw0gpq_Lc4).
+Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt.svg?style=svg)](https://circleci.com/gh/NREL/OpenStudio-BEopt)
+
+Code Coverage: [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
+
 
 ## Table of Contents
 
-* [Development](#development)
 * [Running the Measures](#running-the-measures)
 * [Workflows](#workflows)
-* [Outputs](#outputs)
-
-## Development
-
-See the [wiki page](https://github.com/NREL/OpenStudio-BEopt/wiki/Development) for getting setup as a developer. Also reference the [OpenStudio Measure Writer's Guide](http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/) for in-depth resources on authoring and testing measures.
+* [Development](#development)
+<!--* [Outputs](#outputs)-->
 
 ## Running the Measures
 
@@ -71,7 +66,7 @@ Status: **Not Yet Available**
 
 ![Create Model From Geometry](https://cloud.githubusercontent.com/assets/5861765/25557648/f77be4e2-2cd2-11e7-9837-33840cadd369.png)
 
-Description pending.
+In the future, we plan to support workflows where the geometry is defined not through our geometry measures, but through the OpenStudio Geometry Editor or SketchUp. There is currently no timeline for when this workflow will become available.
 
 ### Measure Order
 
@@ -143,6 +138,7 @@ The order in which these measures are called is important. For example, the Wind
 |10. Sizing|1. HVAC Sizing|(lots of measures...)|
 <!--- MEASURE_WORKFLOW_END -->
 
+<!---
 ## Outputs
 
 These measures allow multiple outputs to be calculated:
@@ -169,3 +165,8 @@ Status: **Under Development**
 Calculations are under development for ANSI/RESNET 301-2014 "Standard for the Calculation and Labeling of the Energy Performance of Low-Rise Residential Buildings using the HERS Index". This metric is also a performance compliance path in the 2015 IECC. 
 
 Note that because the calculation involves performing multiple simulations (e.g., the Reference Home and Rated Home), a custom workflow will be developed to support this.
+-->
+
+## Development
+
+See the [wiki page](https://github.com/NREL/OpenStudio-BEopt/wiki/Development) for getting setup as a developer. Also reference the [OpenStudio Measure Writer's Guide](http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/) for in-depth resources on authoring and testing measures.

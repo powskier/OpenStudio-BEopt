@@ -4,7 +4,7 @@ gem 'rake', '~> 11.2.2'
 gem 'nokogiri', '~> 1.6', '<= 1.6.8.1'
 
 # uncomment if you need to update the bcl measures
-gem "bcl", "~> 0.5.7"
+gem "bcl", "0.5.6"
 # gem 'bcl', git: 'https://github.com/NREL/bcl-gem', branch: 'develop'
 
 # Specify the JSON dependency so that rubocop and other gem do not try to install it
