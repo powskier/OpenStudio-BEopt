@@ -28,7 +28,6 @@ namespace :measures do
   desc 'Generate measures to prepare for upload to BCL '
   task :generate do
     require 'bcl'
-    name_hash = replace_name_in_measure_xmls()
     # verify staged directory exists
     FileUtils.mkdir_p('./staged')
     dirs = Dir.glob('./measures/*')
@@ -55,7 +54,6 @@ namespace :measures do
       BCL.tarball(destination, paths)
       Dir.chdir(current_d)
     end
-    revert_name_in_measure_xmls(name_hash)
   end
 
   desc 'Push generated measures to the BCL group defined in .bcl/config.yml'
@@ -95,37 +93,6 @@ namespace :measures do
     bcl.login
   end
 
-  desc 'create JSON metadata files'
-  task :create_measure_jsons do
-    require 'bcl'
-    bcl = BCL::ComponentMethods.new
-
-    Dir['./**/measure.rb'].each do |m|
-      puts "Parsing #{m}"
-      j = bcl.parse_measure_file(nil, m)
-      m_j = "#{File.join(File.dirname(m), File.basename(m, '.*'))}.json"
-      puts "Writing #{m_j}"
-      File.open(m_j, 'w') { |f| f << JSON.pretty_generate(j) }
-    end
-  end
-
-  desc 'make csv file of measures'
-  task create_measure_csv: [:create_measure_jsons] do
-    require 'CSV'
-    require 'bcl'
-
-    b = BCL::ComponentMethods.new
-    new_csv_file = './measures_spreadsheet.csv'
-    FileUtils.rm_f(new_csv_file) if File.exist?(new_csv_file)
-    csv = CSV.open(new_csv_file, 'w')
-    Dir.glob('./**/measure.json').each do |file|
-      puts "Parsing Measure JSON for CSV #{file}"
-      json = JSON.parse(File.read(file), symbolize_names: true)
-      b.translate_measure_hash_to_csv(json).each { |r| csv << r }
-    end
-
-    csv.close
-  end
 end # end the :measures namespace
 
 namespace :test do
@@ -133,7 +100,7 @@ namespace :test do
   desc 'Run unit tests for all measures'
   Rake::TestTask.new('all') do |t|
     t.libs << 'test'
-    t.test_files = Dir['measures/*/tests/*.rb']
+    t.test_files = Dir['measures/*/tests/*.rb'] + Dir['workflows/energy_rating_index/tests/*.rb']
     t.warning = false
     t.verbose = true
   end
@@ -342,7 +309,7 @@ task :update_measures do
   
   # Generate example OSW
   generate_example_osw_of_all_measures_in_order
-
+  
 end
 
 desc 'Copy resources from OpenStudio-BuildStock repo'
@@ -425,7 +392,7 @@ def generate_example_osw_of_all_measures_in_order()
   
   # Update README.md as well
   update_readme(data_hash)
-  
+
 end
 
 # This method updates the "Measure Order" table in the README.md
@@ -548,46 +515,4 @@ def get_osms_listed_in_test(testrb)
     str = File.readlines(testrb).join("\n")
     osms = str.scan(/\w+\.osm/)
     return osms.uniq
-end
-
-def replace_name_in_measure_xmls()
-    # This method replaces the <name> element in measure.xml
-    # with the <display_name> value and returns the original
-    # <name> values in a hash.
-    # This is temporary code since the BCL currently looks
-    # at the <name> element, rather than the <display_name>
-    # element, in the measure.xml file. The BCL will be fixed
-    # at some future point.
-    name_hash = {}
-    require 'rexml/document'
-    require 'rexml/xpath'
-    Dir.glob('./measures/*').each do |dir|
-      next if dir.include?('Rakefile')
-      measure_xml = File.absolute_path(File.join(dir, "measure.xml"))
-      xmldoc = REXML::Document.new(File.read(measure_xml))
-      orig_name = REXML::XPath.first(xmldoc, "//measure/name").text
-      display_name = REXML::XPath.first(xmldoc, "//measure/display_name").text
-      REXML::XPath.each(xmldoc, "//measure/name") do |node|
-        node.text = display_name
-      end
-      xmldoc.write(File.open(measure_xml, "w"))
-      name_hash[measure_xml] = orig_name
-    end
-    return name_hash
-end
-
-def revert_name_in_measure_xmls(name_hash)
-    # This method reverts the <name> element in measure.xml
-    # to its original value.
-    require 'rexml/document'
-    require 'rexml/xpath'
-    Dir.glob('./measures/*').each do |dir|
-      next if dir.include?('Rakefile')
-      measure_xml = File.absolute_path(File.join(dir, "measure.xml"))
-      xmldoc = REXML::Document.new(File.read(measure_xml))
-      REXML::XPath.each(xmldoc, "//measure/name") do |node|
-        node.text = name_hash[measure_xml]
-      end
-      xmldoc.write(File.open(measure_xml, "w"))
-    end
 end

@@ -17,7 +17,7 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure removes any existing HVAC cooling components from the building and adds a two-speed central air conditioner along with an on/off supply fan to a unitary air loop. For multifamily buildings, the two-speed central air conditioner can be set for all units of the building."
+    return "This measure removes any existing HVAC cooling components from the building and adds a two-speed central air conditioner along with an on/off supply fan to a unitary air loop. For multifamily buildings, the two-speed central air conditioner can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description
@@ -180,7 +180,7 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
     if not runner.validateUserArguments(arguments(model), user_arguments)
       return false
     end
-	  
+  
     acCoolingInstalledSEER = runner.getDoubleArgumentValue("seer",user_arguments)
     acCoolingEER = [runner.getDoubleArgumentValue("eer",user_arguments), runner.getDoubleArgumentValue("eer2",user_arguments)]
     acSHRRated = [runner.getDoubleArgumentValue("shr",user_arguments), runner.getDoubleArgumentValue("shr2",user_arguments)]
@@ -375,7 +375,7 @@ class ProcessTwoSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeasure
       unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cFM_TON_Rated.join(","))
       
     end # unit
-	
+
     return true
  
   end #end the run method
