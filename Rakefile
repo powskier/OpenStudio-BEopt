@@ -133,7 +133,7 @@ namespace :test do
   desc 'Run unit tests for all measures'
   Rake::TestTask.new('all') do |t|
     t.libs << 'test'
-    t.test_files = Dir['measures/*/tests/*.rb']
+    t.test_files = Dir['measures/*/tests/*.rb'] + Dir['workflows/energy_rating_index/tests/*.rb']
     t.warning = false
     t.verbose = true
   end
@@ -343,6 +343,32 @@ task :update_measures do
   # Generate example OSW
   generate_example_osw_of_all_measures_in_order
 
+  # Copy measure-info.json into certain [measures]/resources
+  measures = ['301EnergyRatingIndexRuleset']
+  measures.each do |measure|
+      json_path = "workflows/measure-info.json"
+      dest_resource = File.expand_path("measures/#{measure}/resources/#{File.basename(json_path)}")
+      measure_resource_dir = File.dirname(dest_resource)  
+      if not File.file?(dest_resource)
+        FileUtils.cp(json_path, measure_resource_dir)
+        puts "Added #{File.basename(json_path)} to #{measure}/resources."
+      elsif not FileUtils.compare_file(json_path, dest_resource)
+        FileUtils.cp(json_path, measure_resource_dir)
+        puts "Updated #{File.basename(json_path)} in #{measure}/resources."
+      end
+  end
+  
+  # Copy HPXML files from measures\301EnergyRatingIndexRuleset\tests to workflows\energy_rating_index\sample_files
+  Dir.foreach(File.expand_path("../measures/301EnergyRatingIndexRuleset/tests", __FILE__)) do |item|
+    next if not (item.start_with?("valid") and item.end_with?(".xml"))
+    src_item = File.expand_path("../measures/301EnergyRatingIndexRuleset/tests/#{item}", __FILE__)
+    dest_item = File.expand_path("../workflows/energy_rating_index/sample_files/#{item}", __FILE__)
+    if not File.exists?(dest_item) or not FileUtils.compare_file(src_item, dest_item)
+      FileUtils.cp(src_item, dest_item)
+      puts "Updated #{File.basename(dest_item)} in workflows/energy_rating_index/sample_files/."
+    end
+  end
+  
 end
 
 desc 'Copy resources from OpenStudio-BuildStock repo'
@@ -426,6 +452,13 @@ def generate_example_osw_of_all_measures_in_order()
   # Update README.md as well
   update_readme(data_hash)
   
+  # Copy create-model-example.osw to OSWtoHPXMLExport measure
+  dest = "measures/OSWtoHPXMLExport/tests"
+  if not FileUtils.compare_file(osw_path, File.join(dest, File.basename(osw_path)))
+    FileUtils.cp(osw_path, dest)
+    puts "Copied example OSW to #{dest}."
+  end
+
 end
 
 # This method updates the "Measure Order" table in the README.md

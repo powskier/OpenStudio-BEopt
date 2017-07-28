@@ -530,7 +530,7 @@ class ProcessTwoSpeedAirSourceHeatPump < OpenStudio::Measure::ModelMeasure
       unit.setFeature(Constants.SizingInfoHVACRatedCFMperTonCooling, cFM_TON_Rated.join(","))
       
     end # unit
-	
+
     return true
  
   end #end the run method

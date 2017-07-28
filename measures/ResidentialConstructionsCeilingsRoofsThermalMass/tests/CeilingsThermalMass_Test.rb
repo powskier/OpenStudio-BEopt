@@ -23,7 +23,7 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     args_hash["specheat1"] = 0.2
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0}
+    expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -39,7 +39,7 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     args_hash["specheat2"] = 0.2
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>2, "Construction"=>2}
-    expected_values = {"LayerThickness"=>0.015875*2, "LayerConductivity"=>0.16029*2, "LayerDensity"=>801*2, "LayerSpecificHeat"=>837.4*2, "LayerIndex"=>0+1+1+0}
+    expected_values = {"LayerThickness"=>0.015875*2, "LayerConductivity"=>0.16029*2, "LayerDensity"=>801*2, "LayerSpecificHeat"=>837.4*2, "LayerIndex"=>0+1+1+0, "SurfacesWithConstructions"=>4}
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -56,7 +56,7 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     expected_num_del_objects = {"Construction"=>4}
     expected_num_new_objects = {"Material"=>2, "Construction"=>4}
     # FIXME: Why is CeilingMass1 not next to CeilingMass2 in one of the constructions?
-    expected_values = {"LayerThickness"=>0.0127*2, "LayerConductivity"=>0.16029*2, "LayerDensity"=>801*2, "LayerSpecificHeat"=>837.4*2, "LayerIndex"=>14}
+    expected_values = {"LayerThickness"=>0.0127*2, "LayerConductivity"=>0.16029*2, "LayerDensity"=>801*2, "LayerSpecificHeat"=>837.4*2, "LayerIndex"=>14, "SurfacesWithConstructions"=>4}
     model = _test_measure(osm_geo_layers, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["thick_in1"] = 0.625
@@ -65,7 +65,7 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     args_hash["specheat1"] = 0.2
     expected_num_del_objects = {"Material"=>2, "Construction"=>4}
     expected_num_new_objects = {"Material"=>1, "Construction"=>4}
-    expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0+2+0+3}
+    expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0+2+0+3, "SurfacesWithConstructions"=>4}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -181,6 +181,15 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     _test_na(nil, args_hash)
   end
 
+  def test_apply_to_specific_surface
+    args_hash = {}
+    args_hash["surface"] = "Surface 12"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_values = {"LayerThickness"=>0.0127, "LayerConductivity"=>0.16029, "LayerDensity"=>801, "LayerSpecificHeat"=>837.4, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
+    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+  end
+  
   private
   
   def _test_error(osm_file, args_hash)
@@ -307,7 +316,7 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"LayerThickness"=>0, "LayerConductivity"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0, "LayerIndex"=>0}
+    actual_values = {"LayerThickness"=>0, "LayerConductivity"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0, "LayerIndex"=>0, "SurfacesWithConstructions"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -324,6 +333,12 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
                     new_material = new_material.to_StandardOpaqueMaterial.get
                     actual_values["LayerIndex"] += new_object.getLayerIndices(new_material)[0]
                 end
+                model.getSurfaces.each do |surface|
+                  if surface.construction.is_initialized
+                    next unless surface.construction.get == new_object
+                    actual_values["SurfacesWithConstructions"] += 1
+                  end
+                end
             end
         end
     end
@@ -332,6 +347,7 @@ class ProcessConstructionsCeilingsRoofsThermalMassTest < MiniTest::Test
     assert_in_epsilon(expected_values["LayerDensity"], actual_values["LayerDensity"], 0.01)
     assert_in_epsilon(expected_values["LayerSpecificHeat"], actual_values["LayerSpecificHeat"], 0.01)
     assert_in_epsilon(expected_values["LayerIndex"], actual_values["LayerIndex"], 0.01)
+    assert_in_epsilon(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"], 0.01)
     
     return model
   end
