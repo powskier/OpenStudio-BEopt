@@ -17,7 +17,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
     end
   
     def description
-        return "This measure adds a new residential heat pump water heater to the model based on user inputs. If there is already an existing residential water heater in the model, it is replaced. For multifamily buildings, the water heater can be set for all units of the building."
+        return "This measure adds a new residential heat pump water heater to the model based on user inputs. If there is already an existing residential water heater in the model, it is replaced. For multifamily buildings, the water heater can be set for all units of the building.#{Constants.WorkflowDescription}"
     end
   
     def modeler_description

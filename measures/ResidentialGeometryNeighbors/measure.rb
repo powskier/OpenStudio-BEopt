@@ -13,7 +13,7 @@ class CreateResidentialNeighbors < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the neighbors (front, back, left, and/or right) of the building for shading purposes. Neighboring buildings will have the same geometry as the model building."
+    return "Sets the neighbors (front, back, left, and/or right) of the building for shading purposes. Neighboring buildings will have the same geometry as the model building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

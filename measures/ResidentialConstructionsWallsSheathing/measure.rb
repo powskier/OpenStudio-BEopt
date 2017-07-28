@@ -15,7 +15,7 @@ class ProcessConstructionsWallsSheathing < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "This measure assigns wall sheathing to all above-grade walls adjacent to finished space."
+    return "This measure assigns wall sheathing to all above-grade walls adjacent to finished space.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

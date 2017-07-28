@@ -23,7 +23,7 @@ class ProcessFurnaceFuel < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure removes any existing HVAC heating components from the building and adds a furnace along with an on/off supply fan to a unitary air loop. For multifamily buildings, the furnace can be set for all units of the building."
+    return "This measure removes any existing HVAC heating components from the building and adds a furnace along with an on/off supply fan to a unitary air loop. For multifamily buildings, the furnace can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

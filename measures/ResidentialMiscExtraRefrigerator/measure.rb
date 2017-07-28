@@ -10,7 +10,7 @@ class ResidentialExtraRefrigerator < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) a residential extra refrigerator with the specified efficiency, operation, and schedule. For multifamily buildings, the extra refrigerator can be set for all units of the building."
+    return "Adds (or replaces) a residential extra refrigerator with the specified efficiency, operation, and schedule. For multifamily buildings, the extra refrigerator can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

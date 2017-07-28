@@ -110,6 +110,14 @@ class CreateResidentialEavesTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_GRG_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 10)
   end
   
+  def test_gable_roof_tucked_garage_aspect_ratio_two
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ShadingSurface"=>6, "ShadingSurfaceGroup"=>1}
+    expected_values = {"eaves_depth"=>2}
+    _test_measure("SFD_2000sqft_2story_SL_GRGTucked_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
+  end  
+  
   def test_flat_roof_garage_left_aspect_ratio_two
     args_hash = {}
     expected_num_del_objects = {}

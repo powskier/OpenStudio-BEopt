@@ -2,29 +2,14 @@
   <schema_version>3.0</schema_version>
   <name>process_constructions_walls_exterior_wood_stud</name>
   <uid>76193c5c-d1a6-4a57-864a-c8a32e67adcb</uid>
-  <version_id>256e367c-c4f8-4667-9d82-b78c63a7698f</version_id>
-  <version_modified>20170710T193011Z</version_modified>
+  <version_id>6d2594d0-d706-4092-83e6-2e8475d3510b</version_id>
+  <version_modified>20170726T225435Z</version_modified>
   <xml_checksum>1E963D9C</xml_checksum>
   <class_name>ProcessConstructionsWallsExteriorWoodStud</class_name>
   <display_name>Set Residential Walls - Wood Stud Construction</display_name>
-  <description>This measure assigns a wood stud construction to above-grade exterior walls adjacent to finished space or attic walls under insulated roofs.</description>
+  <description>This measure assigns a wood stud construction to above-grade exterior walls adjacent to finished space or attic walls under insulated roofs. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Calculates and assigns material layer properties of wood stud constructions for 1) above-grade walls between finished space and outside, and 2) above-grade walls between attics under insulated roofs and outside. If the walls have an existing construction, the layers (other than exterior finish, wall sheathing, and wall mass) are replaced. This measure is intended to be used in conjunction with Exterior Finish, Wall Sheathing, and Exterior Wall Mass measures.</modeler_description>
   <arguments>
-    <argument>
-      <name>surface</name>
-      <display_name>Surface(s)</display_name>
-      <description>Select the surface(s) to assign constructions.</description>
-      <type>Choice</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-      <default_value>auto</default_value>
-      <choices>
-        <choice>
-          <value>auto</value>
-          <display_name>auto</display_name>
-        </choice>
-      </choices>
-    </argument>
     <argument>
       <name>cavity_r</name>
       <display_name>Cavity Insulation Installed R-value</display_name>
@@ -117,6 +102,18 @@
   </attributes>
   <files>
     <file>
+      <filename>WoodStud_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>3FAFFCF3</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_SL_UA_AllLayersButWallInsulation_CeilingIns.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -129,10 +126,10 @@
       <checksum>3C06B792</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
+      <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
+      <checksum>87C9A783</checksum>
     </file>
     <file>
       <version>
@@ -143,25 +140,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>0C1B37FE</checksum>
+      <checksum>9BBFF47D</checksum>
     </file>
     <file>
-      <filename>WoodStud_Test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>328B516C</checksum>
-    </file>
-    <file>
-      <filename>util.rb</filename>
+      <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

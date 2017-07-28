@@ -3739,7 +3739,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             os_val = model.getAirLoopHVACUnitarySystems[0].supplyAirFlowRateDuringCoolingOperation.get
             
         elsif beopt_key.start_with?('AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed_Speed') and beopt_key.end_with?('Supply Air Flow Rate During Cooling Operation {m3/s}')
-            os_val = 0 # FIXME: Available object not wrapped
             next
             
         elsif (beopt_key == 'AirLoopHVAC:UnitaryHeatCool_Supply Air Flow Rate During Heating Operation {m3/s}' or 
@@ -3749,7 +3748,6 @@ class ProcessHVACSizingTest < MiniTest::Test
             os_val = model.getAirLoopHVACUnitarySystems[0].supplyAirFlowRateDuringHeatingOperation.get
             
         elsif beopt_key.start_with?('AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed_Speed') and beopt_key.end_with?('Supply Air Flow Rate During Heating Operation {m3/s}')
-            os_val = 0 # FIXME: Available object not wrapped
             next
             
         elsif beopt_key == 'GroundHeatExchanger:Vertical_Design Flow Rate {m3/s}'

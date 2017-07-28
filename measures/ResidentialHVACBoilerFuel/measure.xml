@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>process_boiler_fuel</name>
   <uid>42909b35-edc9-41b3-ba59-de138eac3c85</uid>
-  <version_id>9d569ad1-9cb6-4c2d-a74b-cf6c7f31d1b2</version_id>
-  <version_modified>20170710T193016Z</version_modified>
+  <version_id>64e774ab-8f93-41c8-b4cd-987cbf773684</version_id>
+  <version_modified>20170726T225441Z</version_modified>
   <xml_checksum>470FC630</xml_checksum>
   <class_name>ProcessBoilerFuel</class_name>
   <display_name>Set Residential Boiler Fuel</display_name>
-  <description>This measure removes any existing HVAC heating components from the building and adds a boiler along with constant speed pump and water baseboard coils to a hot water plant loop. For multifamily buildings, the supply components on the plant loop can be set for all units of the building.</description>
+  <description>This measure removes any existing HVAC heating components from the building and adds a boiler along with constant speed pump and water baseboard coils to a hot water plant loop. For multifamily buildings, the supply components on the plant loop can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Any heating components or baseboard convective electrics/waters are removed from any existing air/plant loops or zones. A boiler along with constant speed pump and water baseboard coils are added to a hot water plant loop.</modeler_description>
   <arguments>
     <argument>
@@ -127,7 +127,7 @@
       <description>Temperature of the outlet water.</description>
       <type>Double</type>
       <units>degrees F</units>
-      <required>true</required>
+      <required>false</required>
       <model_dependent>false</model_dependent>
       <default_value>180</default_value>
     </argument>
@@ -206,6 +206,18 @@
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
       <checksum>9974B671</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>0160C2D1</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ASHP.osm</filename>
@@ -304,6 +316,18 @@
       <checksum>39CBC752</checksum>
     </file>
     <file>
+      <filename>hvac.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>BB1957EF</checksum>
+    </file>
+    <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>87C9A783</checksum>
+    </file>
+    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>1.13.2</identifier>
@@ -312,37 +336,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>613BC41C</checksum>
-    </file>
-    <file>
-      <filename>hvac.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C27A8C79</checksum>
+      <checksum>AA8B0D08</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
-    </file>
-    <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4EA8F63E</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

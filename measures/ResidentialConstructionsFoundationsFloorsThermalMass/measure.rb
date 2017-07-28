@@ -15,7 +15,7 @@ class ProcessConstructionsFoundationsFloorsThermalMass < OpenStudio::Measure::Mo
   end
   
   def description
-    return "This measure assigns floor mass to floors of finished spaces, with the exception of foundation slabs."
+    return "This measure assigns floor mass to floors of finished spaces, with the exception of foundation slabs.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

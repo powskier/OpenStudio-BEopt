@@ -23,7 +23,7 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure assigns a construction to windows. This measure also creates the interior shading schedule, which is based on shade multipliers and the heating and cooling season logic defined in the Building America House Simulation Protocols."
+    return "This measure assigns a construction to windows. This measure also creates the interior shading schedule, which is based on shade multipliers and the heating and cooling season logic defined in the Building America House Simulation Protocols.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

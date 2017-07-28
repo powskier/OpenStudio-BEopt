@@ -15,7 +15,7 @@ class ProcessConstructionsFoundationsFloorsBasementUnfinished < OpenStudio::Meas
   end
   
   def description
-    return "This measure assigns constructions to the unfinished basement ceilings, walls, and floors."
+    return "This measure assigns constructions to the unfinished basement ceilings, walls, and floors.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

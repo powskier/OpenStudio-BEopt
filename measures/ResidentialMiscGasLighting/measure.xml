@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_gas_lighting</name>
   <uid>6b9211da-6274-4b09-8c76-9edbc85886c0</uid>
-  <version_id>eab7d543-25e4-4300-9991-967c88dc6b9c</version_id>
-  <version_modified>20170710T193023Z</version_modified>
+  <version_id>535c7162-7941-4b39-90ef-b16ad83ccf5f</version_id>
+  <version_modified>20170726T225450Z</version_modified>
   <xml_checksum>25A40D75</xml_checksum>
   <class_name>ResidentialGasLighting</class_name>
   <display_name>Set Residential Gas Lighting</display_name>
-  <description>Adds (or replaces) residential gas lighting with the specified efficiency and schedule. The lighting is assumed to be outdoors. For multifamily buildings, the lighting is set for all units of the building.</description>
+  <description>Adds (or replaces) residential gas lighting with the specified efficiency and schedule. The lighting is assumed to be outdoors. For multifamily buildings, the lighting is set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Since there is no Gas Lighting object in OpenStudio/EnergyPlus, we look for a GasEquipment object with the name that denotes it is residential gas lighting. If one is found, it is replaced with the specified properties. Otherwise, a new such object is added to the model. Note: This measure requires the number of bedrooms/bathrooms to have already been assigned.</modeler_description>
   <arguments>
     <argument>
@@ -101,6 +101,12 @@
       <checksum>1872D346</checksum>
     </file>
     <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -139,19 +145,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>2870CB90</checksum>
+      <checksum>1ECBA3E6</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

@@ -15,7 +15,7 @@ class ProcessConstructionsCeilingsRoofsSheathing < OpenStudio::Measure::ModelMea
 
   # human readable description
   def description
-    return "This measure assigns roof sheathing to all attic roofs."
+    return "This measure assigns roof sheathing to all attic roofs.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

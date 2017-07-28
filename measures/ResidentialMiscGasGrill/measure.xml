@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_gas_grill</name>
   <uid>5b539cd4-fef6-4600-9254-166877fabddd</uid>
-  <version_id>16a4458e-1a73-4c11-80b1-82176c48fab3</version_id>
-  <version_modified>20170710T193023Z</version_modified>
+  <version_id>41d6f465-ef68-4456-ab63-f81a2a2d0add</version_id>
+  <version_modified>20170726T225449Z</version_modified>
   <xml_checksum>25A40D75</xml_checksum>
   <class_name>ResidentialGasGrill</class_name>
   <display_name>Set Residential Gas Grill</display_name>
-  <description>Adds (or replaces) a residential gas grill with the specified efficiency and schedule. The grill is assumed to be outdoors. For multifamily buildings, the grill is set for all units of the building.</description>
+  <description>Adds (or replaces) a residential gas grill with the specified efficiency and schedule. The grill is assumed to be outdoors. For multifamily buildings, the grill is set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Since there is no Gas Grill object in OpenStudio/EnergyPlus, we look for a GasEquipment object with the name that denotes it is a residential gas grill. If one is found, it is replaced with the specified properties. Otherwise, a new such object is added to the model. Note: This measure requires the number of bedrooms/bathrooms to have already been assigned.</modeler_description>
   <arguments>
     <argument>
@@ -101,6 +101,12 @@
       <checksum>191DF71C</checksum>
     </file>
     <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -139,19 +145,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>0DE7DDD5</checksum>
+      <checksum>C2CCD8D9</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

@@ -21,7 +21,7 @@ class ResidentialMiscellaneousElectricLoads < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) residential plug loads with the specified efficiency and schedule in all finished spaces. For multifamily buildings, the plug loads can be set for all units of the building."
+    return "Adds (or replaces) residential plug loads with the specified efficiency and schedule in all finished spaces. For multifamily buildings, the plug loads can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

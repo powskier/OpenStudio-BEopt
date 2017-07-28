@@ -14,7 +14,7 @@ class ProcessConstructionsCeilingsRoofsRoofingMaterial < OpenStudio::Measure::Mo
 
   # human readable description
   def description
-    return "This measure assigns the roofing material to all roof surfaces."
+    return "This measure assigns the roofing material to all roof surfaces.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

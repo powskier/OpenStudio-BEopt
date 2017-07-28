@@ -15,7 +15,7 @@ class ProcessConstructionsWallsExteriorFinish < OpenStudio::Measure::ModelMeasur
 
   # human readable description
   def description
-    return "This measure assigns the exterior finish to all above-grade exterior walls."
+    return "This measure assigns the exterior finish to all above-grade exterior walls.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

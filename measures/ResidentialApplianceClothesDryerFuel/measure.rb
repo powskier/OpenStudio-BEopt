@@ -12,7 +12,7 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
   end
 
   def description
-    return "Adds (or replaces) a residential clothes dryer with the specified efficiency, operation, and schedule. For multifamily buildings, the clothes dryer can be set for all units of the building."
+    return "Adds (or replaces) a residential clothes dryer with the specified efficiency, operation, and schedule. For multifamily buildings, the clothes dryer can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

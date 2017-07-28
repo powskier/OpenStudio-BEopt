@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_freezer</name>
   <uid>8cf2bd55-56a1-416f-b2a1-ff6a8f617e49</uid>
-  <version_id>fb33e3f0-01e7-485a-9564-16e680befad2</version_id>
-  <version_modified>20170710T193023Z</version_modified>
+  <version_id>8974bfbb-2103-462f-b8df-47788daa10ba</version_id>
+  <version_modified>20170726T225449Z</version_modified>
   <xml_checksum>126F1C43</xml_checksum>
   <class_name>ResidentialFreezer</class_name>
   <display_name>Set Residential Freezer</display_name>
-  <description>Adds (or replaces) a residential freezer with the specified efficiency, operation, and schedule. For multifamily buildings, the freezer can be set for all units of the building.</description>
+  <description>Adds (or replaces) a residential freezer with the specified efficiency, operation, and schedule. For multifamily buildings, the freezer can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Since there is no Freezer object in OpenStudio/EnergyPlus, we look for an ElectricEquipment object with the name that denotes it is a residential freezer. If one is found, it is replaced with the specified properties. Otherwise, a new such object is added to the model.</modeler_description>
   <arguments>
     <argument>
@@ -97,6 +97,12 @@
       <checksum>BFDBB9EE</checksum>
     </file>
     <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -135,19 +141,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>EBE28429</checksum>
+      <checksum>D393894B</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

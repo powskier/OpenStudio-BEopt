@@ -15,7 +15,7 @@ class ProcessConstructionsWallsExteriorWoodStud < OpenStudio::Measure::ModelMeas
   end
   
   def description
-    return "This measure assigns a wood stud construction to above-grade exterior walls adjacent to finished space or attic walls under insulated roofs."
+    return "This measure assigns a wood stud construction to above-grade exterior walls adjacent to finished space or attic walls under insulated roofs.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

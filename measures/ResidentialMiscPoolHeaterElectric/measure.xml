@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_pool_heater_elec</name>
   <uid>29865d0a-e979-4f09-87b9-7fa7154b9833</uid>
-  <version_id>969d690d-05e2-4333-840e-6733b53de94c</version_id>
-  <version_modified>20170710T193024Z</version_modified>
+  <version_id>7127c9ce-ef20-42d8-a17e-7f6cf2c97648</version_id>
+  <version_modified>20170726T225450Z</version_modified>
   <xml_checksum>126F1C43</xml_checksum>
   <class_name>ResidentialPoolHeaterElec</class_name>
   <display_name>Set Residential Pool Electric Heater</display_name>
-  <description>Adds (or replaces) a residential pool heater with the specified efficiency and schedule. The pool is assumed to be outdoors. For multifamily buildings, the pool heater is set for all units of the building.</description>
+  <description>Adds (or replaces) a residential pool heater with the specified efficiency and schedule. The pool is assumed to be outdoors. For multifamily buildings, the pool heater is set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Since there is no Pool Heater object in OpenStudio/EnergyPlus, we look for an ElectricEquipment or GasEquipment object with the name that denotes it is a residential pool heater. If one is found, it is replaced with the specified properties. Otherwise, a new such object is added to the model. Note: This measure requires the number of bedrooms/bathrooms to have already been assigned.</modeler_description>
   <arguments>
     <argument>
@@ -101,6 +101,12 @@
       <checksum>4C37E3CD</checksum>
     </file>
     <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -145,19 +151,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>D186960C</checksum>
+      <checksum>7F976D8D</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

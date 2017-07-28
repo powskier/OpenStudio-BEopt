@@ -14,7 +14,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
   end
   
   def description
-    return "This measure assigns a construction to slabs-on-grade."
+    return "This measure assigns a construction to slabs-on-grade.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

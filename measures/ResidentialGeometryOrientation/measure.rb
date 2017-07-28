@@ -11,7 +11,7 @@ class CreateResidentialOrientation < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the fixed orientation of the building."
+    return "Sets the fixed orientation of the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

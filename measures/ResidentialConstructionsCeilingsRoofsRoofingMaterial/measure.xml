@@ -2,29 +2,14 @@
   <schema_version>3.0</schema_version>
   <name>process_constructions_ceilings_roofs_roofing_material</name>
   <uid>3239e82d-5efc-4a17-9223-c7c1cd8c9cf7</uid>
-  <version_id>d6922a2d-108d-414f-8544-10d0913cec48</version_id>
-  <version_modified>20170713T181234Z</version_modified>
+  <version_id>120223ab-b8f4-4681-b477-016869564ff5</version_id>
+  <version_modified>20170726T225432Z</version_modified>
   <xml_checksum>A465C8A5</xml_checksum>
   <class_name>ProcessConstructionsCeilingsRoofsRoofingMaterial</class_name>
   <display_name>Set Residential Ceilings/Roofs - Roofing Material</display_name>
-  <description>This measure assigns the roofing material to all roof surfaces.</description>
+  <description>This measure assigns the roofing material to all roof surfaces. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Assigns material layer properties for all roofceiling surfaces adjacent to outside.</modeler_description>
   <arguments>
-    <argument>
-      <name>surface</name>
-      <display_name>Surface(s)</display_name>
-      <description>Select the surface(s) to assign constructions.</description>
-      <type>Choice</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-      <default_value>auto</default_value>
-      <choices>
-        <choice>
-          <value>auto</value>
-          <display_name>auto</display_name>
-        </choice>
-      </choices>
-    </argument>
     <argument>
       <name>solar_abs</name>
       <display_name>Solar Absorptivity</display_name>
@@ -150,22 +135,34 @@
   </attributes>
   <files>
     <file>
+      <filename>RoofingMaterial_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>F3B7096B</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_SL_FA_AllLayersButRoofingMaterial.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>024FF6EF</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
+      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>39FFFE07</checksum>
     </file>
     <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
+      <checksum>87C9A783</checksum>
     </file>
     <file>
       <version>
@@ -176,25 +173,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>E4D0C0AB</checksum>
+      <checksum>4A8D5264</checksum>
     </file>
     <file>
-      <filename>RoofingMaterial_Test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>0CFA54BA</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
+      <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1BA99481</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

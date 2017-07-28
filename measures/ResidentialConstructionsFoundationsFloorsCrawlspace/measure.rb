@@ -15,7 +15,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
   end
   
   def description
-    return "This measure assigns constructions to the crawlspace ceilings, walls, and floors."
+    return "This measure assigns constructions to the crawlspace ceilings, walls, and floors.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

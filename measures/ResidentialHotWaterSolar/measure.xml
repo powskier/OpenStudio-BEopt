@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>residential_hot_water_solar</name>
   <uid>b969f216-f3c0-4301-9b85-34ce2b45f551</uid>
-  <version_id>97f0766d-5735-4ff5-a019-374e0af30696</version_id>
-  <version_modified>20170710T193015Z</version_modified>
+  <version_id>e8d06e83-c292-462f-b635-a3a9739f2957</version_id>
+  <version_modified>20170726T225440Z</version_modified>
   <xml_checksum>F33F6E26</xml_checksum>
   <class_name>ResidentialHotWaterSolar</class_name>
   <display_name>Set Residential Solar Water Heating</display_name>
-  <description>Adds (or replaces) residential solar water heating to the model based on user inputs. For both single-family detached and multifamily buildings, the added storage tank and collector plate provide pre-heated water to the (existing) conventional water heater.</description>
+  <description>Adds (or replaces) residential solar water heating to the model based on user inputs. For both single-family detached and multifamily buildings, the added storage tank and collector plate provide pre-heated water to the (existing) conventional water heater. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Any supply or demand components, including collector plate surface, are removed along with corresponding plant loop. A stratified storage tank demand branch, flat plate collector supply branch, and constant speed pump are added to a new plant loop. The existing water heater is added to the outlet node of the storage tank. A differential thermostat, with collector plate outlet as the hot node and storage tank outlet as the cold node, represents the availability manager on the plant loop.</modeler_description>
   <arguments>
     <argument>
@@ -189,6 +189,12 @@
       <checksum>3C131B97</checksum>
     </file>
     <file>
+      <filename>unit_conversions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>DCB12FCF</checksum>
+    </file>
+    <file>
       <filename>USA_CO_Denver_Intl_AP_725650_TMY3.epw</filename>
       <filetype>epw</filetype>
       <usage_type>test</usage_type>
@@ -199,6 +205,12 @@
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>36B7CAC2</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
     </file>
     <file>
       <filename>MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
@@ -225,22 +237,10 @@
       <checksum>80CCF9CD</checksum>
     </file>
     <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1FE621AE</checksum>
-    </file>
-    <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_North_GasWHTank.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>BCB174BB</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_West_GasWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>A79CB016</checksum>
     </file>
     <file>
       <filename>schedules.rb</filename>
@@ -249,10 +249,10 @@
       <checksum>E4C6BC93</checksum>
     </file>
     <file>
-      <filename>residential_hot_water_solar_test.rb</filename>
+      <filename>hvac.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>542E84DB</checksum>
+      <usage_type>resource</usage_type>
+      <checksum>BB1957EF</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless.osm</filename>
@@ -267,28 +267,40 @@
       <checksum>DEC15BE0</checksum>
     </file>
     <file>
-      <filename>unit_conversions.rb</filename>
+      <filename>waterheater.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>6BA22437</checksum>
+      <checksum>B9EE062E</checksum>
     </file>
     <file>
-      <filename>hvac.rb</filename>
+      <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>C27A8C79</checksum>
+      <checksum>87C9A783</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>BE79CE58</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_West_GasWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>87902DE2</checksum>
+    </file>
+    <file>
+      <filename>residential_hot_water_solar_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>5E746D96</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
-    </file>
-    <file>
-      <filename>waterheater.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>93CC6A35</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
     <file>
       <version>
@@ -299,19 +311,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>DCD165E1</checksum>
+      <checksum>28E1AC15</checksum>
     </file>
     <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_South_GasWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>A64D25AD</checksum>
     </file>
   </files>
 </measure>

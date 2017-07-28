@@ -14,7 +14,7 @@ class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "Sets the window area for the building. Doors with glazing should be set as window area."
+    return "Sets the window area for the building. Doors with glazing should be set as window area.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

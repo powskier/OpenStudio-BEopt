@@ -16,7 +16,7 @@ class ProcessDehumidifier < OpenStudio::Measure::ModelMeasure
 
   # human readable description
   def description
-    return "This measure removes any existing dehumidifiers from the building and adds a dehumidifier. For multifamily buildings, the dehumidifier can be set for all units of the building."
+    return "This measure removes any existing dehumidifiers from the building and adds a dehumidifier. For multifamily buildings, the dehumidifier can be set for all units of the building.#{Constants.WorkflowDescription}"
   end
 
   # human readable description of modeling approach

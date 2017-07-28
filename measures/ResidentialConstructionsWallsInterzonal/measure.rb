@@ -15,7 +15,7 @@ class ProcessConstructionsWallsInterzonal < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure assigns a wood stud construction to walls between finished space and unfinished space."
+    return "This measure assigns a wood stud construction to walls between finished space and unfinished space.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

@@ -2,12 +2,12 @@
   <schema_version>3.0</schema_version>
   <name>process_two_speed_air_source_heat_pump</name>
   <uid>e1fa8fdd-4940-4364-b3ea-3bc6b93ca9c4</uid>
-  <version_id>b1961fd0-5e37-44d5-bde0-73a046f8282e</version_id>
-  <version_modified>20170710T193015Z</version_modified>
+  <version_id>a41aa687-6620-4b70-8e0f-2204f7188478</version_id>
+  <version_modified>20170726T225440Z</version_modified>
   <xml_checksum>470FC630</xml_checksum>
   <class_name>ProcessTwoSpeedAirSourceHeatPump</class_name>
   <display_name>Set Residential Two-Speed Air Source Heat Pump</display_name>
-  <description>This measure removes any existing HVAC components from the building and adds a two-speed air source heat pump along with an on/off supply fan to a unitary air loop. For multifamily buildings, the two-speed air source heat pump can be set for all units of the building.</description>
+  <description>This measure removes any existing HVAC components from the building and adds a two-speed air source heat pump along with an on/off supply fan to a unitary air loop. For multifamily buildings, the two-speed air source heat pump can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Any supply components or baseboard convective electrics/waters are removed from any existing air/plant loops or zones. Any existing air/plant loops are also removed. A heating DX coil, cooling DX coil, electric supplemental heating coil, and an on/off supply fan are added to a unitary air loop. The unitary air loop is added to the supply inlet node of the air loop. This air loop is added to a branch for the living zone. A diffuser is added to the branch for the living zone as well as for the finished basement if it exists.</modeler_description>
   <arguments>
     <argument>
@@ -293,6 +293,16 @@
       <default_value>autosize</default_value>
     </argument>
     <argument>
+      <name>supplemental_efficiency</name>
+      <display_name>Supplemental Efficiency</display_name>
+      <description>The efficiency of the supplemental electric coil.</description>
+      <type>Double</type>
+      <units>Btu/Btu</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
       <name>supplemental_capacity</name>
       <display_name>Supplemental Heating Capacity</display_name>
       <description>The output heating capacity of the supplemental heater. If using 'autosize', the autosizing algorithm will use ACCA Manual S to set the heat pump supplemental heating capacity.</description>
@@ -344,10 +354,22 @@
       <checksum>E23378AA</checksum>
     </file>
     <file>
-      <filename>process_two_speed_air_source_heat_pump_test.rb</filename>
+      <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>DCB12FCF</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
+      <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>D030EEF7</checksum>
+      <checksum>0160C2D1</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ASHP.osm</filename>
@@ -452,51 +474,39 @@
       <checksum>39CBC752</checksum>
     </file>
     <file>
-      <filename>unit_conversions.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>6BA22437</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.13.2</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>F51996A8</checksum>
-    </file>
-    <file>
       <filename>hvac.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>C27A8C79</checksum>
+      <checksum>BB1957EF</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
+      <filename>process_two_speed_air_source_heat_pump_test.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
+      <usage_type>test</usage_type>
+      <checksum>3BCB288C</checksum>
     </file>
     <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
+      <checksum>87C9A783</checksum>
     </file>
     <file>
-      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4EA8F63E</checksum>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.13.2</identifier>
+        <min_compatible>2.1.2</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>58F277AA</checksum>
     </file>
     <file>
-      <filename>geometry.rb</filename>
+      <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>

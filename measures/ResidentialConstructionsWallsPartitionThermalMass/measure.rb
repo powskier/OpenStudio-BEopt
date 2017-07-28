@@ -21,7 +21,7 @@ class ProcessConstructionsWallsPartitionThermalMass < OpenStudio::Measure::Model
   end
   
   def description
-    return "This measure assigns partition wall mass to finished spaces."
+    return "This measure assigns partition wall mass to finished spaces.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

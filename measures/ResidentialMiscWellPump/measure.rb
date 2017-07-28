@@ -10,7 +10,7 @@ class ResidentialWellPump < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "Adds (or replaces) a residential well pump with the specified efficiency and schedule. The well is assumed to be outdoors. For multifamily buildings, the well pump is set for all units of the building."
+    return "Adds (or replaces) a residential well pump with the specified efficiency and schedule. The well is assumed to be outdoors. For multifamily buildings, the well pump is set for all units of the building.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

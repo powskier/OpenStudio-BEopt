@@ -14,7 +14,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAttic < OpenStudio::Measure::Mo
   end
   
   def description
-    return "This measure assigns constructions to unfinished attic floors and ceilings."
+    return "This measure assigns constructions to unfinished attic floors and ceilings.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description

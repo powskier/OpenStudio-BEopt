@@ -2,29 +2,14 @@
   <schema_version>3.0</schema_version>
   <name>process_constructions_ceilings_roofs_unfinished_attic</name>
   <uid>235ba3ce-dd83-4287-aa0e-435dc1cbf1a7</uid>
-  <version_id>135ddd7c-159e-43e8-a260-6fec1fa78bf2</version_id>
-  <version_modified>20170710T193009Z</version_modified>
+  <version_id>f2853fdc-819b-4853-9833-fcf30a4b7bc2</version_id>
+  <version_modified>20170726T225432Z</version_modified>
   <xml_checksum>1E963D9C</xml_checksum>
   <class_name>ProcessConstructionsCeilingsRoofsUnfinishedAttic</class_name>
   <display_name>Set Residential Ceilings/Roofs - Unfinished Attic Constructions</display_name>
-  <description>This measure assigns constructions to unfinished attic floors and ceilings.</description>
+  <description>This measure assigns constructions to unfinished attic floors and ceilings. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
   <modeler_description>Calculates and assigns material layer properties of constructions for 1) floors between unfinished space under a roof and finished space and 2) roofs of unfinished space.</modeler_description>
   <arguments>
-    <argument>
-      <name>surface</name>
-      <display_name>Surface(s)</display_name>
-      <description>Select the surface(s) to assign constructions.</description>
-      <type>Choice</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-      <default_value>auto</default_value>
-      <choices>
-        <choice>
-          <value>auto</value>
-          <display_name>auto</display_name>
-        </choice>
-      </choices>
-    </argument>
     <argument>
       <name>ceil_r</name>
       <display_name>Ceiling Insulation Nominal R-value</display_name>
@@ -171,10 +156,16 @@
   </attributes>
   <files>
     <file>
-      <filename>constants.rb</filename>
+      <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>97687FFD</checksum>
+      <checksum>31FE0BE6</checksum>
+    </file>
+    <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>87C9A783</checksum>
     </file>
     <file>
       <version>
@@ -185,37 +176,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>5D9EBA70</checksum>
+      <checksum>2B460CE7</checksum>
     </file>
     <file>
-      <filename>util.rb</filename>
+      <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4EA8F63E</checksum>
-    </file>
-    <file>
-      <filename>UnfinishedAttic_Test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>D92619E6</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_FA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>31B8592A</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>20190C86</checksum>
+      <checksum>83B2AFF4</checksum>
     </file>
   </files>
 </measure>
