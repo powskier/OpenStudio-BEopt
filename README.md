@@ -110,7 +110,6 @@ The order in which these measures are called is important. For example, the Wind
 These measures can be used in different workflows:
 * [Create Model](#workflow-create-model) - Build up a model from scratch.
 * [Modify Model](#workflow-modify-model) - Apply a measure to an existing model.
-* [Translate Model From HPXML](#workflow-translate-model-from-hpxml) - Translate a model from a supplyied HPXML file.
 * [Create Model from Geometry](#workflow-create-model-from-geometry) - Build up a model on top of an existing geometry.
 
 ### Workflow: Create Model
@@ -134,18 +133,6 @@ Most of these measures were written to be reusable for existing building retrofi
 Note that some measures are dependent on others. For example, if the Clothes Washer measure were to be applied to the existing building model, such that the existing clothes washer is replaced, the Clothes Dryer measure would also need to be subsequently applied to the existing building model so that its energy use, as dependent on the clothes washer, is correct.
 
 While some of these measures may work on any user-created OpenStudio model, they have only been tested on, and are primarily intended to operate on, models created via one of the supported [Workflows](#workflows).
-
-### Workflow: Translate Model From HPXML
-
-Status: **Under Development**
-
-![Translate Model From HPXML Diagram](https://cloud.githubusercontent.com/assets/5861765/25557649/fb0fd910-2cd2-11e7-8e23-bd7815ffd982.png)
-
-[HPXML](http://www.hpxmlonline.com/) is an open data standard that supports the exchange of information and data for residential buildings. A number of software tools have capabilities for reading or writing these XML files.
-
-For software that can export a HPXML file, development is underway to easily translate this into an OpenStudio model. If you are a tool developer that is interested to export HPXML files, see the [HPXML Toolbox](https://hpxml.nrel.gov/) for additional resources.
-
-One of the primary reasons for supporting this workflow is to allow the calculation of an [Energy Rating Index](#output-energy-rating-index-eri) using EnergyPlus.
 
 ### Workflow: Create Model From Geometry
 
@@ -178,6 +165,6 @@ Description pending.
 
 Status: **Under Development**
 
-Calculations are under development for ANSI/RESNET 301-2014 "Standard for the Calculation and Labeling of the Energy Performance of Low-Rise Residential Buildings using the HERS Index". This metric is also a performance compliance path in the 2015 IECC. Any OpenStudio model created via one of the above [Workflows](#workflows) will be able to obtain an ERI.
+Calculations are under development for ANSI/RESNET 301-2014 "Standard for the Calculation and Labeling of the Energy Performance of Low-Rise Residential Buildings using the HERS Index". This metric is also a performance compliance path in the 2015 IECC. 
 
 Note that because the calculation involves performing multiple simulations (e.g., the Reference Home and Rated Home), a custom workflow will be developed to support this.

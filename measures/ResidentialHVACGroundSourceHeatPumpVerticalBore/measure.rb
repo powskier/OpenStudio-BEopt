@@ -204,6 +204,14 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     gshpOutputCapacity.setDefaultValue(Constants.SizingAuto)
     args << gshpOutputCapacity    
     
+    #make an argument for entering supplemental efficiency
+    supp_eff = OpenStudio::Measure::OSArgument::makeDoubleArgument("supplemental_efficiency",true)
+    supp_eff.setDisplayName("Supplemental Efficiency")
+    supp_eff.setUnits("Btu/Btu")
+    supp_eff.setDescription("The efficiency of the supplemental electric coil.")
+    supp_eff.setDefaultValue(1.0)
+    args << supp_eff
+    
     #make a string argument for supplemental heating output capacity
     supcap = OpenStudio::Measure::OSArgument::makeStringArgument("supplemental_capacity", true)
     supcap.setDisplayName("Supplemental Heating Capacity")
@@ -247,6 +255,7 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     unless gshp_capacity == Constants.SizingAuto
       gshp_capacity = OpenStudio::convert(gshp_capacity.to_f,"ton","Btu/h").get
     end
+    supp_eff = runner.getDoubleArgumentValue("supplemental_efficiency",user_arguments)
     supp_capacity = runner.getStringArgumentValue("supplemental_capacity",user_arguments)
     unless supp_capacity == Constants.SizingAuto
       supp_capacity = OpenStudio::convert(supp_capacity.to_f,"kBtu/h","Btu/h").get
@@ -254,7 +263,7 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     
     if frac_glycol == 0
       fluid_type = Constants.FluidWater
-      runner.registerWarning("Specified #{Constants.FluidPropyleneGlycol} fluid type and 0 fraction of glycol, so assuming #{Constants.FluidWater} fluid type.")
+      runner.registerWarning("Specified #{fluid_type} fluid type and 0 fraction of glycol, so assuming #{Constants.FluidWater} fluid type.")
     end
     
     # Ground Loop Heat Exchanger
@@ -316,8 +325,8 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     if fluid_type == Constants.FluidWater
       plant_loop.setFluidType('Water')
     else
-      runner.registerWarning("OpenStudio does not currently support glycol as a fluid type. Overriding to water.")
-      plant_loop.setFluidType('Glycol') # TODO: openstudio changes this to Water since it's not an available fluid type option
+      plant_loop.setFluidType({Constants.FluidPropyleneGlycol=>'PropyleneGlycol', Constants.FluidEthyleneGlycol=>'EthyleneGlycol'}[fluid_type])
+      plant_loop.setGlycolConcentration((frac_glycol * 100).to_i)
     end
     plant_loop.setMaximumLoopTemperature(48.88889)
     plant_loop.setMinimumLoopTemperature(OpenStudio::convert(hw_design,"F","C").get)
@@ -333,7 +342,8 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
     setpoint_mgr_follow_ground_temp.setName(Constants.ObjectNameGroundSourceHeatPumpVerticalBore + " condenser loop temp")
     setpoint_mgr_follow_ground_temp.setControlVariable('Temperature')
     setpoint_mgr_follow_ground_temp.setMaximumSetpointTemperature(48.88889)
-    setpoint_mgr_follow_ground_temp.setMinimumSetpointTemperature(OpenStudio::convert(hw_design,"F","C").get)    
+    setpoint_mgr_follow_ground_temp.setMinimumSetpointTemperature(OpenStudio::convert(hw_design,"F","C").get)
+    setpoint_mgr_follow_ground_temp.setReferenceGroundTemperatureObjectType('Site:GroundTemperature:Deep')
     setpoint_mgr_follow_ground_temp.addToNode(plant_loop.supplyOutletNode)
     
     pump = OpenStudio::Model::PumpVariableSpeed.new(model)
@@ -404,7 +414,7 @@ class ProcessGroundSourceHeatPumpVerticalBore < OpenStudio::Measure::ModelMeasur
         
         supp_htg_coil = OpenStudio::Model::CoilHeatingElectric.new(model, model.alwaysOnDiscreteSchedule)
         supp_htg_coil.setName(obj_name + " supp heater")
-        supp_htg_coil.setEfficiency(1)
+        supp_htg_coil.setEfficiency(supp_eff)
         if supp_capacity != Constants.SizingAuto
           supp_htg_coil.setNominalCapacity(OpenStudio::convert(supp_capacity,"Btu/h","W").get) # Used by HVACSizing measure
         end        
