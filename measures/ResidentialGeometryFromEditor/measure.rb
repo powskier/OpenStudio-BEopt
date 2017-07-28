@@ -7,7 +7,7 @@ require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 
 # start the measure
-class ResidentialGeometryFromEditor < OpenStudio::Ruleset::ModelUserScript
+class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
 
   # human readable name
   def name
@@ -26,7 +26,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Ruleset::ModelUserScript
 
   # define the arguments that the user will input
   def arguments(model)
-    args = OpenStudio::Ruleset::OSArgumentVector.new
+    args = OpenStudio::Measure::OSArgumentVector.new
 
     # path to the floorplan JSON file to load
     arg = OpenStudio::Ruleset::OSArgument.makeStringArgument("floorplan_path", true)
@@ -116,7 +116,8 @@ class ResidentialGeometryFromEditor < OpenStudio::Ruleset::ModelUserScript
     OpenStudio::Model.matchSurfaces(spaces)
     
     json = JSON.parse(json)
-    
+
+    # set the space type standards fields based on what user wrote in the editor
     json["space_types"].each do |st|
       model.getSpaceTypes.each do |space_type|
         next unless st["id"] == space_type.name.to_s
@@ -124,6 +125,14 @@ class ResidentialGeometryFromEditor < OpenStudio::Ruleset::ModelUserScript
       end
     end
     
+    # permit only expected space type names
+    model.getSpaceTypes.each do |space_type|
+      next if [Constants.AtticSpaceType, Constants.BasementSpaceType, Constants.CorridorSpaceType, Constants.CrawlSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.PierBeamSpaceType].include? space_type.standardsSpaceType.get
+      runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'.")
+      return false
+    end
+
+    # create and set thermal zones based on what the user wrote in the editor
     json["thermal_zones"].each do |tz|
       thermal_zone = OpenStudio::Model::ThermalZone.new(model)
       thermal_zone.setName(tz["name"])
@@ -137,11 +146,44 @@ class ResidentialGeometryFromEditor < OpenStudio::Ruleset::ModelUserScript
         end
       end
     end
+
+    # for any spaces with no assigned zone, create (unless another space of the same space type has an assigned zone) a thermal zone based on the space type
+    model.getSpaceTypes.each do |space_type|
+      thermal_zone = nil
+      space_type.spaces.each do |space|
+        if thermal_zone.nil?
+          if not space.thermalZone.is_initialized            
+            thermal_zone = OpenStudio::Model::ThermalZone.new(model)
+            thermal_zone.setName(space_type.standardsSpaceType.get)
+          else
+            thermal_zone = space.thermalZone.get
+          end
+        end
+      end
+      space_type.spaces.each do |space|
+        unless space.thermalZone.is_initialized
+          space.setThermalZone(thermal_zone)
+        end
+      end
+    end
     
+    # ensure that all spaces in a zone are either all finished or all unfinished
+    model.getThermalZones.each do |thermal_zone|
+      if thermal_zone.spaces.length == 0
+        thermal_zone.remove
+        next
+      end
+      unless thermal_zone.spaces.map {|space| Geometry.space_is_finished(space)}.uniq.size == 1
+        runner.registerError("'#{thermal_zone.name}' has a mix of finished and unfinished spaces.")
+        return false
+      end
+    end
+
+    # set the building unit on spaces based on what the user wrote in the editor
     json["building_units"].each do |bu|
       building_unit = OpenStudio::Model::BuildingUnit.new(model)
       building_unit.setName(bu["name"])
-      building_unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, 0.5)      
+      building_unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, 0.5) # FIXME
       model.getSpaces.each do |space|
         json["stories"].each do |stories|
           stories["spaces"].each do |s|
@@ -152,13 +194,14 @@ class ResidentialGeometryFromEditor < OpenStudio::Ruleset::ModelUserScript
         end
       end    
     end
-    
+
+    # set some required meta information
     if model.getBuildingUnits.length == 1
       model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeSingleFamilyDetached)
     else # TODO: how to determine SFA vs MF?
       model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeMultifamily)
     end
-    model.getBuilding.setStandardsNumberOfAboveGroundStories(Geometry.get_building_stories(model.getSpaces)) # TODO: how to count finished attics as well?
+    model.getBuilding.setStandardsNumberOfAboveGroundStories(Geometry.get_building_stories(model.getSpaces)) # FIXME: how to count finished attics as well?
     
     return true
 

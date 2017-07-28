@@ -23,13 +23,49 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot find floorplan path '#{args_hash["floorplan_path"]}'.")    
-  end  
-  
-  def test_floorplan
+  end
+
+  def test_error_unexpected_space_type_name
     args_hash = {}
-    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "floorplan.json")
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "unexpected_space_type_name.json")
+    result = _test_error(nil, args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Unexpected space type name 'graage'.")    
+  end
+  
+  def test_error_mix_of_finished_and_unfinished_spaces_in_a_zone
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "mix_of_spaces_in_a_zone.json")
+    result = _test_error(nil, args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "'Thermal Zone 1' has a mix of finished and unfinished spaces.")    
+  end
+  
+  def test_no_spaces_assigned_to_zones
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end  
+
+  def test_simple_floorplan_unfinished_attic
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "unfinished_attic.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+
+  def test_simple_floorplan_finished_attic
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "finished_attic.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -101,7 +137,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
