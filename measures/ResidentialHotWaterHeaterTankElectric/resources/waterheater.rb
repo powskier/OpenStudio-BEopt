@@ -94,6 +94,8 @@ class Waterheater
                       if not wh.to_WaterHeaterStratified.get.secondaryPlantLoop.is_initialized
                         waterHeater = wh.to_WaterHeaterStratified.get
                         wh_type = "stratified"
+                      else
+                        next
                       end
                     else
                         next

@@ -74,7 +74,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     end
 
     scene = floorplan.get.toThreeScene(true)
-    
+
     new_model = OpenStudio::Model::modelFromThreeJS(scene)
     
     if new_model.empty?
@@ -198,8 +198,12 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     # set some required meta information
     if model.getBuildingUnits.length == 1
       model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeSingleFamilyDetached)
-    else # TODO: how to determine SFA vs MF?
-      model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeMultifamily)
+    else # SFA or MF
+      if model.getBuildingUnits.select{ |building_unit| Geometry.get_building_stories(building_unit.spaces) > 1 }.any?
+        model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeSingleFamilyAttached)
+      else
+        model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeMultifamily)
+      end
     end
     model.getBuilding.setStandardsNumberOfAboveGroundStories(Geometry.get_building_stories(model.getSpaces)) # FIXME: how to count finished attics as well?
     

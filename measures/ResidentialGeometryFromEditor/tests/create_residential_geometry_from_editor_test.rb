@@ -43,6 +43,15 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     assert_includes(result.errors.map{ |x| x.logMessage }, "'Thermal Zone 1' has a mix of finished and unfinished spaces.")    
   end
   
+  def test_error_empty_floorplan
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "empty.json")
+    result = _test_error(nil, args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot load floorplan from '#{args_hash["floorplan_path"]}'.")    
+  end
+  
   def test_no_spaces_assigned_to_zones
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
@@ -66,6 +75,24 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "finished_attic.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_single_family_attached
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFA_2unit.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>75, "Space"=>8, "SpaceType"=>3, "ThermalZone"=>6, "BuildingUnit"=>2}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_multifamily
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_4unit.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>24, "Space"=>4, "SpaceType"=>1, "ThermalZone"=>4, "BuildingUnit"=>4}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -163,6 +190,10 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
         end
     end
 
+    # save the model to test output directory
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
+    model.save(output_file_path,true)    
+    
     return model
   end
 

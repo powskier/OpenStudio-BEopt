@@ -3324,7 +3324,11 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     end
     
     # Dehumidifier
-    dehumids = model.getZoneHVACDehumidifierDXs
+    dehumids = []
+    model.getZoneHVACDehumidifierDXs.each do |dehumidifier|
+      next unless control_zone.handle.to_s == dehumidifier.thermalZone.get.handle.to_s
+      dehumids << dehumidifier
+    end
     if dehumids.size > 1
         runner.registerError("Cannot currently handle multiple zone dehumidifiers in a unit: #{dehumids.to_s}.")
         return nil
