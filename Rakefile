@@ -93,6 +93,20 @@ namespace :measures do
     bcl.login
   end
 
+  desc 'Create measure zip files for upload to BCL '
+  task :zip do
+    Dir.glob('./measures/*').each do |dir|
+      current_d = Dir.pwd
+      Dir.chdir(dir)
+      if File.exists?("measure.zip")
+        File.delete("measure.zip")
+      end
+      command = '"c:/Program Files/7-Zip\7z.exe" a measure.zip *'
+      system(command)
+      Dir.chdir(current_d)
+    end
+  end
+  
 end # end the :measures namespace
 
 namespace :test do
