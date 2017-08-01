@@ -62,9 +62,6 @@ class Constants
   def self.AtticSpace
     return 'attic space'
   end
-  def self.AtticSpaceType
-    return 'attic'
-  end
   def self.AtticZone
     return 'attic zone'
   end
@@ -91,9 +88,6 @@ class Constants
   end
   def self.BasementSpace
     return 'basement space'
-  end
-  def self.BasementSpaceType
-    return 'basement'
   end
   def self.BasementZone
     return 'basement zone'
@@ -219,9 +213,6 @@ class Constants
     end
     return "corridor space#{s_story}"
   end
-  def self.CorridorSpaceType
-    return 'corridor'
-  end
   def self.CorridorZone
     return 'corridor zone'
   end
@@ -234,9 +225,6 @@ class Constants
       s_unit = "|#{unit_name}"
     end
     return "crawl space#{s_unit}"
-  end
-  def self.CrawlSpaceType
-    return 'crawlspace'
   end
   def self.CrawlZone(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
@@ -328,9 +316,6 @@ class Constants
     end
     return "garage space#{s_unit}"
   end
-  def self.GarageSpaceType
-    return 'garage'
-  end
   def self.GarageAtticSpace(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
     if unit_name != self.ObjectNameBuildingUnit
@@ -362,9 +347,6 @@ class Constants
       s_story = "|story #{story}"
     end
     return "living space#{s_unit}#{s_story}"
-  end
-  def self.LivingSpaceType
-    return 'living'
   end
   def self.LivingZone(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
@@ -847,9 +829,6 @@ class Constants
       s_unit = "|#{unit_name}"
     end
     return "pier and beam space#{s_unit}"
-  end
-  def self.PierBeamSpaceType
-    return 'pier and beam'
   end
   def self.PierBeamZone(unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""

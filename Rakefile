@@ -93,16 +93,32 @@ namespace :measures do
     bcl.login
   end
 
+  desc 'Create measure zip files for upload to BCL '
+  task :zip do
+    Dir.glob('./measures/*').each do |dir|
+      current_d = Dir.pwd
+      Dir.chdir(dir)
+      if File.exists?("measure.zip")
+        File.delete("measure.zip")
+      end
+      command = '"c:/Program Files/7-Zip\7z.exe" a measure.zip *'
+      system(command)
+      Dir.chdir(current_d)
+    end
+  end
+  
 end # end the :measures namespace
 
 namespace :test do
 
   desc 'Run unit tests for all measures'
-  Rake::TestTask.new('all') do |t|
-    t.libs << 'test'
-    t.test_files = Dir['measures/*/tests/*.rb']
-    t.warning = false
-    t.verbose = true
+  Dir['measures/*/tests/*.rb'].each do |m|
+    Rake::TestTask.new('all') do |t|
+      t.libs << 'test'
+      t.test_files = [m]
+      t.warning = false
+      t.verbose = true
+    end
   end
   
   desc 'regenerate test osm files from osw files'
@@ -115,7 +131,7 @@ namespace :test do
   
     # Generate hash that maps osw's to measures
     osw_map = {}
-    # measures = ["ResidentialGeometryEaves"] # Use this to specify individual measures (instead of all measures on the following line)
+    #measures = ["ResidentialHotWaterDistribution"] # Use this to specify individual measures (instead of all measures on the following line)
     measures = Dir.entries(File.expand_path("../measures/", __FILE__)).select {|entry| File.directory? File.join(File.expand_path("../measures/", __FILE__), entry) and !(entry == '.' || entry == '..') }
     measures.each do |m|
         testrbs = Dir[File.expand_path("../measures/#{m}/tests/*.rb", __FILE__)]
@@ -312,22 +328,6 @@ task :update_measures do
   
 end
 
-desc 'Copy resources from OpenStudio-BuildStock repo'
-task :copy_buildstock_resources do  
-  extra_files = [
-                 File.join("resources", "helper_methods.rb")
-                ]  
-  extra_files.each do |extra_file|
-      puts "Copying #{extra_file}..."
-      resstock_file = File.join(File.dirname(__FILE__), "..", "OpenStudio-BuildStock", extra_file)
-      local_file = File.join(File.dirname(__FILE__), extra_file)
-      if File.exists?(local_file)
-        FileUtils.rm(local_file)
-      end
-      FileUtils.cp(resstock_file, local_file)
-  end  
-end
-
 # This function will generate an OpenStudio OSW
 # with all the measures in it, in the order specified in /resources/measure-info.json
 #
@@ -377,7 +377,7 @@ def generate_example_osw_of_all_measures_in_order()
             if arg.hasDefaultValue
                 step.setArgument(arg.name, arg.defaultValueAsString)
             elsif arg.required
-                puts "Error: No default value provided for #{measure} argument '#{arg.name}'."
+                puts "Error: No default value provied for #{measure} argument '#{arg.name}'."
                 exit
             end
         end
