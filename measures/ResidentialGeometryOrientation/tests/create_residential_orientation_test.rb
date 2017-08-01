@@ -32,6 +32,11 @@ class CreateResidentialOrientationTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_Windows.osm", args_hash, 1)
   end  
   
+  def test_geometry_editor_sfd
+    args_hash = {}
+    _test_measure("GE_SFD.osm", args_hash, 1)
+  end  
+  
   private
   
   def _test_error(osm_file, args_hash)

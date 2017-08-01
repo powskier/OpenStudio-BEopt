@@ -94,16 +94,6 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     end
     
     runner.registerFinalCondition("Final model has #{model.getPlanarSurfaceGroups.size} planar surface groups")
-
-    # put all of the spaces in the model into a vector
-    spaces = OpenStudio::Model::SpaceVector.new
-    model.getSpaces.each do |space|
-      spaces << space
-    end
-    
-    # intersect and match surfaces for each space in the vector
-    OpenStudio::Model.intersectSurfaces(spaces)
-    OpenStudio::Model.matchSurfaces(spaces)
     
     # put all of the spaces in the model into a vector
     spaces = OpenStudio::Model::SpaceVector.new
@@ -113,7 +103,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     
     # intersect and match surfaces for each space in the vector
     OpenStudio::Model.intersectSurfaces(spaces)
-    OpenStudio::Model.matchSurfaces(spaces)
+    OpenStudio::Model.matchSurfaces(spaces)    
     
     json = JSON.parse(json)
 
@@ -206,6 +196,35 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       end
     end
     model.getBuilding.setStandardsNumberOfAboveGroundStories(Geometry.get_building_stories(model.getSpaces)) # FIXME: how to count finished attics as well?
+    
+    # make all surfaces adjacent to corridor spaces into adiabatic surfaces
+    model.getSpaces.each do |space|
+      next unless Geometry.is_corridor(space)
+      space.surfaces.each do |surface|
+        if surface.adjacentSurface.is_initialized
+          surface.adjacentSurface.get.setOutsideBoundaryCondition("Adiabatic")
+        end
+        surface.setOutsideBoundaryCondition("Adiabatic")
+      end
+    end
+    
+    model.getSurfaces.each do |surface|
+      next unless surface.outsideBoundaryCondition.downcase == "surface"
+      next if surface.adjacentSurface.is_initialized
+      surface.setOutsideBoundaryCondition("Adiabatic")
+    end    
+
+    # FIXME: temp until i figure out why garage roof is adjacent to outdoors
+    model.getSpaces.each do |space|
+      next unless space.spaceType.get.standardsSpaceType.get == Constants.GarageSpaceType
+      space.surfaces.each do |surface|
+        next unless surface.surfaceType.downcase == "roofceiling"
+        model.getSurfaces.each do |adjacent_surface|
+          next unless surface.vertices == adjacent_surface.vertices
+          surface.setAdjacentSurface(adjacent_surface)
+        end
+      end      
+    end
     
     return true
 

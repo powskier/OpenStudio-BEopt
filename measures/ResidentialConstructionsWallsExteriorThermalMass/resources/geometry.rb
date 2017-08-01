@@ -898,6 +898,10 @@ class Geometry
         return self.space_or_zone_is_of_type(space_or_zone, Constants.GarageSpaceType)
     end
     
+    def self.is_corridor(space_or_zone)
+        return self.space_or_zone_is_of_type(space_or_zone, Constants.CorridorSpaceType)
+    end
+    
     def self.space_or_zone_is_of_type(space_or_zone, space_type)
         if space_or_zone.is_a? OpenStudio::Model::Space
           return self.space_is_of_type(space_or_zone, space_type)

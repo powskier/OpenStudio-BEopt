@@ -100,6 +100,14 @@ class CreateResidentialOverhangsTest < MiniTest::Test
     expected_values = {"overhang_depth"=>2}
     _test_measure("SFD_2000sqft_2story_SL_UA_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
+
+  def test_geometry_editor_sfd
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ShadingSurface"=>134, "ShadingSurfaceGroup"=>134}
+    expected_values = {"overhang_depth"=>2}
+    model = _test_measure("GE_SFD_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 134)
+  end
   
   private
   
@@ -166,6 +174,8 @@ class CreateResidentialOverhangsTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+    
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

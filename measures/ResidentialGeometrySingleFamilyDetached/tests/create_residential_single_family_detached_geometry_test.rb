@@ -98,16 +98,16 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_width"] = 40
     args_hash["garage_depth"] = 24
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "GarageAtticHeight"=>35.21/2*0.5, "GarageFloorArea"=>960, "UnfinishedAtticHeight"=>8.8, "UnfinishedAtticFloorArea"=>2960, "BuildingHeight"=>8+8.8}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4, 1)    
   end
-  
+
   def test_fbasement    
     args_hash = {}
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/3, "UnfinishedAtticHeight"=>4.56, "UnfinishedAtticFloorArea"=>2000/3, "BuildingHeight"=>8+8+8+4.56}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)     
   end
@@ -116,7 +116,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["foundation_type"] = Constants.UnfinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+8+5.59}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)   
   end
@@ -125,16 +125,16 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["foundation_type"] = Constants.CrawlFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>3+8+8+5.59}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)   
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
   
   def test_pierandbeam    
     args_hash = {}
     args_hash["foundation_type"] = Constants.PierBeamFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>3+8+8+5.59}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)   
   end  
@@ -144,7 +144,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = Constants.FinishedAtticType
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>2, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>23, "ThermalZone"=>2, "Space"=>4, "SpaceType"=>1}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/4, "FinishedAtticHeight"=>3.95, "FinishedAtticFloorArea"=>2000/4, "BuildingHeight"=>8+8+8+3.95}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
@@ -154,7 +154,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = Constants.FinishedAtticType
     args_hash["roof_type"] = Constants.RoofTypeHip
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>1, "Space"=>3}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>1, "Space"=>3, "SpaceType"=>1}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedAtticHeight"=>4.56, "FinishedAtticFloorArea"=>2000/3, "BuildingHeight"=>8+8+4.56}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
@@ -165,7 +165,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_width"] = 12
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>6.22, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+6.22}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end  
@@ -177,7 +177,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
@@ -190,7 +190,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = Constants.FinishedAtticType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "FinishedAtticHeight"=>4.69, "FinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+4.69}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
@@ -203,7 +203,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = Constants.FinishedAtticType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>3, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>880, "FinishedAtticHeight"=>5.59, "FinishedAtticFloorArea"=>1120, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
@@ -215,7 +215,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end  
@@ -225,7 +225,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_width"] = 10
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>30, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>30, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>600, "UnfinishedAtticHeight"=>5, "UnfinishedAtticFloorArea"=>800, "GarageAtticHeight"=>3, "GarageFloorArea"=>200, "BuildingHeight"=>8+8+8+5}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end   
@@ -235,7 +235,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_width"] = 12
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>5.08, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+5.08}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end  
@@ -246,7 +246,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.69, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.69}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end  
@@ -258,7 +258,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = Constants.FinishedAtticType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>380, "FinishedAtticHeight"=>3.95, "FinishedAtticFloorArea"=>620, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+3.95}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end  
@@ -270,7 +270,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["attic_type"] = Constants.FinishedAtticType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>3, "Space"=>6, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "UnfinishedBasementHeight"=>8, "UnfinishedBasementFloorArea"=>506.66, "FinishedAtticHeight"=>4.43, "FinishedAtticFloorArea"=>746.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.43}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end  
@@ -281,7 +281,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.28, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.28}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end   
@@ -293,7 +293,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_pos"] = "Left"
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>6.22, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+6.22}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)   
   end  
@@ -306,7 +306,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>1000, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end  
@@ -319,7 +319,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>28, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.59, "UnfinishedAtticFloorArea"=>1240, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.59}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end   
@@ -330,7 +330,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_pos"] = "Left"
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>34, "ThermalZone"=>4, "Space"=>5, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>5.08, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+5.08}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end  
@@ -342,7 +342,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 0.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>42, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.69, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.69}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end  
@@ -354,7 +354,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     args_hash["garage_protrusion"] = 1
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>38, "ThermalZone"=>4, "Space"=>6, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>586.66, "UnfinishedAtticHeight"=>4.28, "UnfinishedAtticFloorArea"=>826.66, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+8+4.28}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)
   end
@@ -364,7 +364,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["garage_width"] = 12
     args_hash["roof_type"] = Constants.RoofTypeHip
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>26, "ThermalZone"=>3, "Space"=>4, "SpaceType"=>3}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>5.91, "UnfinishedAtticFloorArea"=>1120, "GarageAtticHeight"=>3, "GarageFloorArea"=>240, "BuildingHeight"=>8+8+5.91}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end  
@@ -373,7 +373,7 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash = {}
     args_hash["aspect_ratio"] = 0.75
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>6.84, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.84}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
@@ -383,11 +383,11 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
     args_hash["aspect_ratio"] = 0.75
     args_hash["roof_type"] = Constants.RoofTypeHip
     expected_num_del_objects = {}
-    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3}
+    expected_num_new_objects = {"BuildingUnit"=>1, "Surface"=>17, "ThermalZone"=>2, "Space"=>3, "SpaceType"=>2}
     expected_values = {"FinishedFloorArea"=>2000, "FinishedBasementHeight"=>8, "FinishedBasementFloorArea"=>2000/2, "UnfinishedAtticHeight"=>6.84, "UnfinishedAtticFloorArea"=>2000/2, "BuildingHeight"=>8+8+6.84}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end  
-  
+
   private
   
   def _test_error(osm_file_or_model, args_hash)

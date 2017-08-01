@@ -16,7 +16,7 @@ class WindowAreaTest < MiniTest::Test
   def osm_geo_rotated
     return "SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm"
   end
-  
+
   def test_no_window_area
     args_hash = {}
     args_hash["front_wwr"] = 0
@@ -33,7 +33,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash = {}
     model = _test_measure(osm_geo_rotated, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1])
   end
-  
+
   def test_sfd_retrofit_replace
     args_hash = {}
     model = _test_measure(osm_geo, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1])
@@ -42,7 +42,7 @@ class WindowAreaTest < MiniTest::Test
     args_hash["left_wwr"] = 0.12
     _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [54.3, 110.3, 46.4, 55.1])
   end
-  
+
   def test_argument_error_invalid_window_area_front_lt_0
     args_hash = {}
     args_hash["front_wwr"] = -20
@@ -209,6 +209,14 @@ class WindowAreaTest < MiniTest::Test
     args_hash["right_wwr"] = 0.12    
     _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63])
   end
+  
+  def test_geometry_editor_sfd
+    num_units = 1
+    args_hash = {}
+    args_hash["front_wwr"] = 0.12
+    args_hash["left_wwr"] = 0.12
+    _test_measure("GE_SFD.osm", args_hash, [0, 0, 0, 0, 0], [OpenStudio.convert(40*6-16*3,"m^2","ft^2").get*0.12, OpenStudio.convert(40*6,"m^2","ft^2").get*0.18, OpenStudio.convert(25*6+8*3,"m^2","ft^2").get*0.12, OpenStudio.convert(25*6+8*3,"m^2","ft^2").get*0.18])
+  end
 
   private
   
@@ -316,7 +324,7 @@ class WindowAreaTest < MiniTest::Test
     del_objects.each do |window|
         del_win_area[Geometry.get_facade_for_surface(window)] += OpenStudio.convert(window.grossArea, "m^2", "ft^2").get
     end
-
+    
     assert_in_epsilon(expected_fblr_win_area_added[0], new_win_area[Constants.FacadeFront], 0.01)
     assert_in_epsilon(expected_fblr_win_area_added[1], new_win_area[Constants.FacadeBack], 0.01)
     assert_in_epsilon(expected_fblr_win_area_added[2], new_win_area[Constants.FacadeLeft], 0.01)
@@ -326,7 +334,7 @@ class WindowAreaTest < MiniTest::Test
     assert_in_epsilon(expected_fblr_win_area_removed[1], del_win_area[Constants.FacadeBack], 0.01)
     assert_in_epsilon(expected_fblr_win_area_removed[2], del_win_area[Constants.FacadeLeft], 0.01)
     assert_in_epsilon(expected_fblr_win_area_removed[3], del_win_area[Constants.FacadeRight], 0.01)
-
+    
     return model
   end  
   

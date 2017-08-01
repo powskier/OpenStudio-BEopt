@@ -59,11 +59,11 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  end  
+  end
 
   def test_simple_floorplan_unfinished_attic
     args_hash = {}
-    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "unfinished_attic.json")
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_UA.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1}
     expected_values = {}
@@ -72,7 +72,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
 
   def test_simple_floorplan_finished_attic
     args_hash = {}
-    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "finished_attic.json")
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_FA.json")
     expected_num_del_objects = {}
     expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1}
     expected_values = {}
@@ -97,6 +97,15 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
+  # def test_multifamily_with_corridor
+    # args_hash = {}
+    # args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_corr_12unit.json")
+    # expected_num_del_objects = {}
+    # expected_num_new_objects = {"Building"=>1, "Surface"=>102, "Space"=>14, "SpaceType"=>2, "ThermalZone"=>13, "BuildingUnit"=>12}
+    # expected_values = {}
+    # model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  # end
+
   private
   
   def _test_error(osm_file, args_hash)
@@ -191,8 +200,8 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     end
 
     # save the model to test output directory
-    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
-    model.save(output_file_path,true)    
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
+    # model.save(output_file_path,true)
     
     return model
   end

@@ -602,7 +602,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         foundation_space_type = space_types_hash[foundation_space_type_name]
       else
         foundation_space_type = OpenStudio::Model::SpaceType.new(model)
-        foundation_space_type.setStandardsSpaceType(foundation_space_name)
+        foundation_space_type.setStandardsSpaceType(foundation_space_type_name)
         space_types_hash[foundation_space_type_name] = foundation_space_type
       end
       foundation_space.setSpaceType(foundation_space_type)      
@@ -614,13 +614,10 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       # set foundation walls outside boundary condition
       spaces = model.getSpaces
       spaces.each do |space|
-        next if space.name.to_s != foundation_space_name
-        surfaces = space.surfaces
-        surfaces.each do |surface|
-          next if surface.surfaceType.downcase != "wall"
-          if foundation_type == Constants.PierBeamFoundationType
-            surface.setOutsideBoundaryCondition("Outdoors")
-          else
+        if Geometry.get_space_floor_z(space) < 0
+          surfaces = space.surfaces
+          surfaces.each do |surface|
+            next if surface.surfaceType.downcase != "wall"
             surface.setOutsideBoundaryCondition("Ground")
           end
         end
@@ -744,13 +741,13 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
           
             garage_attic_space_name = Constants.GarageFinishedAtticSpace
             garage_attic_space.setThermalZone(living_zone)
-            garage_attic_space_type_name = "Living"
+            garage_attic_space_type_name = Constants.LivingSpaceType
             
           else
           
             garage_attic_space_name = Constants.GarageAtticSpace
             garage_attic_space.setThermalZone(attic_zone)
-            garage_attic_space_type_name = "Attic"
+            garage_attic_space_type_name = Constants.AtticSpaceType
             
           end
           

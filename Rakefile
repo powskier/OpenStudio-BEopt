@@ -100,7 +100,7 @@ namespace :test do
   desc 'Run unit tests for all measures'
   Rake::TestTask.new('all') do |t|
     t.libs << 'test'
-    t.test_files = Dir['measures/*/tests/*.rb'] + Dir['workflows/energy_rating_index/tests/*.rb']
+    t.test_files = Dir['measures/*/tests/*.rb']
     t.warning = false
     t.verbose = true
   end
@@ -115,7 +115,7 @@ namespace :test do
   
     # Generate hash that maps osw's to measures
     osw_map = {}
-    #measures = ["ResidentialHotWaterDistribution"] # Use this to specify individual measures (instead of all measures on the following line)
+    # measures = ["ResidentialGeometryEaves"] # Use this to specify individual measures (instead of all measures on the following line)
     measures = Dir.entries(File.expand_path("../measures/", __FILE__)).select {|entry| File.directory? File.join(File.expand_path("../measures/", __FILE__), entry) and !(entry == '.' || entry == '..') }
     measures.each do |m|
         testrbs = Dir[File.expand_path("../measures/#{m}/tests/*.rb", __FILE__)]

@@ -141,6 +141,19 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
   end
 
+  def test_geometry_editor_sfd
+    args_hash = {}
+    args_hash["cavity_r"] = 0
+    args_hash["install_grade"] = "III" # no insulation, shouldn't apply
+    args_hash["cavity_depth"] = 3.5
+    args_hash["ins_fills_cavity"] = "false"
+    args_hash["framing_factor"] = 0.25
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
+    expected_values = {"LayerThickness"=>0.0889, "LayerConductivity"=>0.33822, "LayerDensity"=>129.0207, "LayerSpecificHeat"=>1212.833, "LayerIndex"=>0, "SurfacesWithConstructions"=>13}
+    _test_measure("GE_SFD_CeilingIns.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end  
+  
   private
   
   def _test_error(osm_file, args_hash)
@@ -250,7 +263,7 @@ class ProcessConstructionsWallsExteriorWoodStudTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
