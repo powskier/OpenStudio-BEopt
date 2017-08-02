@@ -23,7 +23,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     result = _test_error_or_NA("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, __method__)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Did not supply an API Key or a JSON File Path.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Did not supply an API Key or a JSON File Path.")
   end  
   
   def test_json_path_valid
@@ -43,7 +43,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 14, 2)  
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 16, 1)
   end
 
   private
