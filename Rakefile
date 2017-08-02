@@ -112,13 +112,11 @@ end # end the :measures namespace
 namespace :test do
 
   desc 'Run unit tests for all measures'
-  Dir['measures/*/tests/*.rb'].each do |m|
-    Rake::TestTask.new('all') do |t|
-      t.libs << 'test'
-      t.test_files = [m]
-      t.warning = false
-      t.verbose = true
-    end
+  Rake::TestTask.new('all') do |t|
+    t.libs << 'test'
+    t.test_files = Dir['measures/*/tests/*.rb']
+    t.warning = false
+    t.verbose = true
   end
   
   desc 'regenerate test osm files from osw files'
