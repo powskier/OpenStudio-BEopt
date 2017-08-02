@@ -113,18 +113,20 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
           resources_dir = File.expand_path(File.join(run_dir, entry, "resources"))
         end
       end    
-    
-      epw = File.basename(runner.lastOpenStudioModel.get.getSite.weatherFile.get.url.get)
-      usaf = epw.split("_")[-2].to_s
-      usaf = "725660" # TODO: remove
+
       cols = CSV.read(File.expand_path(File.join(resources_dir, "by_nsrdb.csv"))).transpose
+      
+      weather_file = runner.lastOpenStudioModel.get.getSite.weatherFile.get      
+      closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to resstock epw
+      puts "Nearest ResStock usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}"
+
       usafs = cols[1].collect { |i| i.to_s }
-      indexes = usafs.each_index.select{|i| usafs[i] == usaf}
+      indexes = usafs.each_index.select{|i| usafs[i] == closest_usaf}
       utility_ids = []
       indexes.each do |ix|
         utility_ids << cols[20][ix]
       end
-      utility_ids = utility_ids.uniq
+      utility_ids = utility_ids.uniq # get all unique utility_ids (eia_ids) contained in this usaf
     
       utility_ixs = []
       cols = CSV.read(File.expand_path(File.join(resources_dir, "utilities.csv")), {:encoding=>'ISO-8859-1'}).transpose
@@ -260,7 +262,36 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     return true
  
   end
+  
+  def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)
+    distances = [1000000]
+    usafs.each do |usaf|
+      if (bldg_lat.to_f - usaf[19].to_f).abs > 1 and (bldg_lon.to_f - usaf[18].to_f).abs > 1 # reduce the set to save some time
+        distances << 100000
+        next
+      end
+      km = haversine(bldg_lat.to_f, bldg_lon.to_f, usaf[19].to_f, usaf[18].to_f)
+      distances << km
+    end
+    
+    return usafs[distances.index(distances.min)][1]
+    
+  end
 
+  def haversine(lat1, lon1, lat2, lon2)
+    # convert decimal degrees to radians
+    [lon1, lat1, lon2, lat2].each do |l|
+      l = OpenStudio.convert(l,"deg","rad").get
+    end
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = Math.sin(dlat/2)**2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2)**2
+    c = 2 * Math.asin(Math.sqrt(a)) 
+    km = 6367 * c
+    return km
+  end
+  
 end
 
 # register the measure to be used by the application
