@@ -122,16 +122,6 @@ class CreateResidentialNeighborsTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_Inset_Windows.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, surfaces_per_neighbor*num_neighbors)
   end
   
-  def test_geometry_editor_sfd
-    surfaces_per_neighbor = 25
-    num_neighbors = 2
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"ShadingSurface"=>surfaces_per_neighbor*num_neighbors, "ShadingSurfaceGroup"=>1}
-    expected_values = {}
-    model = _test_measure("GE_SFD.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, surfaces_per_neighbor*num_neighbors)  
-  end  
-  
   private
   
   def _test_error(osm_file, args_hash)

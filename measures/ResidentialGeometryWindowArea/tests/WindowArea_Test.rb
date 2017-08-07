@@ -209,14 +209,6 @@ class WindowAreaTest < MiniTest::Test
     args_hash["right_wwr"] = 0.12    
     _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63])
   end
-  
-  def test_geometry_editor_sfd
-    num_units = 1
-    args_hash = {}
-    args_hash["front_wwr"] = 0.12
-    args_hash["left_wwr"] = 0.12
-    _test_measure("GE_SFD.osm", args_hash, [0, 0, 0, 0, 0], [OpenStudio.convert(40*6-16*3,"m^2","ft^2").get*0.12, OpenStudio.convert(40*6,"m^2","ft^2").get*0.18, OpenStudio.convert(25*6+8*3,"m^2","ft^2").get*0.12, OpenStudio.convert(25*6+8*3,"m^2","ft^2").get*0.18])
-  end
 
   private
   

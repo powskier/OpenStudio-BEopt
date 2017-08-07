@@ -78,7 +78,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
     def osm_geo_beds_loc_hpwh_shw
       return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_HPWH_SHW.osm"
     end
-    
+
     def test_new_construction_50
         args_hash = {}
         expected_num_del_objects = {}
@@ -496,7 +496,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         end
         
         # show the output
-        #show_output(result)
+        # show_output(result)
         
         # assert that it ran correctly
         assert_equal("Success", result.value.valueName)

@@ -148,7 +148,7 @@ class CreateResidentialEavesTest < MiniTest::Test
     expected_num_new_objects = {"ShadingSurface"=>7, "ShadingSurfaceGroup"=>1}
     expected_values = {"eaves_depth"=>2}
     _test_measure("SFD_2000sqft_1story_SL_GRG_FlatRoof.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
-  end  
+  end
   
   def test_single_family_attached_new_construction_gable_roof_aspect_ratio_two
     num_units = 4
@@ -261,7 +261,7 @@ class CreateResidentialEavesTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

@@ -194,9 +194,17 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
     if @weather.error?
       return false
     end
-        
-    highest_roof_pitch = Geometry.get_roof_pitch(model.getSurfaces)
-    roof_tilt = OpenStudio::convert(Math.atan(highest_roof_pitch),"rad","deg").get # tan(x) = opp/adj = highest_roof_pitch  
+
+    attic_spaces = []
+    model.getSpaces.each do |space|
+      next unless Geometry.is_attic(space)
+      attic_spaces << space
+    end
+    roof_tilt = Geometry.calculate_avg_roof_pitch(attic_spaces)
+    if roof_tilt.nil?
+      runner.registerError("Could not calculate average roof pitch.")
+      return false
+    end
     
     if azimuth_type == Constants.CoordRelative
       shw_azimuth.abs = Geometry.get_abs_azimuth(azimuth_type, azimuth, 0, 0)

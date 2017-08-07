@@ -162,8 +162,16 @@ class ResidentialPhotovoltaics < OpenStudio::Measure::ModelMeasure
     
     obj_name = Constants.ObjectNamePhotovoltaics
     
-    highest_roof_pitch = Geometry.get_roof_pitch(model.getSurfaces)
-    roof_tilt = OpenStudio::convert(Math.atan(highest_roof_pitch),"rad","deg").get # tan(x) = opp/adj = highest_roof_pitch
+    attic_spaces = []
+    model.getSpaces.each do |space|
+      next unless Geometry.is_attic(space)
+      attic_spaces << space
+    end
+    roof_tilt = Geometry.calculate_avg_roof_pitch(attic_spaces)
+    if roof_tilt.nil?
+      runner.registerError("Could not calculate average roof pitch.")
+      return false
+    end    
     
     pv_system.size = size
     pv_system.module_type = {Constants.PVModuleTypeStandard=>0, Constants.PVModuleTypePremium=>1, Constants.PVModuleTypeThinFilm=>2}[module_type]

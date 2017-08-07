@@ -133,7 +133,7 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     expected_values = {"TankVolume"=>60, "Heater1Setpoint"=>126.8, "Heater2Setpoint"=>126.8, "CollectorArea"=>40, "CollectorFlowRate"=>0.0000568724330873, "GlycolFrac"=>0.5, "CoordDir"=>"Northeast", "Tilt"=>OpenStudio.convert(Math.atan(1.0 / 2.0),"rad","deg").get}
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
-  
+
   def test_faces_west_azimuth_absolute_southwest
     args_hash = {}
     args_hash["azimuth_type"] = Constants.CoordAbsolute
@@ -144,7 +144,7 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_West_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
 
-    def test_faces_east_azimuth_absolute_southwest
+  def test_faces_east_azimuth_absolute_southwest
     args_hash = {}
     args_hash["azimuth_type"] = Constants.CoordAbsolute
     args_hash["azimuth"] = 45.0
@@ -383,7 +383,7 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     expected_values = {"TankVolume"=>96, "Heater1Setpoint"=>126.8, "Heater2Setpoint"=>126.8, "CollectorArea"=>64, "CollectorFlowRate"=>0.0000909958929397, "GlycolFrac"=>0.5, "CoordDir"=>"North", "Tilt"=>OpenStudio.convert(Math.atan(1.0 / 2.0),"rad","deg").get}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
-  
+
   private
   
   def _test_error(osm_file_or_model, args_hash)
@@ -501,11 +501,7 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
                 coorddir = "South"
               end
               assert_equal(expected_values["CoordDir"], coorddir)
-              if new_object.outwardNormal.z == 1
-                assert_in_epsilon(expected_values["Tilt"], 0, 0.01)
-              else
-                assert_in_epsilon(expected_values["Tilt"], OpenStudio.convert(Math.atan(Math.sqrt(new_object.outwardNormal.x ** 2 + new_object.outwardNormal.y ** 2) / new_object.outwardNormal.z),"rad","deg").get, 0.01)
-              end
+              assert_in_epsilon(expected_values["Tilt"], OpenStudio.convert(new_object.tilt,"rad","deg").get, 0.03)
               assert_in_epsilon(expected_values["CollectorArea"], OpenStudio.convert(new_object.grossArea,"m^2","ft^2").get, 0.01)
             elsif obj_type == "PlantLoop"
               assert_in_epsilon(expected_values["GlycolFrac"], new_object.glycolConcentration * 0.01, 0.01)

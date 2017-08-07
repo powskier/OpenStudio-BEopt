@@ -30,12 +30,7 @@ class CreateResidentialOrientationTest < MiniTest::Test
   def test_multifamily_new_construction
     args_hash = {}  
     _test_measure("MF_8units_1story_SL_Windows.osm", args_hash, 1)
-  end  
-  
-  def test_geometry_editor_sfd
-    args_hash = {}
-    _test_measure("GE_SFD.osm", args_hash, 1)
-  end  
+  end
   
   private
   

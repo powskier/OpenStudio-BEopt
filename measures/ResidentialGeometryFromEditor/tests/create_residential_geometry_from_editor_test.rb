@@ -96,7 +96,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
+
   # def test_multifamily_with_corridor
     # args_hash = {}
     # args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_corr_12unit.json")

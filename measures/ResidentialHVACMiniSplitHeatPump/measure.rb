@@ -355,11 +355,6 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
           end
         end
       
-        total_slave_zone_floor_area = 0
-        slave_zones.each do |slave_zone|
-          total_slave_zone_floor_area += slave_zone.floorArea
-        end
-      
         # Remove existing equipment
         HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameMiniSplitHeatPump, control_zone)
       

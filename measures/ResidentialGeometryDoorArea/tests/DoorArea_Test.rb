@@ -57,11 +57,6 @@ class DoorAreaTest < MiniTest::Test
     num_units = 8
     args_hash = {}
     _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, 0, 20*num_units, 0)
-  end  
-  
-  def test_geometry_editor_sfd
-    args_hash = {}
-    model = _test_measure("GE_SFD.osm", args_hash, 0, 20, 0)
   end
   
   private

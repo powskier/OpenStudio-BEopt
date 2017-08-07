@@ -80,7 +80,7 @@ class Geometry
     # TODO: Use algorithm in calculate_avg_roof_pitch instead
     def self.get_roof_pitch(surfaces)
       surfaces.each do |surface|
-        next if surface.space.get.name.to_s.downcase.include? "garage" # don't determine the attic height increase based on the garage (gable) roof
+        next unless self.is_attic(surface.space.get)
         next unless surface.surfaceType.downcase == "roofceiling" and surface.outsideBoundaryCondition.downcase == "outdoors"
         attic_length, attic_width, attic_height = self.get_surface_dimensions(surface)
         if attic_length > attic_width
@@ -682,19 +682,17 @@ class Geometry
     end
     
     def self.calculate_avg_roof_pitch(spaces)
-        sum_tilt = 0
-        num_surf = 0
+        tilts = []
         spaces.each do |space|
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "roofceiling"
-                sum_tilt += surface.tilt
-                num_surf += 1
+                tilts << surface.tilt
             end
         end
-        if num_surf == 0
+        if tilts.length == 0 or tilts.max - tilts.min > 0.05
             return nil
         end
-        return sum_tilt/num_surf.to_f*180.0/3.14159
+        return tilts.inject{ |sum, tilt| sum + tilt } / tilts.length * 180.0 / 3.14159
     end
     
     # Checks if the surface is between finished space and outside
@@ -867,6 +865,9 @@ class Geometry
     end
     
     def self.is_living(space_or_zone)
+        if self.is_finished_basement(space_or_zone) or self.is_finished_attic(space_or_zone)
+          return nil
+        end
         return self.space_or_zone_is_of_type(space_or_zone, Constants.LivingSpaceType)
     end
     
@@ -926,38 +927,53 @@ class Geometry
     end
     
     def self.is_basement(space_or_zone)
-      if space_or_zone.respond_to?("to_Space")
+      if space_or_zone.is_a? OpenStudio::Model::Space
         return self.space_is_below_grade(space_or_zone)
-      elsif space_or_zone.respond_to?("to_ThermalZone")
+      elsif space_or_zone.is_a? OpenStudio::Model::ThermalZone
         space_or_zone.spaces.each do |space|
           unless self.space_is_below_grade(space)
             return false
           end
         end
-        return true
       end
+      return true
     end
     
     def self.is_attic(space_or_zone)
-      if space_or_zone.respond_to?("to_Space")
+      if space_or_zone.is_a? OpenStudio::Model::Space
         space_or_zone.surfaces.each do |surface|
           next unless surface.surfaceType.downcase.to_s == "roofceiling"
-          unless surface.outsideBoundaryCondition.downcase.to_s == "outdoors"
+          unless surface.outsideBoundaryCondition.downcase.to_s == "outdoors" 
             return false
           end
         end
-        return true
-      elsif space_or_zone.respond_to?("to_ThermalZone")
-        space_or_zone.spaces.each do |space|
-          space.surfaces.each do |surface|
-            next unless surface.surfaceType.downcase.to_s == "roofceiling"
-            unless surface.outsideBoundaryCondition.downcase.to_s == "outdoors"
+        space_or_zone.surfaces.each do |surface|
+          next unless surface.surfaceType.downcase.to_s == "floor"
+          surface.vertices.each do |vertex|
+            unless vertex.z + space_or_zone.zOrigin > 0 # not an attic if it isn't above grade
               return false
             end
           end
         end
-        return true
-      end    
+      elsif space_or_zone.is_a? OpenStudio::Model::ThermalZone
+        space_or_zone.spaces.each do |space|
+          space.surfaces.each do |surface|
+            next unless surface.surfaceType.downcase.to_s == "roofceiling"
+            if not surface.outsideBoundaryCondition.downcase.to_s == "outdoors"
+              return false
+            end
+          end
+          space.surfaces.each do |surface|
+            next unless surface.surfaceType.downcase.to_s == "floor"
+            surface.vertices.each do |vertex|
+              unless vertex.z + space.zOrigin > 0 # not an attic if it isn't above grade
+                return false
+              end
+            end
+          end
+        end
+      end
+      return true
     end
     
     def self.is_foundation(space_or_zone)

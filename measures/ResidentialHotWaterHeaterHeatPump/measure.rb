@@ -782,8 +782,8 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
             #EMS Program for ducting
             hpwh_ducting_program = OpenStudio::Model::EnergyManagementSystemProgram.new(model)
             hpwh_ducting_program.setName("#{obj_name_hpwh} InletAir")
-            if not (water_heater_tz.name.to_s.start_with?(Constants.FinishedBasementZone) or water_heater_tz.name.to_s.start_with?(Constants.LivingZone))
-                runner.registerWarning("Confined space installations are typically used represent installations in locations like a utility closet. Utility closets installations are typically only done in conditioned spaces.")
+            if not (Geometry.is_finished_basement(water_heater_tz) or Geometry.is_living(water_heater_tz))
+                runner.registerWarning("Confined space installations are typically used to represent installations in locations like a utility closet. Utility closets installations are typically only done in conditioned spaces.")
             end
             if temp_depress_c > 0 and ducting == "none"
                 hpwh_ducting_program.addLine("Set HPWH_last_#{unit_num} = (@TrendValue #{on_off_trend_var.name} 1)")

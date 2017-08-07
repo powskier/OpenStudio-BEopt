@@ -579,8 +579,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     # use the built-in error checking
     if !runner.validateUserArguments(arguments(model), user_arguments)
       return false
-    end
-
+    end    
+    
     infiltrationLivingSpaceACH50 = runner.getDoubleArgumentValue("living_ach50",user_arguments)
     if infiltrationLivingSpaceACH50 == 0
       infiltrationLivingSpaceACH50 = nil
@@ -652,7 +652,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     @infMethodRes = 'RESIDENTIAL'
     @infMethodASHRAE = 'ASHRAE-ENHANCED'
     @infMethodSG = 'SHERMAN-GRIMSRUD'
-
+    
     # Create the class instances
     infil = Infiltration.new(infiltrationLivingSpaceACH50, infiltrationShelterCoefficient, infiltrationGarageACH50)
     wind_speed = WindSpeed.new
@@ -892,15 +892,14 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       # Determine geometry for spaces and zones that are unit specific
       Geometry.get_thermal_zones_from_spaces(building_unit.spaces).each do |thermal_zone|
-        if Geometry.is_living(thermal_zone) or not /#{Constants.URBANoptFinishedZoneIdentifier} [1-9]\d*/.match(thermal_zone.name.to_s).nil?
+        if Geometry.is_finished_basement(thermal_zone)
+          unit.finished_basement_zone = thermal_zone
+          unit.finished_basement = FinBasement.new(fbsmtACH, Geometry.get_height_of_spaces(unit.finished_basement_zone.spaces), OpenStudio.convert(unit.finished_basement_zone.floorArea,"m^2","ft^2").get, Geometry.get_volume_from_spaces(thermal_zone.spaces), Geometry.get_z_origin_for_zone(thermal_zone))        
+        elsif Geometry.is_living(thermal_zone)
           unit.living_zone = thermal_zone
           unit.living = LivingSpace.new(Geometry.get_height_of_spaces(unit.living_zone.spaces), OpenStudio.convert(unit.living_zone.floorArea,"m^2","ft^2").get, Geometry.get_volume_from_spaces(thermal_zone.spaces), Geometry.get_z_origin_for_zone(thermal_zone))
-        elsif Geometry.is_finished_basement(thermal_zone) or thermal_zone.name.to_s.start_with? "#{Constants.URBANoptFinishedZoneIdentifier} 0"
-          unit.finished_basement_zone = thermal_zone
-          unit.finished_basement = FinBasement.new(fbsmtACH, Geometry.get_height_of_spaces(unit.finished_basement_zone.spaces), OpenStudio.convert(unit.finished_basement_zone.floorArea,"m^2","ft^2").get, Geometry.get_volume_from_spaces(thermal_zone.spaces), Geometry.get_z_origin_for_zone(thermal_zone))
         end
       end
-
       if unit.living_zone.nil?
         runner.registerError("Unable to identify the living zone for #{building_unit.name}.")
         return false
@@ -1141,7 +1140,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
           off_rule.setEndDate(date_e)
         end
       end
-      
+     
       unless unit.finished_basement_zone.nil?
         unit.finished_basement_zone.spaces.each do |space|
           obj_name = "#{obj_name_infil}|#{space.name}"

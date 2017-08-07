@@ -92,7 +92,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     new_model.get.getPlanarSurfaceGroups.each do |g| 
       g.clone(model)
     end
-    
+
     runner.registerFinalCondition("Final model has #{model.getPlanarSurfaceGroups.size} planar surface groups")
     
     # put all of the spaces in the model into a vector
@@ -103,7 +103,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     
     # intersect and match surfaces for each space in the vector
     OpenStudio::Model.intersectSurfaces(spaces)
-    OpenStudio::Model.matchSurfaces(spaces)    
+    OpenStudio::Model.matchSurfaces(spaces)
     
     json = JSON.parse(json)
 
@@ -212,8 +212,8 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       next unless surface.outsideBoundaryCondition.downcase == "surface"
       next if surface.adjacentSurface.is_initialized
       surface.setOutsideBoundaryCondition("Adiabatic")
-    end    
-
+    end
+=begin
     # FIXME: temp until i figure out why garage roof is adjacent to outdoors
     model.getSpaces.each do |space|
       next unless space.spaceType.get.standardsSpaceType.get == Constants.GarageSpaceType
@@ -225,7 +225,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
         end
       end      
     end
-    
+=end
     return true
 
   end

@@ -280,7 +280,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
 	
     # create living zone
     living_zone = OpenStudio::Model::ThermalZone.new(model)
-    # living_zone.setName(Constants.LivingZone)
+    living_zone.setName(Constants.LivingZone)
 	
     foundation_offset = 0.0
     if foundation_type == Constants.PierBeamFoundationType
@@ -299,7 +299,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         
         # create garage zone
         garage_zone = OpenStudio::Model::ThermalZone.new(model)
-        # garage_zone.setName(Constants.GarageZone)
+        garage_zone.setName(Constants.GarageZone)
         
         # make points and polygons
         if garage_pos == "Right"
@@ -320,7 +320,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         garage_space = OpenStudio::Model::Space::fromFloorPrint(garage_polygon, living_height, model)
         garage_space = garage_space.get
         garage_space_name = Constants.GarageSpace
-        # garage_space.setName(garage_space_name)
+        garage_space.setName(garage_space_name)
         if space_types_hash.keys.include? Constants.GarageSpaceType
           garage_space_type = space_types_hash[Constants.GarageSpaceType]
         else
@@ -419,7 +419,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       living_space = OpenStudio::Model::Space::fromFloorPrint(living_polygon, living_height, model)
       living_space = living_space.get   
       living_space_name = Constants.LivingSpace(floor+1)
-      # living_space.setName(living_space_name)
+      living_space.setName(living_space_name)
       if space_types_hash.keys.include? Constants.LivingSpaceType
         living_space_type = space_types_hash[Constants.LivingSpaceType]
       else
@@ -527,7 +527,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       if attic_type == Constants.UnfinishedAtticType        
         # create attic zone
         attic_zone = OpenStudio::Model::ThermalZone.new(model)
-        # attic_zone.setName(Constants.UnfinishedAtticZone)
+        attic_zone.setName(Constants.UnfinishedAtticZone)
         attic_space.setThermalZone(attic_zone)
         attic_space_name = Constants.UnfinishedAtticSpace
         attic_space_type_name = Constants.AtticSpaceType
@@ -537,7 +537,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         attic_space_type_name = Constants.LivingSpaceType
       end
 
-      # attic_space.setName(attic_space_name)
+      attic_space.setName(attic_space_name)
       if space_types_hash.keys.include? attic_space_type_name
         attic_space_type = space_types_hash[attic_space_type_name]
       else
@@ -572,7 +572,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       elsif foundation_type == Constants.PierBeamFoundationType
         foundation_zone_name = Constants.PierBeamZone
       end
-      # foundation_zone.setName(foundation_zone_name)
+      foundation_zone.setName(foundation_zone_name)
 
       # make polygons
       p = OpenStudio::Point3dVector.new
@@ -597,7 +597,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
         foundation_space_name = Constants.PierBeamSpace
         foundation_space_type_name = Constants.PierBeamSpaceType
       end
-      # foundation_space.setName(foundation_space_name)
+      foundation_space.setName(foundation_space_name)
       if space_types_hash.keys.include? foundation_space_type_name
         foundation_space_type = space_types_hash[foundation_space_type_name]
       else
@@ -613,8 +613,8 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
       
       # set foundation walls outside boundary condition
       spaces = model.getSpaces
-      spaces.each do |space|
-        if Geometry.get_space_floor_z(space) < 0
+      spaces.each do |space|     
+        if Geometry.get_space_floor_z(space) + OpenStudio.convert(space.zOrigin,"m","ft").get < 0
           surfaces = space.surfaces
           surfaces.each do |surface|
             next if surface.surfaceType.downcase != "wall"
@@ -752,7 +752,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
           end
           
           surface.createAdjacentSurface(garage_attic_space)
-          # garage_attic_space.setName(garage_attic_space_name)
+          garage_attic_space.setName(garage_attic_space_name)
           if space_types_hash.keys.include? garage_attic_space_type_name
             garage_attic_space_type = space_types_hash[garage_attic_space_type_name]
           else

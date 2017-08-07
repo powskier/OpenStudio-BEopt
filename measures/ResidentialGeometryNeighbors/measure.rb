@@ -140,7 +140,7 @@ class CreateResidentialNeighbors < OpenStudio::Measure::ModelMeasure
           space.surfaces.each do |existing_surface|
             next if existing_surface.outsideBoundaryCondition.downcase != "outdoors" and existing_surface.outsideBoundaryCondition.downcase != "adiabatic"
             next if existing_surface.adjacentSurface.is_initialized
-            next if existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and !space.name.to_s.downcase.include? Constants.CorridorSpace
+            next if existing_surface.outsideBoundaryCondition.downcase == "adiabatic" and !space.name.to_s.downcase.include? Constants.CorridorSpace and existing_surface.surfaceType.downcase != "roofceiling"
             m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
             m[0,3] = -x_offset
             m[1,3] = -y_offset

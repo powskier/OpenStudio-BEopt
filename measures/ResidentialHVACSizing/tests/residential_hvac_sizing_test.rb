@@ -129,7 +129,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -243,7 +243,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1553,
             'DehumidLoad_Inf_Lat' => -1150,
@@ -531,7 +531,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1553,
             'DehumidLoad_Inf_Lat' => -1150,
@@ -1158,7 +1158,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -635,
             'DehumidLoad_Inf_Lat' => -470,
@@ -1215,7 +1215,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -635,
             'DehumidLoad_Inf_Lat' => -470,
@@ -1272,7 +1272,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1340,7 +1340,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1408,7 +1408,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1476,7 +1476,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1544,7 +1544,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1618,7 +1618,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1692,7 +1692,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1778,7 +1778,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1864,7 +1864,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -1964,7 +1964,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2308,7 +2308,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2371,7 +2371,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2434,7 +2434,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2500,7 +2500,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2566,7 +2566,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2640,7 +2640,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2714,7 +2714,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2800,7 +2800,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2886,7 +2886,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -2953,7 +2953,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
-    expected_num_new_objects = {}
+    expected_num_new_objects = {"SpaceType"=>1}
     expected_values = {
             'DehumidLoad_Inf_Sens' => -1567,
             'DehumidLoad_Inf_Lat' => -1161,
@@ -3016,7 +3016,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_GF_RAC_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
-  def test_equip_mshp_autosize
+  def test_equip_mshp_autosize # FIXME
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -3091,7 +3091,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_MSHP_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
-  def test_equip_mshp_fixedsize
+  def test_equip_mshp_fixedsize # FIXME
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -3166,7 +3166,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_MSHP_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
-  def test_equip_mshp_autosize_for_max_load
+  def test_equip_mshp_autosize_for_max_load # FIXME
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -3241,7 +3241,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_MSHP_AutosizeForMaxLoad.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
 
-  def test_equip_mshp_and_electric_baseboard_autosize
+  def test_equip_mshp_and_electric_baseboard_autosize # FIXME
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
@@ -3318,7 +3318,7 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_MSHP_BB_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
 
-  def test_equip_mshp_and_electric_baseboard_fixedsize
+  def test_equip_mshp_and_electric_baseboard_fixedsize # FIXME
     args_hash = {}
     args_hash["show_debug_info"] = true
     expected_num_del_objects = {}
