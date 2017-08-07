@@ -195,12 +195,7 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    attic_spaces = []
-    model.getSpaces.each do |space|
-      next unless Geometry.is_attic(space)
-      attic_spaces << space
-    end
-    roof_tilt = Geometry.calculate_avg_roof_pitch(attic_spaces)
+    roof_tilt = Geometry.calculate_avg_roof_pitch(model.getSpaces)
     if roof_tilt.nil?
       runner.registerError("Could not calculate average roof pitch.")
       return false

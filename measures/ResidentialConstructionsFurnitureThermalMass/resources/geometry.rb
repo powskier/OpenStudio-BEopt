@@ -686,9 +686,10 @@ class Geometry
         spaces.each do |space|
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "roofceiling"
+                next if surface.outsideBoundaryCondition.downcase != "outdoors"
                 tilts << surface.tilt
             end
-        end
+        end     
         if tilts.length == 0 or tilts.max - tilts.min > 0.05
             return nil
         end
