@@ -52,44 +52,18 @@ class Geometry
       least_z = 9e99
       greatest_z = -9e99
       surface.vertices.each do |vertex|
-        if vertex.x < least_x
-          least_x = vertex.x
-        end
-        if vertex.x > greatest_x
-          greatest_x = vertex.x
-        end
-        if vertex.y < least_y
-          least_y = vertex.y
-        end
-        if vertex.y > greatest_y
-          greatest_y = vertex.y
-        end
-        if vertex.z > greatest_z
-          greatest_z = vertex.z
-        end
-        if vertex.z < least_z
-          least_z = vertex.z
-        end
+        least_x = [vertex.x, least_x].min
+        greatest_x = [vertex.x, greatest_x].max
+        least_y = [vertex.y, least_y].min
+        greatest_y = [vertex.y, greatest_y].max
+        least_z = [vertex.z, least_z].min
+        greatest_z = [vertex.z, greatest_z].max
       end
       l = greatest_x - least_x
       w = greatest_y - least_y
       h = greatest_z - least_z  
       return l, w, h
     end
-
-    # TODO: Use algorithm in calculate_avg_roof_pitch instead
-    def self.get_roof_pitch(surfaces)
-      surfaces.each do |surface|
-        next unless self.is_attic(surface.space.get)
-        next unless surface.surfaceType.downcase == "roofceiling" and surface.outsideBoundaryCondition.downcase == "outdoors"
-        attic_length, attic_width, attic_height = self.get_surface_dimensions(surface)
-        if attic_length > attic_width
-          return attic_height / attic_width
-        else
-          return attic_height / attic_length
-        end
-      end
-    end  
   
     def self.get_building_stories(spaces)
       space_min_zs = []
