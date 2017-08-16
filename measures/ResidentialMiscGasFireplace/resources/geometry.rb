@@ -501,10 +501,12 @@ class Geometry
     end
     
     def self.space_is_finished(space)
-        if space.spaceType.is_initialized
-          if space.spaceType.get.standardsSpaceType.is_initialized
-            if space.spaceType.get.standardsSpaceType.get == Constants.LivingSpaceType
-              return true
+        unless space.isPlenum
+          if space.spaceType.is_initialized
+            if space.spaceType.get.standardsSpaceType.is_initialized
+              if space.spaceType.get.standardsSpaceType.get == Constants.LivingSpaceType
+                return true
+              end
             end
           end
         end
@@ -913,9 +915,11 @@ class Geometry
     end
     
     def self.space_is_of_type(space, space_type)
-      if space.spaceType.is_initialized
-        if space.spaceType.get.standardsSpaceType.is_initialized          
-          return true if space.spaceType.get.standardsSpaceType.get == space_type
+      unless space.isPlenum
+        if space.spaceType.is_initialized
+          if space.spaceType.get.standardsSpaceType.is_initialized          
+            return true if space.spaceType.get.standardsSpaceType.get == space_type
+          end
         end
       end
       return nil

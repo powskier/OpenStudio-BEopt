@@ -93,6 +93,116 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
     top_floor_z = determine_top_floor_z(model.getSpaces)
     num_floors = Geometry.get_building_stories(model.getSpaces)
     
+    model.getSurfaces.each do |roof_surface|
+
+      next unless roof_surface.surfaceType.downcase == "roofceiling"
+      next unless roof_surface.outsideBoundaryCondition.downcase == "outdoors"
+
+      model.getSurfaces.each do |wall_surface|
+      
+        next unless wall_surface.surfaceType.downcase == "wall"
+        next unless wall_surface.outsideBoundaryCondition.downcase == "outdoors"
+        # next unless wall_surface.vertices.length == 4
+
+        wall_top_vertices = []
+        roof_surface.vertices.each do |roof_vertex|
+
+          wall_surface.vertices.each do |wall_vertex|
+
+            next unless (roof_vertex.x - wall_vertex.x).abs < 0.001
+            next unless (roof_vertex.y - wall_vertex.y).abs < 0.001
+            next unless ((roof_vertex.z + roof_surface.space.get.zOrigin) - (wall_vertex.z + wall_surface.space.get.zOrigin)).abs < 0.001
+
+            wall_top_vertices << wall_vertex
+
+          end
+           
+        end
+
+        next unless wall_top_vertices.length == 2
+
+        zmin = 1000000
+        wall_surface.vertices.each do |vertex|
+          zmin = [zmin, vertex.z].min
+        end
+        
+        vertices = []
+        wall_surface.vertices.each do |vertex|
+          if vertex.z == zmin
+            newz = vertex.z + 0.1
+          else
+            newz = vertex.z
+          end
+          vertices << OpenStudio::Point3d.new(vertex.x, vertex.y, newz)
+        end
+        
+        wall_polygon = OpenStudio::Point3dVector.new(vertices)
+        sub_surface = OpenStudio::Model::SubSurface.new(wall_polygon, model)
+        sub_surface.setSubSurfaceType("FixedWindow")
+        sub_surface.setSurface(wall_surface)
+        overhang = sub_surface.addOverhang(eaves_depth - existing_eaves_depth, 0)
+        sub_surface.remove        
+        
+        eave = overhang.get
+        eave.setName("#{wall_surface.name} eave")
+        
+        xmin = 1000000
+        xmax = -1000000
+        ymin = 1000000
+        ymax = -1000000
+        eave.vertices.each do |vertex|
+          xmin = [xmin, vertex.x].min
+          xmax = [xmax, vertex.x].max
+          ymin = [ymin, vertex.y].min
+          ymax = [ymax, vertex.y].max
+        end
+        
+        # rotation with roof pitch
+        vector = OpenStudio::Vector3d.new(wall_top_vertices[0].x - wall_top_vertices[1].x, wall_top_vertices[0].y - wall_top_vertices[1].y, 0)
+        transformation = OpenStudio::Transformation.rotation(eave.vertices[0], vector, -Geometry.calculate_avg_roof_pitch(model.getSpaces) / 180.0 * 3.14159)
+        new_vertices = transformation * eave.vertices
+
+        # stretch the outside points
+        # new_vertices = OpenStudio::Point3dVector.new
+        # eave.vertices.each do |vertex|
+          # m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
+          # if (xmin - vertex.x) < 0.001
+            # m[0, 3] = -(eaves_depth - existing_eaves_depth)
+          # elsif (xmax - vertex.x) < 0.001
+            # m[0, 3] = eaves_depth - existing_eaves_depth
+          # elsif (ymin - vertex.y) < 0.001
+            # m[1, 3] = -(eaves_depth - existing_eaves_depth)
+          # elsif (ymax - vertex.y) < 0.001
+            # m[1, 3] = eaves_depth - existing_eaves_depth
+          # end
+          # new_vertices << OpenStudio::Transformation.new(m) * vertex
+        # end
+
+        eave.setVertices(new_vertices)
+        
+      end
+    
+    end
+    
+    # eliminate overlapping of eaves
+    model.getShadingSurfaces.each do |eave_1|
+      model.getShadingSurfaces.each do |eave_2|
+        next if eave_1 == eave_2
+        # puts eave_1.name, eave_2.name
+        new_eave_1 = OpenStudio::Point3dVector.new
+        eave_1.vertices.each do |vertex|
+          new_eave_1 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+        end
+        new_eave_2 = OpenStudio::Point3dVector.new
+        eave_2.vertices.each do |vertex|
+          new_eave_2 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+        end
+        next unless OpenStudio::intersects(new_eave_1, new_eave_2, 0.001)
+      end
+    end
+
+    return true
+    
     surfaces_modified = false
     
     shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
@@ -576,7 +686,7 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
             new_vertices << OpenStudio::Transformation.new(m_left_mid_in) * left_lower
             new_vertices << OpenStudio::Transformation.new(m_right_mid_in) * right_lower
             new_vertices << OpenStudio::Transformation.new(m_right_mid_out) * right_lower
-            new_surface.setVertices(new_vertices)        
+            new_surface.setVertices(new_vertices)
             shading_surface = OpenStudio::Model::ShadingSurface.new(new_surface.vertices, model)
             shading_surface.setName(Constants.ObjectNameEaves(Geometry.get_facade_for_surface(new_surface)))
             shading_surface.setShadingSurfaceGroup(shading_surface_group)
