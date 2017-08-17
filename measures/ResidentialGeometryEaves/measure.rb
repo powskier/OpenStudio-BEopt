@@ -85,13 +85,8 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
     if existing_eaves_depth.nil?
       existing_eaves_depth = 0
     end
-
     
-    model.getSurfaces.each do |roof_surface|
-    
-    end
-    
-    surfaces_modified = false    
+    surfaces_modified = false
     shading_surface_group = OpenStudio::Model::ShadingSurfaceGroup.new(model)
     shading_surface_group.setName(Constants.ObjectNameEaves)
 
@@ -123,7 +118,7 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
       
         vertex_dir_backup = roof_surface.vertices[-3]
         vertex_dir = roof_surface.vertices[-2]
-        vertex_1 = roof_surface.vertices[-1]      
+        vertex_1 = roof_surface.vertices[-1]
 
         roof_surface.vertices[0..-1].each do |vertex|
 
@@ -185,7 +180,21 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
           m = Geometry.initialize_transformation_matrix(OpenStudio::Matrix.new(4,4,0))
           m[2, 3] = roof_surface.space.get.zOrigin
           new_vertices = OpenStudio::Transformation.new(m) * new_vertices
-          
+=begin
+          shared_vertices = 0
+          model.getSurfaces.each do |surface|
+            next unless surface.surfaceType.downcase == "roofceiling"
+            next unless surface.outsideBoundaryCondition.downcase == "outdoors"
+            next if surface == roof_surface
+            surface.vertices.each do |roof_vertex|
+              new_vertices.each do |eave_vertex|
+                next unless roof_vertex == eave_vertex
+                shared_vertices += 1
+              end
+            end
+          end          
+          next if shared_vertices > 1
+=end
           shading_surface = OpenStudio::Model::ShadingSurface.new(new_vertices, model)
           shading_surface.setName("#{roof_surface.name} - #{Constants.ObjectNameEaves}")
           shading_surface.setShadingSurfaceGroup(shading_surface_group)
@@ -266,60 +275,111 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
         shading_surface.setShadingSurfaceGroup(shading_surface_group)
         
       end
-    
+      
     end
+
+    shading_surfaces_to_remove = []
+    shading_surfaces_to_add = []
+=begin    
+    model.getShadingSurfaces.each do |eave_1|
     
-    # remove any eaves with points inside roof deck polygons
-    model.getSurfaces.each do |roof_surface|
-
-      next unless roof_surface.surfaceType.downcase == "roofceiling"
-      next unless roof_surface.outsideBoundaryCondition.downcase == "outdoors"
-      
-      new_roof_surface = OpenStudio::Point3dVector.new
-      roof_surface.vertices.each do |vertex|
-        new_roof_surface << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)        
-      end
-      
-      model.getShadingSurfaces.each do |shading_surface|
-
-        new_shading_surface = OpenStudio::Point3dVector.new
-        shading_surface.vertices.each do |vertex|
-          new_shading_surface << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
-        end
-      
-        vertex_1 = new_shading_surface[-1]
-        new_shading_surface[0..-1].each do |vertex|
-
-          vertex_2 = vertex
-          midpoint = OpenStudio::Point3d.new((vertex_1.x + vertex_2.x) / 2, (vertex_1.y + vertex_2.y) / 2, 0)
-          if OpenStudio::pointInPolygon(midpoint, new_roof_surface, 0.001)
-            shading_surface.remove
+      vertices_1 = eave_1.vertices
+    
+      model.getShadingSurfaces.each do |eave_2|
+        
+        next if eave_1 == eave_2
+        
+        vertices_2 = eave_2.vertices
+        
+        vertex_1 = vertices_1[-1]
+        vertex_2 = nil
+        vertices_1.each do |point_1|
+          vertex_2 = point_1
+          distance_1 = Math.sqrt((vertex_1.x - vertex_2.x) ** 2 + (vertex_1.y - vertex_2.y) ** 2)
+          next unless (distance_1 - eaves_depth).abs < 0.001 # get the vertices of the short side
+          next unless vertices_2.include? vertex_1 and vertices_2.include? vertex_2
+          shading_surfaces_to_remove << eave_1
+          shading_surfaces_to_remove << eave_2
+          vertices = vertices_1 + vertices_2.reverse
+          vertices.each do |vertex|
+            next if vertices.count(vertex) == 1
+            vertices.delete(vertex)
           end
-          
+          shading_surfaces_to_add << vertices
           vertex_1 = vertex_2
+        end
+        
+      end
+    end
+
+    eliminate overlapping of eaves
+    model.getShadingSurfaces.each do |eave_1|
+      model.getShadingSurfaces.each do |eave_2|
+        next if eave_1 == eave_2
+        new_eave_1 = OpenStudio::Point3dVector.new
+        eave_1.vertices.each do |vertex|
+          new_eave_1 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+        end
+        new_eave_2 = OpenStudio::Point3dVector.new
+        eave_2.vertices.each do |vertex|
+          new_eave_2 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
+        end
+        next unless OpenStudio::intersects(new_eave_1, new_eave_2, 0.001)
+      end
+    end
+
+    # remove interior eaves
+    model.getShadingSurfaces.each do |shading_surface_1|
+
+      points_1 = shading_surface_1.vertices
+      model.getShadingSurfaces.each do |shading_surface_2|
+      
+        next if shading_surface_1 == shading_surface_2
+
+        total = 0
+      
+        points_2 = shading_surface_2.vertices
+        points_2.each do |point_2|
+        
+          zero_distance_to_segments = 0
+        
+          vertex_1 = points_1[-1]
+          points_1.each do |point_1|
+          
+            vertex_2 = point_1
+            
+            if OpenStudio::getDistancePointToLineSegment(point_2, [vertex_1, vertex_2]) == 0
+              zero_distance_to_segments += 1
+            end
+            
+            vertex_1 = vertex_2
+          
+          end
+
+          if zero_distance_to_segments > 0
+            total += 1
+          end
         
         end
 
-      end
+        if total >= 2 # FIXME
+          shading_surfaces_to_remove << shading_surface_2
+        end
       
+      end
+    
     end
-    
-    # eliminate overlapping of eaves
-    # model.getShadingSurfaces.each do |eave_1|
-      # model.getShadingSurfaces.each do |eave_2|
-        # next if eave_1 == eave_2
-        # new_eave_1 = OpenStudio::Point3dVector.new
-        # eave_1.vertices.each do |vertex|
-          # new_eave_1 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
-        # end
-        # new_eave_2 = OpenStudio::Point3dVector.new
-        # eave_2.vertices.each do |vertex|
-          # new_eave_2 << OpenStudio::Point3d.new(vertex.x, vertex.y, 0)
-        # end
-        # next unless OpenStudio::intersects(new_eave_1, new_eave_2, 0.001)
-      # end
-    # end
-    
+=end
+    shading_surfaces_to_remove.uniq.each do |shading_surface|
+      shading_surface.remove
+    end
+
+    shading_surfaces_to_add.uniq.each do |vertices|
+      shading_surface = OpenStudio::Model::ShadingSurface.new(vertices, model)
+      shading_surface.setName("Merged - #{Constants.ObjectNameEaves}")
+      shading_surface.setShadingSurfaceGroup(shading_surface_group)       
+    end
+
     unless surfaces_modified
       runner.registerAsNotApplicable("No surfaces found for adding eaves.")
       return true
