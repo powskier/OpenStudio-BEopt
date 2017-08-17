@@ -177,6 +177,10 @@ class DoorAreaTest < MiniTest::Test
     assert_in_epsilon(expected_corridor_door_area_added, new_corridor_door_area, 0.01)
     assert_in_epsilon(expected_door_area_removed, del_door_area, 0.01)
 
+    model.getSurfaces.each do |surface|
+      assert(surface.netArea > 0)
+    end
+    
     return model
   end  
   

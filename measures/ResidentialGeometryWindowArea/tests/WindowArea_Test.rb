@@ -17,6 +17,10 @@ class WindowAreaTest < MiniTest::Test
     return "SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm"
   end
   
+  def osm_geo_door_area
+    return "SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm"
+  end
+  
   def test_no_window_area
     args_hash = {}
     args_hash["front_wwr"] = 0
@@ -32,6 +36,11 @@ class WindowAreaTest < MiniTest::Test
   def test_sfd_new_construction_rotated
     args_hash = {}
     model = _test_measure(osm_geo_rotated, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1])
+  end
+  
+  def test_sfd_new_construction_door_area
+    args_hash = {}
+    model = _test_measure(osm_geo_door_area, args_hash, [0, 0, 0, 0], [0.0, 59.0, 32.8, 15.5])
   end
   
   def test_sfd_retrofit_replace
@@ -327,6 +336,10 @@ class WindowAreaTest < MiniTest::Test
     assert_in_epsilon(expected_fblr_win_area_removed[2], del_win_area[Constants.FacadeLeft], 0.01)
     assert_in_epsilon(expected_fblr_win_area_removed[3], del_win_area[Constants.FacadeRight], 0.01)
 
+    model.getSurfaces.each do |surface|
+      assert(surface.netArea > 0)
+    end
+    
     return model
   end  
   
