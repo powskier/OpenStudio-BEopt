@@ -128,6 +128,9 @@ class SetResidentialWindowArea < OpenStudio::Measure::ModelMeasure
             surface.subSurfaces.each do |sub_surface|
                 next if sub_surface.subSurfaceType.downcase != "fixedwindow"
                 if sub_surface.construction.is_initialized
+                  if not construction.nil?
+                    runner.registerWarning("Multiple constructions found. An arbitrary construction will be assigned to any new window(s).")
+                  end
                   construction = sub_surface.construction.get
                 end
                 sub_surface.remove

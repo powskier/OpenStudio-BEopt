@@ -52,6 +52,9 @@ class CreateResidentialDoorArea < OpenStudio::Measure::ModelMeasure
     model.getSubSurfaces.each do |sub_surface|
         next if sub_surface.subSurfaceType.downcase != "door"
         if sub_surface.construction.is_initialized
+          if not construction.nil?
+            runner.registerWarning("Multiple constructions found. An arbitrary construction will be assigned to any new door(s).")
+          end
           construction = sub_surface.construction.get
         end
         runner.registerInfo("Removed door(s) from #{sub_surface.surface.get.name}.")
