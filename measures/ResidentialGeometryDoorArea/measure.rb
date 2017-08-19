@@ -48,8 +48,15 @@ class CreateResidentialDoorArea < OpenStudio::Measure::ModelMeasure
 
     door_area = runner.getDoubleArgumentValue("door_area",user_arguments)
     
+    construction = nil
     model.getSubSurfaces.each do |sub_surface|
         next if sub_surface.subSurfaceType.downcase != "door"
+        if sub_surface.construction.is_initialized
+          if not construction.nil?
+            runner.registerWarning("Multiple constructions found. An arbitrary construction will be assigned to any new door(s).")
+          end
+          construction = sub_surface.construction.get
+        end
         runner.registerInfo("Removed door(s) from #{sub_surface.surface.get.name}.")
         sub_surface.remove
     end
@@ -214,6 +221,9 @@ class CreateResidentialDoorArea < OpenStudio::Measure::ModelMeasure
         door_sub_surface.setName("#{unit.name.to_s} - #{min_story_avail_wall.name} - Door")
         door_sub_surface.setSubSurfaceType("Door")
         door_sub_surface.setSurface(min_story_avail_wall)
+        if not construction.nil?
+          door_sub_surface.setConstruction(construction)
+        end
         
         tot_door_area += door_area
         break
