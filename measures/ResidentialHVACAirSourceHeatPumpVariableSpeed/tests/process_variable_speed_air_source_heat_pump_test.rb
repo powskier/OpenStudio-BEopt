@@ -6,7 +6,7 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class ProcessVariableSpeedAirSourceHeatPumpTest < MiniTest::Test  
-  
+
   def test_new_construction_seer_22_10_hspf
     args_hash = {}
     expected_num_del_objects = {}
@@ -88,7 +88,7 @@ class ProcessVariableSpeedAirSourceHeatPumpTest < MiniTest::Test
     expected_values = {"CoolingCOP"=>[5.65, 5.44, 4.57, 4.13], "HeatingCOP"=>[5.13, 4.83, 4.08, 4.11], "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 9)
   end  
-  
+
   def test_retrofit_replace_mshp
     args_hash = {}
     expected_num_del_objects = {"FanOnOff"=>2, "AirConditionerVariableRefrigerantFlow"=>2, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>2, "CoilCoolingDXVariableRefrigerantFlow"=>2, "CoilHeatingDXVariableRefrigerantFlow"=>2, "ZoneHVACBaseboardConvectiveElectric"=>2}
@@ -96,7 +96,7 @@ class ProcessVariableSpeedAirSourceHeatPumpTest < MiniTest::Test
     expected_values = {"CoolingCOP"=>[5.65, 5.44, 4.57, 4.13], "HeatingCOP"=>[5.13, 4.83, 4.08, 4.11], "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 10)
   end
-  
+
   def test_retrofit_replace_furnace_central_air_conditioner
     args_hash = {}
     expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingGas"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilCoolingDXSingleSpeed"=>1}
@@ -178,7 +178,7 @@ class ProcessVariableSpeedAirSourceHeatPumpTest < MiniTest::Test
     expected_values = {"CoolingCOP"=>[5.65, 5.44, 4.57, 4.13], "HeatingCOP"=>[5.13, 4.83, 4.08, 4.11], "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
   end
-  
+
   private
   
   def _test_error(osm_file_or_model, args_hash)
