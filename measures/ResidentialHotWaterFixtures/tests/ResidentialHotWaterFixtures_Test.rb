@@ -19,6 +19,10 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank.osm"
   end
 
+  def osm_geo_beds_loc_tankwh_fixtures_recircdist
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_HWFixtures_RecircDist.osm"
+  end
+  
   def test_new_construction_none
     # Using energy multiplier
     args_hash = {}
@@ -73,6 +77,14 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     expected_num_new_objects = {"OtherEquipmentDefinition"=>2, "OtherEquipment"=>2, "WaterUseEquipmentDefinition"=>2, "WaterUseEquipment"=>2, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>2}
     expected_values = {"Annual_kwh"=>107.7, "HotWater_gpd"=>23, "Space"=>args_hash["space"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+  end
+  
+  def test_retrofit_replace2
+    args_hash = {}
+    expected_num_del_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60, "Space"=>args_hash["space"]}
+    model = _test_measure(osm_geo_beds_loc_tankwh_fixtures_recircdist, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
     
   def test_retrofit_remove
@@ -231,7 +243,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -272,6 +284,10 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     if not expected_values["Space"].nil?
         assert_equal(1, actual_values["Space"].uniq.size)
         assert_equal(expected_values["Space"], actual_values["Space"][0])
+    end
+    
+    model.getElectricEquipments.each do |ee|
+      assert(ee.schedule.is_initialized)
     end
 
     return model

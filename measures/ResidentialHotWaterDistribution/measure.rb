@@ -543,7 +543,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
                     recirc_pump_def.setFractionLatent(0)
                     recirc_pump_def.setFractionLost(1)
                 end
-                recirc_pump.setSchedule(sch_sh_schedule)
+                recirc_pump.setSchedule(sch_sh_schedule.clone.to_Schedule.get)
             end
         
             pump_s = ""
