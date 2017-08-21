@@ -178,6 +178,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
                 end
                 space.electricEquipment.each do |ee|
                     next if ee.name.to_s != obj_name_recirc_pump
+                    ee.schedule.get.remove if ee.schedule.is_initialized
                     ee.remove
                     dist_removed = true
                 end
