@@ -178,6 +178,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
                 end
                 space.electricEquipment.each do |ee|
                     next if ee.name.to_s != obj_name_recirc_pump
+                    ee.schedule.get.remove if ee.schedule.is_initialized
                     ee.remove
                     dist_removed = true
                 end
@@ -543,7 +544,7 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
                     recirc_pump_def.setFractionLatent(0)
                     recirc_pump_def.setFractionLost(1)
                 end
-                recirc_pump.setSchedule(sch_sh_schedule)
+                recirc_pump.setSchedule(sch_sh_schedule.clone.to_Schedule.get)
             end
         
             pump_s = ""
