@@ -122,6 +122,13 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
     plant_loop.setDescription("Select the plant loop for the dishwasher. '#{Constants.Auto}' will try to choose the plant loop associated with the specified space. For multifamily buildings, '#{Constants.Auto}' will choose the plant loop for each unit of the building.")
     plant_loop.setDefaultValue(Constants.Auto)
 	args << plant_loop
+    
+    #make an argument for the number of days to shift the draw profile by
+    days_shift = OpenStudio::Measure::OSArgument::makeIntegerArgument("days_shift",true)
+    days_shift.setDisplayName("Number of days to shift the hot water draw profile by")
+    days_shift.setDescription("Number of days by which to shift the domestic hot water profile. Draw profiles are shifted to ensure that there aren't too many coincident events when doing ResStock runs or runs in multiple units.")
+    days_shift.setDefaultValue(0)
+    args << days_shift
 
     return args
   end #end the arguments method
@@ -147,6 +154,7 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
 	dw_hot_water_multiplier = runner.getDoubleArgumentValue("mult_hw", user_arguments)
 	space_r = runner.getStringArgumentValue("space",user_arguments)
     plant_loop_s = runner.getStringArgumentValue("plant_loop", user_arguments)
+    d_sh = runner.getIntegerArgumentValue("days_shift",user_arguments)
 	
 	#Check for valid inputs
 	if dw_capacity < 1
@@ -177,6 +185,10 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
 		runner.registerError("Occupancy hot water multiplier must be greater than or equal to 0.")
 		return false
 	end
+    if d_sh < 0 or d_sh > 364
+        runner.registerError("Hot water draw profile can only be shifted by 0-364 days.")
+        return false
+    end
     
     # Get building units
     units = Geometry.get_building_units(model, runner)
@@ -424,7 +436,7 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
         if dw_ann > 0
             
             # Create schedule
-            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", Constants.ObjectNameDishwasher + " temperature schedule", nbeds, sch_unit_index, "Dishwasher", wh_setpoint, File.dirname(__FILE__))
+            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", Constants.ObjectNameDishwasher + " temperature schedule", nbeds, d_sh, "Dishwasher", wh_setpoint, File.dirname(__FILE__))
             if not sch.validated?
                 return false
             end

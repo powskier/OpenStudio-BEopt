@@ -80,6 +80,13 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
         plant_loop.setDescription("Select the plant loop for the hot water fixtures. '#{Constants.Auto}' will try to choose the plant loop associated with the specified space. For multifamily buildings, '#{Constants.Auto}' will choose the plant loop for each unit of the building.")
         plant_loop.setDefaultValue(Constants.Auto)
         args << plant_loop
+        
+        #make an argument for the number of days to shift the draw profile by
+        days_shift = OpenStudio::Measure::OSArgument::makeIntegerArgument("days_shift",true)
+        days_shift.setDisplayName("Number of days to shift the hot water draw profile by")
+        days_shift.setDescription("Number of days by which to shift the domestic hot water profile. Draw profiles are shifted to ensure that there aren't too many coincident events when doing ResStock runs or runs in multiple units.")
+        days_shift.setDefaultValue(0)
+        args << days_shift
 
 		return args
 	end #end the arguments method
@@ -94,40 +101,16 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
 		end
 
 		#assign the user inputs to variables
-    sh_mult = runner.getDoubleArgumentValue("shower_mult",user_arguments)
-    s_mult = runner.getDoubleArgumentValue("sink_mult", user_arguments)
-    b_mult = runner.getDoubleArgumentValue("bath_mult", user_arguments)
-    space_r = runner.getStringArgumentValue("space",user_arguments)
-    plant_loop_s = runner.getStringArgumentValue("plant_loop", user_arguments)
-    
-    #Check for valid and reasonable inputs
-    if sh_mult < 0
-        runner.registerError("Shower hot water usage multiplier must be greater than or equal to 0.")
-        return false
-    end
-    if s_mult < 0
-        runner.registerError("Sink hot water usage multiplier must be greater than or equal to 0.")
-        return false
-    end
-    if b_mult < 0
-        runner.registerError("Bath hot water usage multiplier must be greater than or equal to 0.")
-        return false
-    end
-    
-    # Get building units
-    units = Geometry.get_building_units(model, runner)
-    if units.nil?
-        return false
-    end
-
-    tot_sh_gpd = 0
-    tot_s_gpd = 0
-    tot_b_gpd = 0
-    msgs = []
-    units.each do |unit|
-        # Get unit beds/baths
-        nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
-        if nbeds.nil? or nbaths.nil?
+        sh_mult = runner.getDoubleArgumentValue("shower_mult",user_arguments)
+        s_mult = runner.getDoubleArgumentValue("sink_mult", user_arguments)
+        b_mult = runner.getDoubleArgumentValue("bath_mult", user_arguments)
+        space_r = runner.getStringArgumentValue("space",user_arguments)
+        plant_loop_s = runner.getStringArgumentValue("plant_loop", user_arguments)
+        d_sh = runner.getIntegerArgumentValue("days_shift",user_arguments)
+        
+        #Check for valid and reasonable inputs
+        if sh_mult < 0
+            runner.registerError("Shower hot water usage multiplier must be greater than or equal to 0.")
             return false
         end
         sch_unit_index = Geometry.get_unit_dhw_sched_index(model, unit, runner)
@@ -142,6 +125,15 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
         #Get plant loop
         plant_loop = Waterheater.get_plant_loop_from_string(model.getPlantLoops, plant_loop_s, unit.spaces, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_"), runner)
         if plant_loop.nil?
+            return false
+        end
+        if d_sh < 0 or d_sh > 364
+            runner.registerError("Hot water draw profile can only be shifted by 0-364 days.")
+            return false
+        end
+        # Get building units
+        units = Geometry.get_building_units(model, runner)
+        if units.nil?
             return false
         end
 
