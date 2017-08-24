@@ -258,12 +258,15 @@ class ResidentialHotWaterSolar < OpenStudio::Measure::ModelMeasure
           dhw_loop.supplyComponents.each do |supply_component|
             if supply_component.to_WaterHeaterMixed.is_initialized
               water_heater = supply_component.to_WaterHeaterMixed.get
-              setpoint_schedule_one = water_heater.setpointTemperatureSchedule.get
-              setpoint_schedule_two = water_heater.setpointTemperatureSchedule.get
+              setpoint_temperature_schedule = water_heater.setpointTemperatureSchedule.get.clone.to_ScheduleConstant.get
+              setpoint_schedule_one = setpoint_temperature_schedule
+              setpoint_schedule_two = setpoint_temperature_schedule
             elsif supply_component.to_WaterHeaterStratified.is_initialized
               water_heater = supply_component.to_WaterHeaterStratified.get
-              setpoint_schedule_one = water_heater.heater1SetpointTemperatureSchedule
-              setpoint_schedule_two = water_heater.heater2SetpointTemperatureSchedule
+              setpoint_temperature_schedule_one = water_heater.heater1SetpointTemperatureSchedule.clone.to_ScheduleConstant.get
+              setpoint_temperature_schedule_two = water_heater.heater2SetpointTemperatureSchedule.clone.to_ScheduleConstant.get
+              setpoint_schedule_one = setpoint_temperature_schedule_one
+              setpoint_schedule_two = setpoint_temperature_schedule_two
             end
           end
           break
