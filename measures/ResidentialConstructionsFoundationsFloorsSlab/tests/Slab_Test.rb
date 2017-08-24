@@ -270,6 +270,23 @@ class ProcessConstructionsFoundationsFloorsSlabTest < MiniTest::Test
     _test_measure(osm_geo_slab, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
+  def test_sfd_multi_zone
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_values = {"LayerRValue"=>0.0254/0.0049311663085221+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>5}
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_mf_multi_zone
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Material"=>3, "Construction"=>1}
+    expected_values = {"LayerRValue"=>0.0254/0.00479759147063824+0.3048/1.731+0.1016/1.3127, "LayerDensity"=>40.05+1842.3+2242.8, "LayerSpecificHeat"=>1214.23+418.7+837.4, "LayerIndex"=>0+1+2, "SurfacesWithConstructions"=>13}
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
   private
   
   def _test_error(osm_file, args_hash)

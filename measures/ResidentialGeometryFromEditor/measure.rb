@@ -117,7 +117,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     
     # permit only expected space type names
     model.getSpaceTypes.each do |space_type|
-      next if [Constants.AtticSpaceType, Constants.BasementSpaceType, Constants.CorridorSpaceType, Constants.CrawlSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.PierBeamSpaceType].include? space_type.standardsSpaceType.get
+      next if expected_space_types.include? space_type.standardsSpaceType.get
       runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'.")
       return false
     end
@@ -228,6 +228,21 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
 =end
     return true
 
+  end
+  
+  def expected_space_types
+    space_types = []
+    space_types << Constants.AtticSpaceType
+    space_types << Constants.BasementSpaceType
+    space_types << Constants.CorridorSpaceType
+    space_types << Constants.CrawlSpaceType
+    space_types << Constants.GarageSpaceType
+    space_types << Constants.LivingSpaceType
+    space_types << Constants.PierBeamSpaceType
+    space_types << Constants.KitchenSpaceType
+    space_types << Constants.BedroomSpaceType
+    space_types << Constants.BathroomSpaceType
+    return space_types
   end
   
 end

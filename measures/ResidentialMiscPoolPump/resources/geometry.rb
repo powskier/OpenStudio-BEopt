@@ -233,31 +233,41 @@ class Geometry
         return (model.getSpaces - self.get_all_unit_spaces(model, runner))
     end
     
-    def self.get_unit_default_finished_space(unit_spaces, runner)
-        # For the specified unit, chooses an arbitrary finished space on the lowest above-grade story.
-        # If no above-grade finished spaces are available, reverts to an arbitrary below-grade finished space.
+    def self.get_unit_space_type_finished_space(unit_spaces, runner, space_type)
         space = nil
-        # Get lowest above-grade space
-        bldg_min_z = 100000
+        # TODO: loop thru the array of ordered space types
         unit_spaces.each do |s|
-            next if self.space_is_below_grade(s)
-            next if self.space_is_unfinished(s)      
-            space_min_z = self.getSurfaceZValues(s.surfaces).min + OpenStudio::convert(s.zOrigin,"m","ft").get
-            next if space_min_z >= bldg_min_z
-            bldg_min_z = space_min_z
-            space = s
+          next unless s.spaceType.get.standardsSpaceType.get == space_type
+          space = s
+          break
         end
         if space.nil?
-            # Try below-grade space
-            unit_spaces.each do |s|
-                next if self.space_is_above_grade(s)
-                next if self.space_is_unfinished(s)
-                space = s
-                break
-            end
+          runner.registerWarning("Could not find a space with space type '#{space_type}'. Choosing an arbitrary finished space on the lowest above-grade story.")
+          # For the specified unit, chooses an arbitrary finished space on the lowest above-grade story.
+          # If no above-grade finished spaces are available, reverts to an arbitrary below-grade finished space.
+          space = nil
+          # Get lowest above-grade space
+          bldg_min_z = 100000
+          unit_spaces.each do |s|
+              next if self.space_is_below_grade(s)
+              next if self.space_is_unfinished(s)
+              space_min_z = self.getSurfaceZValues(s.surfaces).min + OpenStudio::convert(s.zOrigin,"m","ft").get
+              next if space_min_z >= bldg_min_z
+              bldg_min_z = space_min_z
+              space = s
+          end
+          if space.nil?
+              # Try below-grade space
+              unit_spaces.each do |s|
+                  next if self.space_is_above_grade(s)
+                  next if self.space_is_unfinished(s)
+                  space = s
+                  break
+              end
+          end
         end
         if space.nil?
-            runner.registerError("Could not find a finished space for '#{unit_spaces[0].buildingUnit.get.name}'.")
+          runner.registerWarning("Could not find a finished space for '#{unit_spaces[0].buildingUnit.get.name}'.")
         end
         return space
     end
@@ -478,13 +488,18 @@ class Geometry
         unless space.isPlenum
           if space.spaceType.is_initialized
             if space.spaceType.get.standardsSpaceType.is_initialized
-              if space.spaceType.get.standardsSpaceType.get == Constants.LivingSpaceType
-                return true
-              end
+              return self.is_living_space_type(space.spaceType.get.standardsSpaceType.get)
             end
           end
         end
         return false
+    end
+    
+    def self.is_living_space_type(space_type)
+      if [Constants.LivingSpaceType, Constants.KitchenSpaceType, Constants.BedroomSpaceType, Constants.BathroomSpaceType].include? space_type
+        return true
+      end
+      return false
     end
     
     # Returns true if space is fully above grade
@@ -525,19 +540,18 @@ class Geometry
         return false
     end
 
-    def self.get_space_from_string(spaces, space_s, runner=nil)
-        if space_s == Constants.Auto
-            return self.get_unit_default_finished_space(spaces, runner)
+    def self.get_space_from_string(spaces, space_s, runner=nil, space_type=nil)
+        if not space_type.nil?
+            return self.get_unit_space_type_finished_space(spaces, runner, space_type)
         end
         space = nil
         spaces.each do |s|
-            if s.name.to_s == space_s
-                space = s
-                break
-            end
+            next unless "Space: #{s.name}" == space_s
+            space = s
+            break
         end
         if space.nil? and !runner.nil?
-            runner.registerError("Could not find space with the name '#{space_s}'.")
+            runner.registerWarning("Could not find space with the name '#{space_s.gsub("Space: ", "")}' for '#{spaces[0].buildingUnit.get.name}'.")
         end
         return space
     end
@@ -545,13 +559,11 @@ class Geometry
     def self.get_thermal_zone_from_string(zones, thermalzone_s, runner=nil)
         thermal_zone = nil
         zones.each do |tz|
-            if tz.name.to_s == thermalzone_s
-                thermal_zone = tz
-                break
-            end
+            next unless "Thermal Zone: #{tz.name}" == thermalzone_s
+            thermal_zone = tz
         end
         if thermal_zone.nil? and !runner.nil?
-            runner.registerError("Could not find zone with the name '#{thermalzone_s}'.")
+            runner.registerError("Could not find zone with the name '#{thermalzone_s.gsub("Thermal Zone: ", "")}'.")
         end
         return thermal_zone
     end
@@ -1023,7 +1035,7 @@ class Geometry
         return finished_attic_spaces
     end
         
-    def self.get_garage_spaces(spaces, model)
+    def self.get_garage_spaces(spaces)
         garage_spaces = []
         spaces.each do |space|
             next if not self.is_garage(space)

@@ -483,52 +483,61 @@ class Waterheater
         end
     end
     
-    def self.get_water_heater_location_auto(model, spaces, runner)
-        #If auto is picked, get the BA climate zone, 
-        #check if the building has a garage/basement, 
-        #and assign the water heater location appropriately
-        climateZones = model.getClimateZones
-        ba_cz_name = ""
-        climateZones.climateZones.each do |climateZone|
-            if climateZone.institution == Constants.BuildingAmericaClimateZone
-                ba_cz_name = climateZone.value.to_s
-            end
-        end
-        living = Geometry.get_unit_default_finished_space(spaces, runner)
-        garage = Geometry.get_garage_spaces(spaces, model)
-        fin_basement = Geometry.get_finished_basement_spaces(spaces)
-        unfin_basement = Geometry.get_unfinished_basement_spaces(spaces)
+    def self.get_water_heater_location_auto(model, spaces, runner, space_type)
         wh_tz = nil
-        if ba_cz_name == Constants.BAZoneHotDry or ba_cz_name == Constants.BAZoneHotHumid
-            #check if the building has a garage
-            if garage.length > 0
-                wh_tz = garage[0].thermalZone.get
-            elsif not living.nil? #no garage, in living space
-                wh_tz = living.thermalZone.get
-            end
-        elsif ba_cz_name == Constants.BAZoneMarine or ba_cz_name == Constants.BAZoneMixedHumid or ba_cz_name == Constants.BAZoneMixedHumid or ba_cz_name == Constants.BAZoneCold or ba_cz_name == Constants.BAZoneVeryCold or ba_cz_name == Constants.BAZoneSubarctic
-            #TODO: always locating the water heater in the first unconditioned space, what if there's multiple
-            if fin_basement.length > 0
-                wh_tz = fin_basement[0].thermalZone.get
-            elsif unfin_basement.length > 0
-                wh_tz = unfin_basement[0].thermalZone.get
-            elsif not living.nil? #no basement, in living space
-                wh_tz = living.thermalZone.get
-            end
-        else
-            runner.registerWarning("No Building America climate zone has been assigned. The water heater location will be chosen with the following priority: basement > garage > living")
-            #check for suitable WH locations
-            #TODO: in BEopt, priority goes living>fin attic. Since we always assign a zone as the living space in OS, this is the final location.
-            #If geometry.rb is changed to better identify living zones, update this code to differentiate between living tz and fin attic tz
-            if fin_basement.length > 0
-                wh_tz = fin_basement[0].thermalZone.get
-            elsif unfin_basement.length > 0
-                wh_tz = unfin_basement[0].thermalZone.get
-            elsif garage.length > 0
-                wh_tz = garage[0].thermalZone.get
-            elsif not living.nil? #no basement or garage, in living space
-                wh_tz = living.thermalZone.get
-            end
+        # TODO: loop thru the array of ordered space types
+        spaces.each do |s|
+          next unless s.spaceType.get.standardsSpaceType.get == space_type
+          wh_tz = s.thermalZone.get
+          break
+        end
+        if wh_tz.nil?
+          runner.registerWarning("Could not find a thermal zone with space type '#{space_type}'. Choosing a thermal zone based on BA climate zone.")
+          #If auto is picked, get the BA climate zone, 
+          #check if the building has a garage/basement, 
+          #and assign the water heater location appropriately
+          climateZones = model.getClimateZones
+          ba_cz_name = ""
+          climateZones.climateZones.each do |climateZone|
+              if climateZone.institution == Constants.BuildingAmericaClimateZone
+                  ba_cz_name = climateZone.value.to_s
+              end
+          end
+          living = Geometry.get_unit_space_type_finished_space(spaces, runner, space_type)
+          garage = Geometry.get_garage_spaces(spaces)
+          fin_basement = Geometry.get_finished_basement_spaces(spaces)
+          unfin_basement = Geometry.get_unfinished_basement_spaces(spaces)
+          if ba_cz_name == Constants.BAZoneHotDry or ba_cz_name == Constants.BAZoneHotHumid
+              #check if the building has a garage
+              if garage.length > 0
+                  wh_tz = garage[0].thermalZone.get
+              elsif not living.nil? #no garage, in living space
+                  wh_tz = living.thermalZone.get
+              end
+          elsif ba_cz_name == Constants.BAZoneMarine or ba_cz_name == Constants.BAZoneMixedHumid or ba_cz_name == Constants.BAZoneMixedHumid or ba_cz_name == Constants.BAZoneCold or ba_cz_name == Constants.BAZoneVeryCold or ba_cz_name == Constants.BAZoneSubarctic
+              #TODO: always locating the water heater in the first unconditioned space, what if there's multiple
+              if fin_basement.length > 0
+                  wh_tz = fin_basement[0].thermalZone.get
+              elsif unfin_basement.length > 0
+                  wh_tz = unfin_basement[0].thermalZone.get
+              elsif not living.nil? #no basement, in living space
+                  wh_tz = living.thermalZone.get
+              end
+          else
+              runner.registerWarning("No Building America climate zone has been assigned. The water heater location will be chosen with the following priority: basement > garage > living")
+              #check for suitable WH locations
+              #TODO: in BEopt, priority goes living>fin attic. Since we always assign a zone as the living space in OS, this is the final location.
+              #If geometry.rb is changed to better identify living zones, update this code to differentiate between living tz and fin attic tz
+              if fin_basement.length > 0
+                  wh_tz = fin_basement[0].thermalZone.get
+              elsif unfin_basement.length > 0
+                  wh_tz = unfin_basement[0].thermalZone.get
+              elsif garage.length > 0
+                  wh_tz = garage[0].thermalZone.get
+              elsif not living.nil? #no basement or garage, in living space
+                  wh_tz = living.thermalZone.get
+              end
+          end
         end
         
         return wh_tz

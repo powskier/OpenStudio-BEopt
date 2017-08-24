@@ -106,6 +106,24 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     # model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   # end
 
+  def test_sfd_multi_zone_floorplan
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_Multizone.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>73, "Space"=>11, "SpaceType"=>6, "ThermalZone"=>11, "BuildingUnit"=>1}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  # def test_mf_multi_zone_floorplan
+    # args_hash = {}
+    # args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_Multizone.json")
+    # expected_num_del_objects = {}
+    # expected_num_new_objects = {"Building"=>1, "Surface"=>159, "Space"=>21, "SpaceType"=>6, "ThermalZone"=>21, "BuildingUnit"=>1}
+    # expected_values = {}
+    # model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  # end
+
   private
   
   def _test_error(osm_file, args_hash)
@@ -172,6 +190,10 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     measure.run(model, runner, argument_map)
     result = runner.result
 
+    # save the model to test output directory
+    output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
+    model.save(output_file_path,true)    
+    
     # show the output
     # show_output(result)
     
@@ -198,10 +220,6 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
 
         end
     end
-
-    # save the model to test output directory
-    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/#{File.basename(args_hash["floorplan_path"]).gsub(".json","")}" + ".osm")
-    # model.save(output_file_path,true)
     
     return model
   end

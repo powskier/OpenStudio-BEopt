@@ -98,6 +98,9 @@ class Constants
   def self.BasementZone
     return 'basement zone'
   end
+  def self.BathroomSpaceType
+    return 'bathroom'
+  end
   def self.BAZoneCold
     return 'Cold'
   end
@@ -121,6 +124,9 @@ class Constants
   end
   def self.BAZoneVeryCold
     return 'Very Cold'
+  end
+  def self.BedroomSpaceType
+    return 'bedroom'
   end
   def self.BoilerTypeCondensing
     return 'hot water, condensing'
@@ -351,6 +357,9 @@ class Constants
       s_unit = "|#{unit_name}"
     end
     return "garage zone#{s_unit}"
+  end
+  def self.KitchenSpaceType
+    return 'kitchen'
   end
   def self.LivingSpace(story=1, unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""

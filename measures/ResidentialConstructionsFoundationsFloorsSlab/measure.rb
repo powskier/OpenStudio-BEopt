@@ -337,8 +337,7 @@ class ProcessConstructionsFoundationsFloorsSlab < OpenStudio::Measure::ModelMeas
     
     return slabCarpetPerimeterConduction, slabBarePerimeterConduction, slabHasWholeInsulation
     
-  end
-  
+  end  
 
   def PerimeterSlabInsulation(rperim, rgap, wperim, slabWidth, slabLength, carpet, k)
     # Coded by Dennis Barley, April 2013.

@@ -27,18 +27,52 @@ class AddResidentialBedroomsAndBathrooms < OpenStudio::Measure::ModelMeasure
   def arguments(model)
     args = OpenStudio::Measure::OSArgumentVector.new        
 
+    num_beds = []
+    num_baths = []    
+    model.getBuildingUnits.each do |unit|
+      num_br = 0
+      num_ba = 0
+      unit.spaces.each do |space|
+        next unless space.spaceType.is_initialized
+        next unless space.spaceType.get.standardsSpaceType.is_initialized
+        if space.spaceType.get.standardsSpaceType.get == Constants.BedroomSpaceType
+          num_br += 1
+        elsif space.spaceType.get.standardsSpaceType.get == Constants.BathroomSpaceType
+          num_ba += 1
+        end
+      end
+      if num_br > 0
+        num_beds << num_br
+      end
+      if num_ba > 0
+        num_baths << num_ba
+      end
+    end
+    
+    if num_beds.empty?
+      num_beds = "3"
+    else
+      num_beds = num_beds.join(", ")
+    end
+    
+    if num_baths.empty?
+      num_baths = "2"
+    else
+      num_baths = num_baths.join(", ")
+    end
+    
     #make a string argument for number of bedrooms
     num_br = OpenStudio::Measure::OSArgument::makeStringArgument("num_bedrooms", false)
     num_br.setDisplayName("Number of Bedrooms")
     num_br.setDescription("Specify the number of bedrooms. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. Used to determine the energy usage of appliances and plug loads, hot water usage, mechanical ventilation rate, etc.")
-    num_br.setDefaultValue("3")
+    num_br.setDefaultValue(num_beds)
     args << num_br
     
     #make a string argument for number of bathrooms
     num_ba = OpenStudio::Measure::OSArgument::makeStringArgument("num_bathrooms", false)
     num_ba.setDisplayName("Number of Bathrooms")
     num_ba.setDescription("Specify the number of bathrooms. For a multifamily building, specify one value for all units or a comma-separated set of values (in the correct order) for each unit. Used to determine the hot water usage, etc.")
-    num_ba.setDefaultValue("2")
+    num_ba.setDefaultValue(num_baths)
     args << num_ba
     
     return args
@@ -117,7 +151,7 @@ class AddResidentialBedroomsAndBathrooms < OpenStudio::Measure::ModelMeasure
       unit.setFeature(Constants.BuildingUnitFeatureNumBathrooms, num_ba[unit_index])
       
       if units.size > 1
-        runner.registerInfo("Unit '#{unit_index}' has been assigned #{num_br[unit_index].to_s} bedroom(s) and #{num_ba[unit_index].round(2).to_s} bathroom(s).")
+        runner.registerInfo("'#{unit.name}' has been assigned #{num_br[unit_index].to_s} bedroom(s) and #{num_ba[unit_index].round(2).to_s} bathroom(s).")
       end
       
       total_num_br += num_br[unit_index]

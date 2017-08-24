@@ -12,55 +12,55 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.0"
     args_hash["num_bathrooms"] = "2.0, 2.0"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bedroom elements specified inconsistent with number of bathroom elements specified.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedroom elements specified inconsistent with number of bathroom elements specified.")
   end
   
   def test_argument_error_beds_not_equal_to_units
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bedroom elements specified inconsistent with number of multifamily units defined in the model.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedroom elements specified inconsistent with number of multifamily units defined in the model.")
   end
   
   def test_argument_error_baths_not_equal_to_units
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bathroom elements specified inconsistent with number of multifamily units defined in the model.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathroom elements specified inconsistent with number of multifamily units defined in the model.")
   end
   
   def test_argument_error_beds_not_numerical
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, typo"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bedrooms must be a numerical value.")
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedrooms must be a numerical value.")
   end
   
   def test_argument_error_baths_not_numerical
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0, typo"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bathrooms must be a numerical value.")  
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathrooms must be a numerical value.")  
   end
   
   def test_argument_error_beds_not_positive_integer
     args_hash = {}
     args_hash["num_bedrooms"] = "3.0, 3.0, 3.5"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bedrooms must be a positive integer.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bedrooms must be a positive integer.")    
   end
   
   def test_argument_error_baths_not_positive_multiple_of_0pt25
     args_hash = {}
     args_hash["num_bathrooms"] = "2.0, 2.0, 2.8"
     result = _test_error("SFD_2000sqft_2story_SL_UA.osm", args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of bathrooms must be a positive multiple of 0.25.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Number of bathrooms must be a positive multiple of 0.25.")    
   end
   
   def test_error_no_units_defined_in_model
     args_hash = {}
     result = _test_error(nil, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "No building geometry has been defined.")   
+    assert_includes(result.errors.map{ |x| x.logMessage }, "No building geometry has been defined.")   
   end
   
   def test_retrofit_replace
@@ -68,13 +68,13 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"Beds"=>3.0, "Baths"=>2.0, "Num_Units"=>num_units}
+    expected_values = {"Beds"=>3.0, "Baths"=>2.0}
     model = _test_measure("SFD_2000sqft_2story_SL_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["num_bedrooms"] = "4"
     args_hash["num_bathrooms"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"Beds"=>4.0, "Baths"=>3.0, "Num_Units"=>num_units}
+    expected_values = {"Beds"=>args_hash["num_bedrooms"].to_f, "Baths"=>args_hash["num_bathrooms"].to_f}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
   
@@ -85,7 +85,7 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash["num_bathrooms"] = "1"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"Beds"=>2.0, "Baths"=>1.0, "Num_Units"=>num_units}
+    expected_values = {"Beds"=>num_units*args_hash["num_bedrooms"].to_f, "Baths"=>num_units*args_hash["num_bathrooms"].to_f}
     _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)    
   end
   
@@ -96,9 +96,26 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     args_hash["num_bathrooms"] = "1.5"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"Beds"=>2.0, "Baths"=>1.5, "Num_Units"=>num_units}
+    expected_values = {"Beds"=>num_units*args_hash["num_bedrooms"].to_f, "Baths"=>num_units*args_hash["num_bathrooms"].to_f}
     _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)    
   end  
+  
+  def test_sfd_multi_zone
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {"Beds"=>2.0, "Baths"=>2.0}
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+  
+  def test_mf_multi_zone
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {"Beds"=>4.0, "Baths"=>3.0}
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+  end
   
   private
   
@@ -169,6 +186,9 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
+    # show the output
+    # show_output(result)
+    
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
@@ -186,11 +206,16 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
+    num_beds = 0
+    num_baths = 0
     model.getBuildingUnits.each do |unit|
         nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
-        assert_equal(expected_values["Beds"], nbeds)
-        assert_equal(expected_values["Baths"], nbaths)
+        num_beds += nbeds
+        num_baths += nbaths
     end
+
+    assert_equal(expected_values["Beds"], num_beds)
+    assert_equal(expected_values["Baths"], num_baths)
     
     return model
   end 
