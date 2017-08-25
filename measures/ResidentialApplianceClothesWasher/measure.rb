@@ -116,12 +116,12 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
     space_args = OpenStudio::StringVector.new
     space_args << Constants.Auto
     spaces.each do |space|
-        space_args << "Space: #{space.name.to_s}"
+        space_args << "Space: #{space.name}"
     end
     spaceTypes = model.getSpaceTypes
     spaceTypes.each do |spaceType|
       space_args << "Space Type: #{spaceType.standardsSpaceType.get}"
-    end    
+    end
     space = OpenStudio::Measure::OSArgument::makeChoiceArgument("space", space_args, true)
     space.setDisplayName("Location")
     space.setDescription("Select the space where the dishwasher is located. '#{Constants.Auto}' will choose the lowest above-grade finished space available (e.g., first story living space), or a below-grade finished space as last resort. For multifamily buildings, '#{Constants.Auto}' will choose a space for each unit of the building.")

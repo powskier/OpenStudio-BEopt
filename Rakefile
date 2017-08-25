@@ -154,7 +154,7 @@ namespace :test do
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
-    osw_files = ["SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osw", "MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osw"]
+
     osw_files.each do |osw|
 
         # Generate osm from osw

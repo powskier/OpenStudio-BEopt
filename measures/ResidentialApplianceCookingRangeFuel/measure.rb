@@ -90,7 +90,11 @@ class ResidentialCookingRangeFuel < OpenStudio::Measure::ModelMeasure
     space_args = OpenStudio::StringVector.new
     space_args << Constants.Auto
     spaces.each do |space|
-        space_args << space.name.to_s
+        space_args << "Space: #{space.name}"
+    end
+    spaceTypes = model.getSpaceTypes
+    spaceTypes.each do |spaceType|
+      space_args << "Space Type: #{spaceType.standardsSpaceType.get}"
     end
     space = OpenStudio::Measure::OSArgument::makeChoiceArgument("space", space_args, true)
     space.setDisplayName("Location")
@@ -152,8 +156,20 @@ class ResidentialCookingRangeFuel < OpenStudio::Measure::ModelMeasure
             return false
         end
         
+        # Get space type
+        space_type = nil
+        if space_r == Constants.Auto
+          space_type = Constants.KitchenSpaceType # TODO: make this an array based on Jon's spreadsheet
+        else
+          model.getSpaceTypes.each do |st|
+            next unless "Space Type: #{st.standardsSpaceType.get}" == space_r
+            space_type = st.standardsSpaceType.get
+            break
+          end
+        end
+        
         # Get space
-        space = Geometry.get_space_from_string(unit.spaces, space_r)
+        space = Geometry.get_space_from_string(unit.spaces, space_r, runner, space_type)
         next if space.nil?
 
         unit_obj_name_e = Constants.ObjectNameCookingRange(Constants.FuelTypeElectric, false, unit.name.to_s)
@@ -251,7 +267,11 @@ class ResidentialCookingRangeFuel < OpenStudio::Measure::ModelMeasure
             if e_ignition
                 s_ignition = " and #{range_ann_i.round} kWhs"
             end
-            msgs << "A cooking range with #{s_ann}#{s_ignition} annual energy consumption has been assigned to space '#{space.name.to_s}'."
+            msg = "A cooking range with #{s_ann}#{s_ignition} annual energy consumption has been assigned to space '#{space.name.to_s}'"
+            if space.spaceType.is_initialized
+              msg += " of space type '#{space.spaceType.get.standardsSpaceType.get}'"
+            end
+            msgs << msg + "."
             
             tot_range_ann_f += range_ann_f
             tot_range_ann_i += range_ann_i

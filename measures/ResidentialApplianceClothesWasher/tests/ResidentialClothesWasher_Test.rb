@@ -302,7 +302,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ScheduleConstant"=>1, "ScheduleFixedInterval"=>1, "WaterUseEquipment"=>1, "WaterUseEquipmentDefinition"=>1}
     expected_values = {"Annual_kwh"=>42.94, "HotWater_gpd"=>9.99, "Space"=>args_hash["space"]}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, num_units-1)
   end  
 
   def test_multifamily_new_construction
@@ -423,7 +423,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
