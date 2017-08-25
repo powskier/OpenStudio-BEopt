@@ -452,11 +452,11 @@ class ResidentialClothesWasherTest < MiniTest::Test
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
                 actual_values["Annual_kwh"] += OpenStudio.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh").get
                 actual_values["Space"] << new_object.space.get.name.to_s
+                actual_values["SpaceType"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             elsif obj_type == "WaterUseEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.flowRateFractionSchedule.get)
                 actual_values["HotWater_gpd"] += OpenStudio.convert(full_load_hrs * new_object.waterUseEquipmentDefinition.peakFlowRate * new_object.multiplier, "m^3/s", "gal/min").get * 60.0 / 365.0
-                actual_values["Space"] << new_object.space.get.name.to_s
-                actual_values["SpaceType"] << new_object.space.get.spaceType.get.standardsSpaceType.get
+                actual_values["Space"] << new_object.space.get.name.to_s                
             end
         end
     end

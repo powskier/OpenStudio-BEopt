@@ -60,11 +60,15 @@ class ResidentialExtraRefrigerator < OpenStudio::Measure::ModelMeasure
     args << monthly_sch
 
     #make a choice argument for space
-    spaces = model.getSpaces
     space_args = OpenStudio::StringVector.new
     space_args << Constants.Auto
+    spaces = model.getSpaces
     spaces.each do |space|
-        space_args << space.name.to_s
+      space_args << "Space: #{space.name}"
+    end
+    spaceTypes = model.getSpaceTypes
+    spaceTypes.each do |spaceType|
+      space_args << "Space Type: #{spaceType.standardsSpaceType.get}"
     end
     space = OpenStudio::Measure::OSArgument::makeChoiceArgument("space", space_args, true)
     space.setDisplayName("Location")
@@ -129,8 +133,20 @@ class ResidentialExtraRefrigerator < OpenStudio::Measure::ModelMeasure
             end
         end
 
+        # Get space type
+        space_type = nil
+        if space_r == Constants.Auto
+          space_type = Constants.GarageSpaceType # TODO: make this an array based on Jon's spreadsheet
+        else
+          model.getSpaceTypes.each do |st|
+            next unless "Space Type: #{st.standardsSpaceType.get}" == space_r
+            space_type = st.standardsSpaceType.get
+            break
+          end
+        end
+        
         # Get space
-        space = Geometry.get_space_from_string(unit_spaces, space_r)
+        space = Geometry.get_space_from_string(unit_spaces, space_r, runner, space_type)
         next if space.nil?
         
         unit_obj_name = Constants.ObjectNameExtraRefrigerator(unit.name.to_s)
@@ -181,7 +197,11 @@ class ResidentialExtraRefrigerator < OpenStudio::Measure::ModelMeasure
             frg_def.setFractionLost(0)
             frg.setSchedule(sch.schedule)
             
-            msgs << "An extra refrigerator with #{fridge_ann.round} kWhs annual energy consumption has been assigned to space '#{space.name.to_s}'."
+            msg = "An extra refrigerator with #{fridge_ann.round} kWhs annual energy consumption has been assigned to space '#{space.name.to_s}'"
+            if space.spaceType.is_initialized
+              msg += " of space type '#{space.spaceType.get.standardsSpaceType.get}'"
+            end
+            msgs << msg + "."
             
             tot_fridge_ann += fridge_ann
         end

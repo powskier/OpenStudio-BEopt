@@ -119,7 +119,7 @@ class ResidentialWellPump < OpenStudio::Measure::ModelMeasure
         end
         
         # Get space
-        space = Geometry.get_space_from_string(unit.spaces, Constants.Auto)
+        space = Geometry.get_space_from_string(unit.spaces, nil, runner, Constants.LivingSpaceType)
         next if space.nil?
 
         unit_obj_name = Constants.ObjectNameWellPump(unit.name.to_s)

@@ -92,13 +92,12 @@ class ResidentialPoolHeaterElecTest < MiniTest::Test
   end
   
   def test_retrofit_replace_gas_pool_heater
-    model = get_model(File.dirname(__FILE__), "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_GasPoolHeater.osm")
     args_hash = {}
     args_hash["base_energy"] = 1150.0
     expected_num_del_objects = {"GasEquipmentDefinition"=>1, "GasEquipment"=>1, "ScheduleRuleset"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>1162.0}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure("SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_GasPoolHeater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
     
   def test_retrofit_remove
@@ -277,7 +276,7 @@ class ResidentialPoolHeaterElecTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
