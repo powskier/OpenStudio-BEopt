@@ -48,21 +48,23 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
         dhw_setpoint.setDefaultValue(125)
         args << dhw_setpoint
         
-        #make a choice argument for water heater location
-        spaces = Geometry.get_all_unit_spaces(model)
-        if spaces.nil?
-            spaces = []
+        # make an argument for water_heater_location
+        tz_args = OpenStudio::StringVector.new
+        tz_args << Constants.Auto
+        thermal_zones = model.getThermalZones
+        thermal_zones.each do |thermal_zone|
+          tz_args << "Thermal Zone: #{thermal_zone.name}"
         end
-        space_args = OpenStudio::StringVector.new
-        space_args << Constants.Auto
-        spaces.each do |space|
-            space_args << space.name.to_s
+        spaceTypes = model.getSpaceTypes
+        spaceTypes.each do |spaceType|
+          tz_args << "Space Type: #{spaceType.standardsSpaceType.get}"
         end
-        space = OpenStudio::Ruleset::OSArgument::makeChoiceArgument("space", space_args, true)
-        space.setDisplayName("Location")
-        space.setDescription("Select the space where the water heater is located. #{Constants.Auto} will locate the water heater according the BA House Simulation Protocols: A garage (if available) or the living space in hot-dry and hot-humid climates, a basement (finished or unfinished, if available) or living space in all other climates.")
-        space.setDefaultValue(Constants.Auto)
-        args << space
+        water_heater_location = osargument::makeChoiceArgument("location", tz_args, true)
+        water_heater_location.setDefaultValue(Constants.Auto)
+        water_heater_location.setDisplayName("Location")
+        water_heater_location.setDescription("Thermal zone where the water heater is located. #{Constants.Auto} will locate the water heater according the BA House Simulation Protocols: A garage (if available) or the living space in hot-dry and hot-humid climates, a basement (finished or unfinished, if available) or living space in all other climates.")
+        
+        args << water_heater_location
         
         # make an argument for element_capacity
         element_capacity = osargument::makeDoubleArgument("element_capacity", true)
@@ -180,7 +182,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
         #Assign user inputs to variables
         e_cap = runner.getDoubleArgumentValue("element_capacity",user_arguments)
         vol = runner.getDoubleArgumentValue("storage_tank_volume",user_arguments)
-        water_heater_space_name = runner.getStringArgumentValue("space",user_arguments)
+        water_heater_loc = runner.getStringArgumentValue("location",user_arguments)
         t_set = runner.getDoubleArgumentValue("setpoint_temp",user_arguments).to_f
         min_temp = runner.getDoubleArgumentValue("min_temp",user_arguments).to_f
         max_temp = runner.getDoubleArgumentValue("max_temp",user_arguments).to_f
@@ -344,6 +346,7 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
           end
         end
 
+        msgs = []
         units.each do |unit|
 
             obj_name_hpwh = Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_")
@@ -360,16 +363,29 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
                 return false
             end
 
-            #If location is Auto, get the location
-            water_heater_tz = nil
-            if water_heater_space_name != Constants.Auto
-                water_heater_tz = Geometry.get_thermal_zones_from_spaces([Geometry.get_space_from_string(model.getSpaces, water_heater_space_name)])[0]
+            # Get space type
+            space_type = nil
+            if water_heater_loc == Constants.Auto
+              space_type = Constants.LivingSpaceType # TODO: make this an array based on Jon's spreadsheet
             else
-                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner)
+              model.getSpaceTypes.each do |st|
+                next unless "Space Type: #{st.standardsSpaceType.get}" == water_heater_loc
+                space_type = st.standardsSpaceType.get
+                break
+              end
+            end
+            
+            #If location is Auto, get the location
+            if water_heater_loc == Constants.Auto or not space_type.nil?
+                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner, space_type)
                 if water_heater_tz.nil?
-                    runner.registerError("The water heater cannot be automatically assigned to a thermal zone. Please manually select which zone the water heater should be located in.")
+                    runner.registerError("The water heater cannot be assigned to a thermal zone. Please manually select which zone the water heater should be located in.")
                     return false
                 end
+            else
+                unit_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
+                water_heater_tz = Geometry.get_thermal_zone_from_string(unit_zones, water_heater_loc)
+                next if water_heater_tz.nil?
             end
             water_heater_space = water_heater_tz.spaces[0] #first space in the zone
         
@@ -944,17 +960,24 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
             else
               tank.addToNode(storage_tank.supplyOutletModelObject.get.to_Node.get)
             end
+
+          rated_heat_cap_kW = OpenStudio.convert(rated_heat_cap,"W","kW").get 
+          msgs << "A new #{vol.round} gallon heat pump water heater, with a rated COP of #{cop} and a nominal heat pump capacity of #{rated_heat_cap_kW.round(2)} kW has been added to the model, in thermal zone '#{water_heater_tz.name}'."
             
         end
         
-        rated_heat_cap_kW = OpenStudio.convert(rated_heat_cap,"W","kW").get 
-        runner.registerFinalCondition("A new  #{vol.round} gallon heat pump water heater, with a rated COP of #{cop} and a nominal heat pump capacity of #{rated_heat_cap_kW.round(2)} kW has been added to the model")
+        register_final_conditions(runner, msgs)
         
         return true
  
     end #end the run method
 
     private
+    
+    def register_final_conditions(runner, msgs)
+        final_condition = msgs.join("\n")
+        runner.registerFinalCondition(final_condition)
+    end
     
     def validate_storage_tank_volume(vol, runner)
         vol = vol.to_f

@@ -48,10 +48,17 @@ class ResidentialHotWaterHeaterTankElectric < OpenStudio::Measure::ModelMeasure
         args << dhw_setpoint
     
         # make an argument for water_heater_location
+        tz_args = OpenStudio::StringVector.new
+        tz_args << Constants.Auto
         thermal_zones = model.getThermalZones
-        thermal_zone_names = thermal_zones.select { |tz| not tz.name.empty?}.collect{|tz| tz.name.get }
-        thermal_zone_names << Constants.Auto
-        water_heater_location = osargument::makeChoiceArgument("location",thermal_zone_names, true)
+        thermal_zones.each do |thermal_zone|
+          tz_args << "Thermal Zone: #{thermal_zone.name}"
+        end
+        spaceTypes = model.getSpaceTypes
+        spaceTypes.each do |spaceType|
+          tz_args << "Space Type: #{spaceType.standardsSpaceType.get}"
+        end
+        water_heater_location = osargument::makeChoiceArgument("location", tz_args, true)
         water_heater_location.setDefaultValue(Constants.Auto)
         water_heater_location.setDisplayName("Location")
         water_heater_location.setDescription("Thermal zone where the water heater is located. #{Constants.Auto} will locate the water heater according the BA House Simulation Protocols: A garage (if available) or the living space in hot-dry and hot-humid climates, a basement (finished or unfinished, if available) or living space in all other climates.")
@@ -137,16 +144,28 @@ class ResidentialHotWaterHeaterTankElectric < OpenStudio::Measure::ModelMeasure
                 return false
             end
 
-            #If location is Auto, get the location
+            # Get space type
+            space_type = nil
             if water_heater_loc == Constants.Auto
-                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner)
+              space_type = Constants.GarageSpaceType # TODO: make this an array based on Jon's spreadsheet
+            else
+              model.getSpaceTypes.each do |st|
+                next unless "Space Type: #{st.standardsSpaceType.get}" == water_heater_loc
+                space_type = st.standardsSpaceType.get
+                break
+              end
+            end
+            
+            #If location is Auto, get the location
+            if water_heater_loc == Constants.Auto or not space_type.nil?
+                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner, space_type)
                 if water_heater_tz.nil?
-                    runner.registerError("The water heater cannot be automatically assigned to a thermal zone. Please manually select which zone the water heater should be located in.")
+                    runner.registerError("The water heater cannot be assigned to a thermal zone. Please manually select which zone the water heater should be located in.")
                     return false
                 end
             else
                 unit_zones = Geometry.get_thermal_zones_from_spaces(unit.spaces)
-                water_heater_tz = Geometry.get_thermal_zone_from_string(unit_zones, water_heater_loc.to_s)
+                water_heater_tz = Geometry.get_thermal_zone_from_string(unit_zones, water_heater_loc)
                 next if water_heater_tz.nil?
             end
         
@@ -245,7 +264,7 @@ class ResidentialHotWaterHeaterTankElectric < OpenStudio::Measure::ModelMeasure
             te = heater.getHeaterThermalEfficiency
           
             water_heaters << "Water heater '#{heatername}' added to plant loop '#{loopname}', with a capacity of #{capacity.round(1)} kW" +
-            " and an actual tank volume of #{volume.round(1)} gal."
+            " and an actual tank volume of #{volume.round(1)} gal, in thermal zone '#{heater.ambientTemperatureThermalZone.get.name}'."
         end
         water_heaters
     end
