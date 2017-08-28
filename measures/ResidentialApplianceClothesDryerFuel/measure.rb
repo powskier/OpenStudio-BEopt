@@ -149,6 +149,11 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
             return false
         end
         
+        unit_obj_name_e = Constants.ObjectNameClothesDryer(Constants.FuelTypeElectric, unit.name.to_s)
+        unit_obj_name_g = Constants.ObjectNameClothesDryer(Constants.FuelTypeGas, unit.name.to_s)
+        unit_obj_name_p = Constants.ObjectNameClothesDryer(Constants.FuelTypePropane, unit.name.to_s)
+        unit_obj_name_f = Constants.ObjectNameClothesDryer(cd_fuel_type, unit.name.to_s)
+        
         # Get space type
         space_type = nil
         if space_r == Constants.Auto
@@ -161,35 +166,31 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
           end
         end
         
-        # Get space
-        space = Geometry.get_space_from_string(unit.spaces, space_r, runner, space_type)
-        next if space.nil?
-
-        # Get clothes washer properties
-        cw = nil
-        model.getElectricEquipments.each do |ee|
-            next if ee.name.to_s != Constants.ObjectNameClothesWasher(unit.name.to_s)
-            cw = ee
+        unit_spaces = []
+        unless space_type.nil?
+          unit.spaces.each do |space|
+            if space.spaceType.is_initialized
+              if space.spaceType.get.standardsSpaceType.is_initialized
+                next unless space.spaceType.get.standardsSpaceType.get == space_type
+              end
+            end
+            space.electricEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != unit_obj_name_e
+              unit_spaces << space
+            end
+            space.otherEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != unit_obj_name_g and space_equipment.name.to_s != unit_obj_name_p
+              unit_spaces << space
+            end
+          end
         end
-        if cw.nil?
-            runner.registerError("Could not find clothes washer equipment.")
-            return false
+        if unit_spaces.empty?
+          unit_spaces = unit.spaces
         end
-        cw_drum_volume = unit.getFeatureAsDouble(Constants.ClothesWasherDrumVolume(cw))
-        cw_imef = unit.getFeatureAsDouble(Constants.ClothesWasherIMEF(cw))
-        cw_rated_annual_energy = unit.getFeatureAsDouble(Constants.ClothesWasherRatedAnnualEnergy(cw))
-        if !cw_drum_volume.is_initialized or !cw_imef.is_initialized or !cw_rated_annual_energy.is_initialized
-            runner.registerError("Could not find clothes washer properties.")
-            return false
-        end
-        cw_drum_volume = cw_drum_volume.get
-        cw_imef = cw_imef.get
-        cw_rated_annual_energy = cw_rated_annual_energy.get
         
-        unit_obj_name_e = Constants.ObjectNameClothesDryer(Constants.FuelTypeElectric, unit.name.to_s)
-        unit_obj_name_g = Constants.ObjectNameClothesDryer(Constants.FuelTypeGas, unit.name.to_s)
-        unit_obj_name_p = Constants.ObjectNameClothesDryer(Constants.FuelTypePropane, unit.name.to_s)
-        unit_obj_name_f = Constants.ObjectNameClothesDryer(cd_fuel_type, unit.name.to_s)
+        # Get space
+        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_type)
+        next if space.nil?
         
         # Remove any existing clothes dryer
         objects_to_remove = []
@@ -219,6 +220,27 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
                 # no op
             end
         end
+        
+        # Get clothes washer properties
+        cw = nil
+        model.getElectricEquipments.each do |ee|
+            next if ee.name.to_s != Constants.ObjectNameClothesWasher(unit.name.to_s)
+            cw = ee
+        end
+        if cw.nil?
+            runner.registerError("Could not find clothes washer equipment.")
+            return false
+        end
+        cw_drum_volume = unit.getFeatureAsDouble(Constants.ClothesWasherDrumVolume(cw))
+        cw_imef = unit.getFeatureAsDouble(Constants.ClothesWasherIMEF(cw))
+        cw_rated_annual_energy = unit.getFeatureAsDouble(Constants.ClothesWasherRatedAnnualEnergy(cw))
+        if !cw_drum_volume.is_initialized or !cw_imef.is_initialized or !cw_rated_annual_energy.is_initialized
+            runner.registerError("Could not find clothes washer properties.")
+            return false
+        end
+        cw_drum_volume = cw_drum_volume.get
+        cw_imef = cw_imef.get
+        cw_rated_annual_energy = cw_rated_annual_energy.get
         
         cd_ef = cd_cef * 1.15 # RESNET interpretation
         cw_mef = 0.503 + 0.95 * cw_imef # RESNET interpretation

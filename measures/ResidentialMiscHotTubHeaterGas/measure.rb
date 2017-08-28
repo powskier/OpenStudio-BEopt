@@ -115,41 +115,68 @@ class ResidentialHotTubHeaterGas < OpenStudio::Measure::ModelMeasure
         if ffa.nil?
             return false
         end
-        
-        # Get space
-        space = Geometry.get_space_from_string(unit.spaces, nil, runner, Constants.LivingSpaceType)
-        next if space.nil?
 
         unit_obj_name_e = Constants.ObjectNameHotTubHeater(Constants.FuelTypeElectric, unit.name.to_s)
-        unit_obj_name_g = Constants.ObjectNameHotTubHeater(Constants.FuelTypeGas, unit.name.to_s)
-    
-        # Remove any existing hot tub heater
-        objects_to_remove = []
-        space.electricEquipment.each do |space_equipment|
+        unit_obj_name_g = Constants.ObjectNameHotTubHeater(Constants.FuelTypeGas, unit.name.to_s)        
+        
+        # Get space type
+        space_type = Constants.LivingSpaceType        
+        
+        unit_spaces = []
+        unit.spaces.each do |space|
+          if space.spaceType.is_initialized
+            if space.spaceType.get.standardsSpaceType.is_initialized
+              next unless space.spaceType.get.standardsSpaceType.get == space_type
+            end
+          end
+          space.electricEquipment.each do |space_equipment|
             next if space_equipment.name.to_s != unit_obj_name_e
-            objects_to_remove << space_equipment
-            objects_to_remove << space_equipment.electricEquipmentDefinition
-            if space_equipment.schedule.is_initialized
-                objects_to_remove << space_equipment.schedule.get
-            end
-        end
-        space.gasEquipment.each do |space_equipment|
+            unit_spaces << space
+          end
+          space.gasEquipment.each do |space_equipment|
             next if space_equipment.name.to_s != unit_obj_name_g
-            objects_to_remove << space_equipment
-            objects_to_remove << space_equipment.gasEquipmentDefinition
-            if space_equipment.schedule.is_initialized
-                objects_to_remove << space_equipment.schedule.get
-            end
+            unit_spaces << space
+          end          
         end
-        if objects_to_remove.size > 0
-            runner.registerInfo("Removed existing hot tub heater from outside.")
+        if unit_spaces.empty?
+          unit.spaces.each do |unit_space|
+              unit_spaces << unit_space
+          end
         end
-        objects_to_remove.uniq.each do |object|
-            begin
-                object.remove
-            rescue
-                # no op
-            end
+        
+        # Get space
+        space = Geometry.get_space_from_string(unit_spaces.uniq, nil, runner, space_type)
+        next if space.nil?        
+        
+        # Remove any existing hot tub heater
+        unit.spaces.each do |space|
+          objects_to_remove = []
+          space.electricEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != unit_obj_name_e
+              objects_to_remove << space_equipment
+              objects_to_remove << space_equipment.electricEquipmentDefinition
+              if space_equipment.schedule.is_initialized
+                  objects_to_remove << space_equipment.schedule.get
+              end
+          end
+          space.gasEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != unit_obj_name_g
+              objects_to_remove << space_equipment
+              objects_to_remove << space_equipment.gasEquipmentDefinition
+              if space_equipment.schedule.is_initialized
+                  objects_to_remove << space_equipment.schedule.get
+              end
+          end
+          if objects_to_remove.size > 0
+              runner.registerInfo("Removed existing hot tub heater from outside (space #{space.name}).")
+          end
+          objects_to_remove.uniq.each do |object|
+              begin
+                  object.remove
+              rescue
+                  # no op
+              end
+          end
         end
     
         #Calculate annual energy use
@@ -190,7 +217,7 @@ class ResidentialHotTubHeaterGas < OpenStudio::Measure::ModelMeasure
             hth_def.setFractionLost(1)
             hth.setSchedule(sch.schedule)
             
-            msgs << "A hot tub heater with #{hth_ann_g.round} therms annual energy consumption has been assigned to outside."
+            msgs << "A hot tub heater with #{hth_ann_g.round} therms annual energy consumption has been assigned to outside (space #{space.name})."
             
             tot_hth_ann_g += hth_ann_g
         end

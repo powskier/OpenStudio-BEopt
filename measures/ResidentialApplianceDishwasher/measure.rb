@@ -211,6 +211,8 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
             return false
         end
         
+        obj_name = Constants.ObjectNameDishwasher(unit.name.to_s)
+        
         # Get space type
         space_type = nil
         if space_r == Constants.Auto
@@ -223,8 +225,30 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
           end
         end
         
+        unit_spaces = []
+        unless space_type.nil?
+          unit.spaces.each do |space|
+            if space.spaceType.is_initialized
+              if space.spaceType.get.standardsSpaceType.is_initialized
+                next unless space.spaceType.get.standardsSpaceType.get == space_type
+              end
+            end
+            space.electricEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != obj_name
+              unit_spaces << space
+            end
+            space.waterUseEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != obj_name
+              unit_spaces << space
+            end
+          end
+        end
+        if unit_spaces.empty?
+          unit_spaces = unit.spaces
+        end
+        
         # Get space
-        space = Geometry.get_space_from_string(unit.spaces, space_r, runner, space_type)
+        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_type)
         next if space.nil?
 
         #Get plant loop
@@ -238,8 +262,6 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
         if wh_setpoint.nil?
             return false
         end
-
-        obj_name = Constants.ObjectNameDishwasher(unit.name.to_s)
 
         # Remove any existing dishwasher
         objects_to_remove = []

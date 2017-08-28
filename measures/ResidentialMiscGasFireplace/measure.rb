@@ -137,6 +137,8 @@ class ResidentialGasFireplace < OpenStudio::Measure::ModelMeasure
             return false
         end
         
+        unit_obj_name = Constants.ObjectNameGasFireplace(unit.name.to_s)
+        
         # Get space type
         space_type = nil
         if space_r == Constants.Auto
@@ -147,13 +149,31 @@ class ResidentialGasFireplace < OpenStudio::Measure::ModelMeasure
             space_type = st.standardsSpaceType.get
             break
           end
+        end        
+        
+        unit_spaces = []
+        unless space_type.nil?
+          unit.spaces.each do |space|
+            if space.spaceType.is_initialized
+              if space.spaceType.get.standardsSpaceType.is_initialized
+                next unless space.spaceType.get.standardsSpaceType.get == space_type
+              end
+            end
+            space.gasEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != unit_obj_name
+              unit_spaces << space
+            end
+          end
+        end
+        if unit_spaces.empty?
+          unit.spaces.each do |unit_space|
+              unit_spaces << unit_space
+          end
         end
         
         # Get space
-        space = Geometry.get_space_from_string(unit.spaces, space_r, runner, space_type)
+        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_type)
         next if space.nil?
-
-        unit_obj_name = Constants.ObjectNameGasFireplace(unit.name.to_s)
 
         # Remove any existing gas fireplace
         objects_to_remove = []

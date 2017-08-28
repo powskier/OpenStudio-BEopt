@@ -116,11 +116,32 @@ class ResidentialGasLighting < OpenStudio::Measure::ModelMeasure
             return false
         end
         
-        # Get space
-        space = Geometry.get_space_from_string(unit.spaces, nil, runner, Constants.LivingSpaceType)
-        next if space.nil?
-
         unit_obj_name = Constants.ObjectNameGasLighting(unit.name.to_s)
+        
+        # Get space type
+        space_type = Constants.LivingSpaceType
+        
+        unit_spaces = []
+        unit.spaces.each do |space|
+          if space.spaceType.is_initialized
+            if space.spaceType.get.standardsSpaceType.is_initialized
+              next unless space.spaceType.get.standardsSpaceType.get == space_type
+            end
+          end
+          space.gasEquipment.each do |space_equipment|
+            next if space_equipment.name.to_s != unit_obj_name
+            unit_spaces << space
+          end
+        end
+        if unit_spaces.empty?
+          unit.spaces.each do |unit_space|
+              unit_spaces << unit_space
+          end
+        end
+        
+        # Get space
+        space = Geometry.get_space_from_string(unit_spaces.uniq, nil, runner, space_type)
+        next if space.nil?
     
         # Remove any existing gas lighting
         objects_to_remove = []

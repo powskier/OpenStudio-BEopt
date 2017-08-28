@@ -119,19 +119,8 @@ class ResidentialExtraRefrigerator < OpenStudio::Measure::ModelMeasure
     msgs = []
     sch = nil
     units.each_with_index do |unit, unit_index|
-
-        unit_spaces = []
-        unit.spaces.each do |unit_space|
-            unit_spaces << unit_space
-        end
         
-        if unit_index == 0 and space_r != Constants.Auto
-            # Append spaces not associated with a unit
-            model.getSpaces.each do |space|
-                next if Geometry.space_is_finished(space)
-                unit_spaces << space
-            end
-        end
+        unit_obj_name = Constants.ObjectNameExtraRefrigerator(unit.name.to_s)
 
         # Get space type
         space_type = nil
@@ -145,11 +134,36 @@ class ResidentialExtraRefrigerator < OpenStudio::Measure::ModelMeasure
           end
         end
         
-        # Get space
-        space = Geometry.get_space_from_string(unit_spaces, space_r, runner, space_type)
-        next if space.nil?
+        unit_spaces = []
+        unless space_type.nil?
+          unit.spaces.each do |space|
+            if space.spaceType.is_initialized
+              if space.spaceType.get.standardsSpaceType.is_initialized
+                next unless space.spaceType.get.standardsSpaceType.get == space_type
+              end
+            end
+            space.electricEquipment.each do |space_equipment|
+              next if space_equipment.name.to_s != unit_obj_name
+              unit_spaces << space
+            end
+          end
+        end
+        if unit_spaces.empty?
+          unit.spaces.each do |unit_space|
+              unit_spaces << unit_space
+          end
+          if unit_index == 0
+            # Append spaces not associated with a unit
+            model.getSpaces.each do |space|
+                next if Geometry.space_is_finished(space)
+                unit_spaces << space
+            end
+          end
+        end
         
-        unit_obj_name = Constants.ObjectNameExtraRefrigerator(unit.name.to_s)
+        # Get space
+        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_type)
+        next if space.nil?
 
         # Remove any existing extra fridge
         objects_to_remove = []
