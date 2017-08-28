@@ -434,7 +434,7 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
         end
         
         # Get unit garage floor area
-        unit_garage_spaces = Geometry.get_garage_spaces(unit.spaces, model)
+        unit_garage_spaces = Geometry.get_garage_spaces(unit.spaces)
         gfa = Geometry.get_floor_area_from_spaces(unit_garage_spaces)
         if unit_garage_spaces.size == 0
             num_units_without_garage += 1
@@ -503,7 +503,7 @@ class ResidentialLighting < OpenStudio::Measure::ModelMeasure
     
     # Common garage lighting (garages not associated with a unit)
     common_spaces = Geometry.get_all_common_spaces(model, runner)
-    common_garage_spaces = Geometry.get_garage_spaces(common_spaces, model)
+    common_garage_spaces = Geometry.get_garage_spaces(common_spaces)
     common_gfa = Geometry.get_floor_area_from_spaces(common_garage_spaces)
     if option_type == Constants.OptionTypeLightingEnergyUses
         common_garage_ann = energy_use_garage * num_units_without_garage

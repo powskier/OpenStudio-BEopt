@@ -528,7 +528,7 @@ class Geometry
         return false
     end
     
-    def self.space_below_is_finished(space, model)
+    def self.space_below_is_finished(space)
         space.surfaces.each do |surface|
             next if surface.surfaceType.downcase != "floor"
             next if not surface.adjacentSurface.is_initialized
@@ -1017,7 +1017,7 @@ class Geometry
     end
    
     
-    def self.get_unfinished_attic_spaces(spaces, model)
+    def self.get_unfinished_attic_spaces(spaces)
         unfinished_attic_spaces = []
         spaces.each do |space|
             next if not self.is_unfinished_attic(space)
@@ -1026,7 +1026,7 @@ class Geometry
         return unfinished_attic_spaces
     end
         
-    def self.get_finished_attic_spaces(spaces, model)
+    def self.get_finished_attic_spaces(spaces)
         finished_attic_spaces = []
         spaces.each do |space|
             next if not self.is_finished_attic(space)
@@ -1044,12 +1044,12 @@ class Geometry
         return garage_spaces
     end
     
-    def self.get_non_attic_unfinished_roof_spaces(spaces, model)
+    def self.get_non_attic_unfinished_roof_spaces(spaces)
         non_attic_unfinished_roof_spaces = []
         spaces.each do |space|
             next if self.space_is_finished(space)
             next if not self.space_has_roof(space)
-            next if self.space_below_is_finished(space, model)
+            next if self.space_below_is_finished(space)
             non_attic_unfinished_roof_spaces << space
         end
         return non_attic_unfinished_roof_spaces

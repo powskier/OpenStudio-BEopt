@@ -307,7 +307,7 @@ class ProcessConstructionsCeilingsRoofsUnfinishedAttic < OpenStudio::Measure::Mo
   
   def get_unfinished_attic_ceilings_and_roofs_surfaces(model)
   
-    spaces = Geometry.get_unfinished_attic_spaces(model.getSpaces, model)
+    spaces = Geometry.get_unfinished_attic_spaces(model.getSpaces)
 
     ceiling_surfaces = []
     spaces.each do |space|

@@ -303,7 +303,7 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
     end
     
     # Roofs above unfinished space
-    roof_spaces = Geometry.get_non_attic_unfinished_roof_spaces(model.getSpaces, model)
+    roof_spaces = Geometry.get_non_attic_unfinished_roof_spaces(model.getSpaces)
     roof_surfaces = []
     roof_spaces.each do |space|
         space.surfaces.each do |surface|
