@@ -229,23 +229,23 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
         obj_name = Constants.ObjectNameClothesWasher(unit.name.to_s)
         
         # Get space type
-        space_type = nil
+        space_types = []
         if space_r == Constants.Auto
-          space_type = Constants.LivingSpaceType # TODO: make this an array based on Jon's spreadsheet
+          space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
         else
           model.getSpaceTypes.each do |st|
             next unless "Space Type: #{st.standardsSpaceType.get}" == space_r
-            space_type = st.standardsSpaceType.get
+            space_types << st.standardsSpaceType.get
             break
           end
         end
 
         unit_spaces = []
-        unless space_type.nil?
+        unless space_types.empty?
           unit.spaces.each do |space|
             if space.spaceType.is_initialized
               if space.spaceType.get.standardsSpaceType.is_initialized
-                next unless space.spaceType.get.standardsSpaceType.get == space_type
+                next unless space.spaceType.get.standardsSpaceType.get == space_types[0]
               end
             end
             space.electricEquipment.each do |space_equipment|
@@ -263,7 +263,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
         end
 
         # Get space
-        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_type)
+        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_types)
         next if space.nil?
 		
         #Get plant loop
@@ -612,7 +612,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
             cw_def2.setTargetTemperatureSchedule(sch.temperatureSchedule)
             water_use_connection.addWaterUseEquipment(cw2)
             
-            msg = "A clothes washer with #{cw_ann_e.round} kWhs annual energy consumption has been added to plant loop '#{plant_loop.name}' and assigned to space '#{space.name.to_s}'."
+            msg = "A clothes washer with #{cw_ann_e.round} kWhs annual energy consumption has been added to plant loop '#{plant_loop.name}' and assigned to space '#{space.name.to_s}'"
             if space.spaceType.is_initialized
               msg += " of space type '#{space.spaceType.get.standardsSpaceType.get}'"
             end

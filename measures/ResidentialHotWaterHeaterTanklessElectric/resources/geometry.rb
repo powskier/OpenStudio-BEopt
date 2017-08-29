@@ -232,17 +232,28 @@ class Geometry
     def self.get_all_common_spaces(model, runner=nil)
         return (model.getSpaces - self.get_all_unit_spaces(model, runner))
     end
-    
-    def self.get_unit_space_type_finished_space(unit_spaces, runner, space_type)
+
+    def self.get_unit_space_type_finished_space(unit_spaces, runner, space_types)
         space = nil
-        # TODO: loop thru the array of ordered space types
-        unit_spaces.each do |s|
-          next unless s.spaceType.get.standardsSpaceType.get == space_type
-          space = s
-          break
+        space_types.each do |space_type|
+          above_grade = true
+          if space_type == Constants.FinishedBasementFoundationType
+            space_type = Constants.LivingSpaceType
+            above_grade = false
+          end
+          unit_spaces.each do |s|
+            next unless s.spaceType.get.standardsSpaceType.get == space_type
+            unless above_grade
+              next unless self.space_is_below_grade(s)
+            end
+            space = s
+            break
+          end
+          break unless space.nil?
+          runner.registerWarning("Could not find a space in '#{unit_spaces[0].buildingUnit.get.name}' with space type '#{space_type}'.")
         end
         if space.nil?
-          runner.registerWarning("Could not find a space with space type '#{space_type}'. Choosing an arbitrary finished space on the lowest above-grade story.")
+          runner.registerWarning("Choosing an arbitrary finished space on the lowest above-grade story.")
           # For the specified unit, chooses an arbitrary finished space on the lowest above-grade story.
           # If no above-grade finished spaces are available, reverts to an arbitrary below-grade finished space.
           space = nil
@@ -496,7 +507,7 @@ class Geometry
     end
     
     def self.is_living_space_type(space_type)
-      if [Constants.LivingSpaceType, Constants.KitchenSpaceType, Constants.BedroomSpaceType, Constants.BathroomSpaceType].include? space_type
+      if [Constants.LivingSpaceType, Constants.KitchenSpaceType, Constants.BedroomSpaceType, Constants.BathroomSpaceType, Constants.LaundryRoomSpaceType].include? space_type
         return true
       end
       return false
@@ -540,9 +551,9 @@ class Geometry
         return false
     end
 
-    def self.get_space_from_string(spaces, space_s, runner=nil, space_type=nil)
-        if not space_type.nil?
-            return self.get_unit_space_type_finished_space(spaces, runner, space_type)
+    def self.get_space_from_string(spaces, space_s, runner=nil, space_types=[])
+        if not space_types.empty?
+            return self.get_unit_space_type_finished_space(spaces, runner, space_types)
         end
         space = nil
         spaces.each do |s|
@@ -1278,6 +1289,15 @@ class Geometry
             end
         end
         return below_grade_exterior_floors
+    end
+    
+    def self.space_type_hierarchy(measure)
+      hierarchy = {
+        "ResidentialApplianceRefrigerator"=>[Constants.KitchenSpaceType, Constants.LivingSpaceType, Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType],
+        "ResidentialApplianceClothesWasher"=>[Constants.LaundryRoomSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
+        "ResidentialHotWaterFixtures"=>[Constants.KitchenSpaceType, Constants.BathroomSpaceType]
+      }
+      return hierarchy[measure]
     end
 
 end

@@ -242,6 +242,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     space_types << Constants.KitchenSpaceType
     space_types << Constants.BedroomSpaceType
     space_types << Constants.BathroomSpaceType
+    space_types << Constants.LaundryRoomSpaceType
     return space_types
   end
   

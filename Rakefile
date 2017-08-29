@@ -154,7 +154,11 @@ namespace :test do
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
-    osw_files = ["SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher_ElecClothesDryer.osw"]
+    # osw_files = ["SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osw", "MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osw"]
+    osw_files = ["SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osw", "MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osw"]
+    # osw_files = ["SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank_ClothesWasher.osw", "MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank_ClothesWasher.osw"]
+    # osw_files = ["SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Kitchen_Denver.osw", "MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Kitchen_Denver.osw"]
+    # osw_files = ["SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Laundry_Denver_GasWHTank.osw", "MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Laundry_Denver_GasWHTank.osw"]
     osw_files.each do |osw|
 
         # Generate osm from osw

@@ -203,40 +203,77 @@ class ResidentialRefrigeratorTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units)
   end
   
-  def test_sfd_multi_zone_auto
+  def test_sfd_multi_zone_auto_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
     expected_values = {"Annual_kwh"=>434.35, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    args_hash = {}
+    expected_num_del_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
+    expected_values = {"Annual_kwh"=>434.35, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
-  def test_sfd_multi_zone_garage
+  def test_sfd_multi_zone_two_spaces
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
+    expected_values = {"Annual_kwh"=>434.35, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
+    model = _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
     args_hash = {}
     args_hash["space"] = "Space Type: #{Constants.GarageSpaceType}"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
     expected_values = {"Annual_kwh"=>434.35, "SpaceType"=>args_hash["space"]}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
-  def test_mf_multi_zone_auto
+  def test_mf_multi_zone_auto_retrofit_replace
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>2, "ElectricEquipmentDefinition"=>2}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
     expected_values = {"Annual_kwh"=>num_units*434.35, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    model = _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)  
+    args_hash = {}
+    expected_num_del_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units+num_units)
   end
   
-  def test_mf_multi_zone_garage
+  def test_mf_multi_zone_two_spaces
     num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
+    model = _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)  
     args_hash = {}
     args_hash["space"] = "Space Type: #{Constants.GarageSpaceType}"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>2, "ElectricEquipmentDefinition"=>2}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
     expected_values = {"Annual_kwh"=>num_units*434.35, "SpaceType"=>args_hash["space"]}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+  end
+  
+  def test_sfd_multi_zone_no_kitchen
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1}
+    expected_values = {"Annual_kwh"=>434.35, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)  
+  end
+  
+  def test_mf_multi_zone_no_kitchen
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>num_units*1, "ElectricEquipmentDefinition"=>num_units*1}
+    expected_values = {"Annual_kwh"=>num_units*434.35, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units)  
   end
   
   private

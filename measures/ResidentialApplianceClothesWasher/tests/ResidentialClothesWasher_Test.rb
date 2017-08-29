@@ -35,7 +35,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "HotWater_gpd"=>0, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_new_construction_standard
@@ -45,7 +45,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>42.9, "HotWater_gpd"=>10.00, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_new_construction_energystar
@@ -57,7 +57,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_new_construction_standard_2003
@@ -68,7 +68,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>176.0, "HotWater_gpd"=>4.80, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
 
   def test_new_construction_standard_mult_0_80
@@ -80,7 +80,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.3, "HotWater_gpd"=>8.00, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
   
   def test_new_construction_standard_int_heater
@@ -91,7 +91,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>42.9, "HotWater_gpd"=>10.00, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
 
   def test_new_construction_standard_no_thermostatic_control
@@ -102,7 +102,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>42.9, "HotWater_gpd"=>8.67, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
 
   def test_new_construction_energystar_cold_inlet
@@ -115,7 +115,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
 
   def test_new_construction_energystar_cold_inlet_tankless
@@ -128,7 +128,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tanklesswh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds_loc_tanklesswh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
   end
 
   def test_new_construction_basement
@@ -149,7 +149,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>42.9, "HotWater_gpd"=>10.00, "Space"=>args_hash["space"]}
-    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
     args_hash = {}
     args_hash["imef"] = (2.47 - 0.503) / 0.95
     args_hash["rated_annual_energy"] = 123.0
@@ -158,7 +158,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 1)
   end
     
   def test_retrofit_remove
@@ -168,14 +168,14 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>42.9, "HotWater_gpd"=>10.00, "Space"=>args_hash["space"]}
-    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
     args_hash = {}
     args_hash["mult_e"] = 0.0
     args_hash["mult_hw"] = 0.0
     expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "HotWater_gpd"=>0, "Space"=>args_hash["space"]}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 1)
   end
   
   def test_argument_error_cw_imef_negative
@@ -292,7 +292,7 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleConstant"=>num_units, "ScheduleFixedInterval"=>num_units, "WaterUseEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units}
     expected_values = {"Annual_kwh"=>171.77, "HotWater_gpd"=>39.99, "Space"=>args_hash["space"]}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units)
   end
   
   def test_single_family_attached_new_construction_finished_basement
@@ -311,43 +311,80 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleConstant"=>num_units, "ScheduleFixedInterval"=>num_units, "WaterUseEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units}
     expected_values = {"Annual_kwh"=>343.54, "HotWater_gpd"=>79.99, "Space"=>args_hash["space"]}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units)
   end
   
-  def test_sfd_multi_zone_auto
+  def test_sfd_multi_zone_auto_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
-    expected_values = {"Annual_kwh"=>35.8, "HotWater_gpd"=>8.33, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_values = {"Annual_kwh"=>35.8, "HotWater_gpd"=>8.33, "SpaceType"=>"Space Type: #{Constants.LaundryRoomSpaceType}"}
+    model = _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values) 
+    args_hash = {}    
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
+    expected_values = {"Annual_kwh"=>35.8, "HotWater_gpd"=>8.33, "SpaceType"=>"Space Type: #{Constants.LaundryRoomSpaceType}"}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1) 
   end
   
-  def test_sfd_multi_zone_garage
+  def test_sfd_multi_zone_two_spaces
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
+    expected_values = {"Annual_kwh"=>35.8, "HotWater_gpd"=>8.33, "SpaceType"=>"Space Type: #{Constants.LaundryRoomSpaceType}"}
+    model = _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
     args_hash = {}
     args_hash["space"] = "Space Type: #{Constants.GarageSpaceType}"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>35.8, "HotWater_gpd"=>8.33, "SpaceType"=>args_hash["space"]}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
-  def test_mf_multi_zone_auto
+  def test_mf_multi_zone_auto_retrofit_replace
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
-    expected_values = {"Annual_kwh"=>num_units*35.5, "HotWater_gpd"=>num_units*8.4, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    expected_values = {"Annual_kwh"=>num_units*35.5, "HotWater_gpd"=>num_units*8.4, "SpaceType"=>"Space Type: #{Constants.LaundryRoomSpaceType}"}
+    model = _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    args_hash = {}
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*35.5, "HotWater_gpd"=>num_units*8.4, "SpaceType"=>"Space Type: #{Constants.LaundryRoomSpaceType}"}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units+num_units)
   end
   
-  def test_mf_multi_zone_garage
+  def test_mf_multi_zone_two_spaces
     num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*35.5, "HotWater_gpd"=>num_units*8.4, "SpaceType"=>"Space Type: #{Constants.LaundryRoomSpaceType}"}
+    model = _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
     args_hash = {}
     args_hash["space"] = "Space Type: #{Constants.GarageSpaceType}"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
     expected_values = {"Annual_kwh"=>num_units*35.5, "HotWater_gpd"=>num_units*8.4, "SpaceType"=>args_hash["space"]}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+  end
+  
+  def test_sfd_multi_zone_no_laundry_room
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
+    expected_values = {"Annual_kwh"=>35.8, "HotWater_gpd"=>8.33, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Laundry_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1) 
+  end
+  
+  def test_mf_multi_zone_no_laundry_room
+    num_units = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
+    expected_values = {"Annual_kwh"=>num_units*35.5, "HotWater_gpd"=>num_units*8.4, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Laundry_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units)
   end
   
   private

@@ -361,6 +361,9 @@ class Constants
   def self.KitchenSpaceType
     return 'kitchen'
   end
+  def self.LaundryRoomSpaceType
+    return 'laundry room'
+  end
   def self.LivingSpace(story=1, unit_name=self.ObjectNameBuildingUnit)
     s_unit = ""
     s_story = ""
