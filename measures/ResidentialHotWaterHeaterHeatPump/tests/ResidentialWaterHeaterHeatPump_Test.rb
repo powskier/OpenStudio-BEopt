@@ -229,26 +229,29 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
     
     def test_retrofit_replace_tank_electric_shw
       args_hash = {}
+      args_hash["setpoint_temp"] = "130"
       expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7, "OutputVariable"=>16}
-      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
+      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
       _test_measure(osm_geo_beds_loc_tank_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end  
     
     def test_retrofit_replace_tankless_electric_shw
       args_hash = {}
+      args_hash["setpoint_temp"] = "130"
       expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7, "OutputVariable"=>16}
-      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
+      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
       _test_measure(osm_geo_beds_loc_tankless_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     end  
     
     def test_retrofit_replace_hpwh_shw
       args_hash = {}
+      args_hash["setpoint_temp"] = "130"
       args_hash["fuel_type"] = Constants.FuelTypeGas
       expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>5, "ScheduleRuleset"=>7}
-      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235}
+      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
       _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
     end
     
@@ -521,6 +524,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         actual_values_hpwh = {"CondBottom"=>0, "CondTop"=>0, "AirflowRate"=>0, "Sensor1Height"=>0, "Sensor2Height"=>0}
         actual_values_coil = {"Cap"=>0, "COP"=>0, "SHR"=>0, "WBTemp"=>0}
         actual_values_fan = {"FanEff"=>0}
+        actual_values_storage = {"StorageTankSetpoint1"=>0, "StorageTankSetpoint2"=>0}
         
         num_new_whs = 0
         all_new_objects.each do |obj_type, new_objects|
@@ -534,6 +538,16 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
                     actual_values_wh["TankU"] += new_object.uniformSkinLossCoefficientperUnitAreatoAmbientTemperature.to_f
                     actual_values_wh["OnCycle"] += new_object.onCycleParasiticFuelConsumptionRate
                     actual_values_wh["OffCycle"] += new_object.offCycleParasiticFuelConsumptionRate
+                    if new_object.supplyInletModelObject.is_initialized
+                      inlet_object = new_object.supplyInletModelObject.get.connectedObject(new_object.supplyInletModelObject.get.to_Node.get.inletPort).get
+                      if inlet_object.to_WaterHeaterStratified.is_initialized
+                        storage_tank = inlet_object.to_WaterHeaterStratified.get
+                        setpoint_schedule_one = storage_tank.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get
+                        setpoint_schedule_two = storage_tank.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get
+                        actual_values_storage["StorageTankSetpoint1"] += OpenStudio.convert(setpoint_schedule_one.value + 2.89,"C","F").get
+                        actual_values_storage["StorageTankSetpoint2"] += OpenStudio.convert(setpoint_schedule_two.value,"C","F").get
+                      end
+                    end
                     num_new_whs += 1
                 elsif obj_type == "WaterHeaterHeatPumpWrappedCondenser"
                     actual_values_hpwh["CondBottom"] += new_object.condenserBottomLocation
@@ -581,6 +595,10 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         assert_in_epsilon(expected_values["SHR"], actual_values_coil["SHR"], 0.01)
         assert_in_epsilon(expected_values["WBTemp"], actual_values_coil["WBTemp"], 0.01)
         assert_in_epsilon(expected_values["FanEff"], actual_values_fan["FanEff"], 0.01)
+        if not expected_values["StorageTankSetpoint1"].nil? and not expected_values["StorageTankSetpoint2"].nil?
+          assert_in_epsilon(expected_values["StorageTankSetpoint1"], actual_values_storage["StorageTankSetpoint1"], 0.01)
+          assert_in_epsilon(expected_values["StorageTankSetpoint2"], actual_values_storage["StorageTankSetpoint2"], 0.01)
+        end
 
         return model
     end

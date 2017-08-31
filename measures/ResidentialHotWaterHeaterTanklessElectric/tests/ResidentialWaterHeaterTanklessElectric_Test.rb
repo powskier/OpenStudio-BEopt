@@ -168,26 +168,29 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
   
   def test_retrofit_replace_tank_electric_shw
     args_hash = {}
+    args_hash["setpoint_temp"] = "130"
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>125}
+    expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
     _test_measure(osm_geo_beds_loc_tank_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end  
   
   def test_retrofit_replace_tankless_electric_shw
     args_hash = {}
+    args_hash["setpoint_temp"] = "130"
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>125}
+    expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
     _test_measure(osm_geo_beds_loc_tankless_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end  
   
   def test_retrofit_replace_hpwh_shw
     args_hash = {}
+    args_hash["setpoint_temp"] = "130"
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>125}
+    expected_values = {"InputCapacity"=>100000000.0, "ThermalEfficiency"=>0.911, "Setpoint"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint1"=>args_hash["setpoint_temp"].to_f, "StorageTankSetpoint2"=>args_hash["setpoint_temp"].to_f}
     _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
   end
   
@@ -393,7 +396,7 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
-    actual_values = {"TankVolume"=>0, "InputCapacity"=>0, "ThermalEfficiency"=>0, "TankUA1"=>0, "TankUA2"=>0, "Setpoint"=>0, "OnCycle"=>0, "OffCycle"=>0, "SkinLossFrac"=>0}
+    actual_values = {"TankVolume"=>0, "InputCapacity"=>0, "ThermalEfficiency"=>0, "TankUA1"=>0, "TankUA2"=>0, "Setpoint"=>0, "OnCycle"=>0, "OffCycle"=>0, "SkinLossFrac"=>0, "StorageTankSetpoint1"=>0, "StorageTankSetpoint2"=>0}
     num_new_whs = 0
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
@@ -409,6 +412,16 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
                 actual_values["OnCycle"] += new_object.onCycleParasiticFuelConsumptionRate
                 actual_values["OffCycle"] += new_object.offCycleParasiticFuelConsumptionRate
                 actual_values["SkinLossFrac"] += new_object.offCycleLossFractiontoThermalZone
+                if new_object.supplyInletModelObject.is_initialized
+                  inlet_object = new_object.supplyInletModelObject.get.connectedObject(new_object.supplyInletModelObject.get.to_Node.get.inletPort).get
+                  if inlet_object.to_WaterHeaterStratified.is_initialized
+                    storage_tank = inlet_object.to_WaterHeaterStratified.get
+                    setpoint_schedule_one = storage_tank.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get
+                    setpoint_schedule_two = storage_tank.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get
+                    actual_values["StorageTankSetpoint1"] += OpenStudio.convert(setpoint_schedule_one.value - new_object.deadbandTemperatureDifference/2.0,"C","F").get
+                    actual_values["StorageTankSetpoint2"] += OpenStudio.convert(setpoint_schedule_two.value - new_object.deadbandTemperatureDifference/2.0,"C","F").get
+                  end
+                end                
                 num_new_whs += 1
             end
         end
@@ -422,6 +435,10 @@ class ResidentialHotWaterHeaterTanklessElectricTest < MiniTest::Test
     assert_in_epsilon(0, actual_values["OnCycle"], 0.01)
     assert_in_epsilon(0, actual_values["OffCycle"], 0.01)
     assert_in_epsilon(num_new_whs, actual_values["SkinLossFrac"], 0.01)
+    if not expected_values["StorageTankSetpoint1"].nil? and not expected_values["StorageTankSetpoint2"].nil?
+      assert_in_epsilon(expected_values["StorageTankSetpoint1"], actual_values["StorageTankSetpoint1"], 0.01)
+      assert_in_epsilon(expected_values["StorageTankSetpoint2"], actual_values["StorageTankSetpoint2"], 0.01)
+    end    
 
     return model
   end
