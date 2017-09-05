@@ -288,7 +288,7 @@ class ResidentialDishwasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>69, "HotWater_gpd"=>1.38, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_sfd_multi_zone_bathroom
@@ -297,7 +297,7 @@ class ResidentialDishwasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>69, "HotWater_gpd"=>1.38, "SpaceType"=>args_hash["space"]}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_mf_multi_zone_auto
@@ -306,7 +306,7 @@ class ResidentialDishwasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
     expected_values = {"Annual_kwh"=>num_units*69, "HotWater_gpd"=>num_units*1.38, "SpaceType"=>"Space Type: #{Constants.KitchenSpaceType}"}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   def test_mf_multi_zone_bathroom
@@ -316,7 +316,7 @@ class ResidentialDishwasherTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>num_units, "ElectricEquipment"=>num_units, "WaterUseEquipmentDefinition"=>num_units, "WaterUseEquipment"=>num_units, "ScheduleFixedInterval"=>num_units, "ScheduleConstant"=>num_units}
     expected_values = {"Annual_kwh"=>num_units*69, "HotWater_gpd"=>num_units*1.38, "SpaceType"=>args_hash["space"]}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   private

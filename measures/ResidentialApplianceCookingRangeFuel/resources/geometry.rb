@@ -1295,6 +1295,11 @@ class Geometry
       hierarchy = {
         "ResidentialApplianceRefrigerator"=>[Constants.KitchenSpaceType, Constants.LivingSpaceType, Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType],
         "ResidentialApplianceClothesWasher"=>[Constants.LaundryRoomSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
+        "ResidentialApplianceClothesDryerElectric"=>[Constants.LaundryRoomSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
+        "ResidentialApplianceClothesDryerFuel"=>[Constants.LaundryRoomSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
+        "ResidentialApplianceDishwasher"=>[Constants.KitchenSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
+        "ResidentialApplianceCookingRangeElectric"=>[Constants.KitchenSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
+        "ResidentialApplianceCookingRangeFuel"=>[Constants.KitchenSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
         "ResidentialHotWaterFixtures"=>[Constants.KitchenSpaceType, Constants.BathroomSpaceType],
         "ResidentialMiscExtraRefrigerator"=>[Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.LivingSpaceType],
         "ResidentialMiscFreezer"=>[Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.LivingSpaceType],
