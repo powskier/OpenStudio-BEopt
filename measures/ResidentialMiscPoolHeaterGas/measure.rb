@@ -120,13 +120,13 @@ class ResidentialPoolHeaterGas < OpenStudio::Measure::ModelMeasure
         unit_obj_name_g = Constants.ObjectNamePoolHeater(Constants.FuelTypeGas, unit.name.to_s)
         
         # Get space type
-        space_type = Constants.LivingSpaceType
+        space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
     
         unit_spaces = []
         unit.spaces.each do |space|
           if space.spaceType.is_initialized
             if space.spaceType.get.standardsSpaceType.is_initialized
-              next unless space.spaceType.get.standardsSpaceType.get == space_type
+              next unless space.spaceType.get.standardsSpaceType.get == space_types[0]
             end
           end
           space.electricEquipment.each do |space_equipment|
@@ -145,7 +145,7 @@ class ResidentialPoolHeaterGas < OpenStudio::Measure::ModelMeasure
         end
     
         # Get space
-        space = Geometry.get_space_from_string(unit_spaces.uniq, nil, runner, space_type)
+        space = Geometry.get_space_from_string(unit_spaces.uniq, nil, runner, space_types)
         next if space.nil?
     
         # Remove any existing pool heater

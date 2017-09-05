@@ -213,7 +213,7 @@ class ResidentialExtraRefrigeratorTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"ElectricEquipment"=>num_units, "ElectricEquipmentDefinition"=>num_units, "ScheduleRuleset"=>1}
     expected_values = {"Annual_kwh"=>num_units*1102.0, "Space"=>args_hash["space"]}
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units)
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*3)
   end
   
   def test_sfd_multi_zone_auto

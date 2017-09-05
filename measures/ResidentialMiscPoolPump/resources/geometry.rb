@@ -1295,7 +1295,19 @@ class Geometry
       hierarchy = {
         "ResidentialApplianceRefrigerator"=>[Constants.KitchenSpaceType, Constants.LivingSpaceType, Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType],
         "ResidentialApplianceClothesWasher"=>[Constants.LaundryRoomSpaceType, Constants.LivingSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType],
-        "ResidentialHotWaterFixtures"=>[Constants.KitchenSpaceType, Constants.BathroomSpaceType]
+        "ResidentialHotWaterFixtures"=>[Constants.KitchenSpaceType, Constants.BathroomSpaceType],
+        "ResidentialMiscExtraRefrigerator"=>[Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.LivingSpaceType],
+        "ResidentialMiscFreezer"=>[Constants.GarageSpaceType, Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.LivingSpaceType],
+        "ResidentialMiscGasFireplace"=>[Constants.LivingSpaceType],
+        "ResidentialMiscGasGrill"=>[Constants.LivingSpaceType],
+        "ResidentialMiscGasLighting"=>[Constants.LivingSpaceType],
+        "ResidentialMiscHotTubHeaterElectric"=>[Constants.LivingSpaceType],
+        "ResidentialMiscHotTubHeaterGas"=>[Constants.LivingSpaceType],
+        "ResidentialMiscHotTubPump"=>[Constants.LivingSpaceType],
+        "ResidentialMiscPoolHeaterElectric"=>[Constants.LivingSpaceType],
+        "ResidentialMiscPoolHeaterGas"=>[Constants.LivingSpaceType],
+        "ResidentialMiscPoolPump"=>[Constants.LivingSpaceType],
+        "ResidentialMiscWellPump"=>[Constants.LivingSpaceType]
       }
       return hierarchy[measure]
     end
