@@ -26,16 +26,6 @@ class SetResidentialEPWFileTest < MiniTest::Test
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid daylight saving date specified.")
   end   
   
-  def test_error_weather_file_missing_solar
-    args_hash = {}
-    args_hash["weather_directory"] = "./resources"
-    args_hash["weather_file_name"] = "missing_solar.epw"
-    result = _test_error_or_NA(nil, args_hash)
-    assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot retrieve extraterrestrialHorizontalRadiation from the EPW for hour 1.")
-  end
-  
   def test_NA_daylight_saving
     args_hash = {}
     args_hash["dst_start_date"] = "NA"
