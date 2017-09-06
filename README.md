@@ -5,7 +5,7 @@ This project includes [OpenStudio measures](http://nrel.github.io/OpenStudio-use
 
 The latest official measures are available on the [Building Component Library](https://bcl.nrel.gov/search/site?f[0]=sm_og_group_ref%3Anode%3A83284).
 
-Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt.svg?style=svg)](https://circleci.com/gh/NREL/OpenStudio-BEopt)
+Unit Test Status: [![CircleCI](https://circleci.com/gh/NREL/OpenStudio-BEopt/tree/master.svg?style=svg)](https://circleci.com/gh/NREL/OpenStudio-BEopt/tree/master)
 
 Code Coverage: [![Coverage Status](https://coveralls.io/repos/github/NREL/OpenStudio-Beopt/badge.svg?branch=master)](https://coveralls.io/github/NREL/OpenStudio-Beopt?branch=master)
 
