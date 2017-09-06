@@ -79,7 +79,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
     
@@ -89,7 +89,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["capacity"] = "5.5"
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.34, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.34, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -99,7 +99,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["capacity"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.69, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.69, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
@@ -117,7 +117,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["setpoint_temp"] = 130
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>130, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>130, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -126,7 +126,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["tank_volume"] = "30"
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>30, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>30, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -136,7 +136,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["energy_factor"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>20, "InputCapacity"=>2.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.52, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>20, "InputCapacity"=>2.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.52, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_1_1, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -146,7 +146,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["energy_factor"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>30, "InputCapacity"=>3.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.90, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>30, "InputCapacity"=>3.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.90, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_2_1, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -156,7 +156,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["energy_factor"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>40, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.29, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>40, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.29, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_2_2, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -166,7 +166,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["energy_factor"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>66, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>3.36, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>66, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>3.36, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_5_3, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -174,7 +174,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     model = _test_measure(osm_geo_beds_loc, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     args_hash = {}
     args_hash["energy_factor"] = "0.95"
@@ -182,7 +182,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["setpoint_temp"] = 130
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.34, "Setpoint"=>130, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>5.5, "ThermalEfficiency"=>1.0, "TankUA"=>1.34, "Setpoint"=>130, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
@@ -190,7 +190,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tank_gas, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -198,7 +198,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tank_oil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -206,7 +206,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tank_propane, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -214,7 +214,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankless_electric, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -222,7 +222,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankless_gas, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -230,7 +230,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankless_propane, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
@@ -239,7 +239,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_hpwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
   end
   
@@ -247,7 +247,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tank_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end  
   
@@ -255,7 +255,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_tankless_electric_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
   end  
   
@@ -264,7 +264,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash["fuel_type"] = Constants.FuelTypeGas
     expected_num_del_objects = {"WaterHeaterStratified"=>1, "ScheduleConstant"=>5, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemTrendVariable"=>3}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "ScheduleConstant"=>1}
-    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0}
+    expected_values = {"TankVolume"=>50, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
     _test_measure(osm_geo_beds_loc_hpwh_shw, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
   end
   
@@ -375,8 +375,8 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
-    expected_values = {"TankVolume"=>num_units*50, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units+num_units)
+    expected_values = {"TankVolume"=>num_units*50, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
 
   def test_single_family_attached_new_construction_living_zone
@@ -394,8 +394,8 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
-    expected_values = {"TankVolume"=>num_units*50, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units+num_units)
+    expected_values = {"TankVolume"=>num_units*50, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*3)
   end
   
   def test_sfd_multi_zone_auto
@@ -403,7 +403,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
     expected_values = {"TankVolume"=>40, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>"Space Type: #{Constants.GarageSpaceType}"}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 2)
   end
   
   def test_sfd_multi_zone_living
@@ -412,7 +412,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
     expected_values = {"TankVolume"=>40, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>args_hash["location"]}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
   def test_mf_multi_zone_auto
@@ -421,7 +421,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
     expected_values = {"TankVolume"=>num_units*35, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>"Space Type: #{Constants.GarageSpaceType}"}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*2)
   end
   
   def test_mf_multi_zone_living
@@ -431,7 +431,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
     expected_values = {"TankVolume"=>num_units*35, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>args_hash["location"]}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_1Kitchen_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   private

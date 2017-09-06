@@ -1312,7 +1312,12 @@ class Geometry
         "ResidentialMiscPoolHeaterElectric"=>[Constants.LivingSpaceType],
         "ResidentialMiscPoolHeaterGas"=>[Constants.LivingSpaceType],
         "ResidentialMiscPoolPump"=>[Constants.LivingSpaceType],
-        "ResidentialMiscWellPump"=>[Constants.LivingSpaceType]
+        "ResidentialMiscWellPump"=>[Constants.LivingSpaceType],
+        "ResidentialHotWaterHeaterTankElectric"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
+        "ResidentialHotWaterHeaterTankFuel"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
+        "ResidentialHotWaterHeaterTanklessElectric"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
+        "ResidentialHotWaterHeaterTanklessFuel"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
+        "ResidentialHotWaterHeaterHeatPump"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
       }
       return hierarchy[measure]
     end

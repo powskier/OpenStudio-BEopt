@@ -364,20 +364,20 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
             end
 
             # Get space type
-            space_type = nil
+            space_types = []
             if water_heater_loc == Constants.Auto
-              space_type = Constants.LivingSpaceType # TODO: make this an array based on Jon's spreadsheet
+              space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
             else
               model.getSpaceTypes.each do |st|
                 next unless "Space Type: #{st.standardsSpaceType.get}" == water_heater_loc
-                space_type = st.standardsSpaceType.get
+                space_types << st.standardsSpaceType.get
                 break
               end
             end
             
             #If location is Auto, get the location
-            if water_heater_loc == Constants.Auto or not space_type.nil?
-                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner, space_type)
+            if water_heater_loc == Constants.Auto or not space_types.empty?
+                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner, space_types)
                 if water_heater_tz.nil?
                     runner.registerError("The water heater cannot be assigned to a thermal zone. Please manually select which zone the water heater should be located in.")
                     return false
@@ -962,7 +962,11 @@ class ResidentialHotWaterHeaterHeatPump < OpenStudio::Measure::ModelMeasure
             end
 
           rated_heat_cap_kW = OpenStudio.convert(rated_heat_cap,"W","kW").get 
-          msgs << "A new #{vol.round} gallon heat pump water heater, with a rated COP of #{cop} and a nominal heat pump capacity of #{rated_heat_cap_kW.round(2)} kW has been added to the model, in thermal zone '#{water_heater_tz.name}'."
+          msg = "A new #{vol.round} gallon heat pump water heater, with a rated COP of #{cop} and a nominal heat pump capacity of #{rated_heat_cap_kW.round(2)} kW has been added to the model, in thermal zone '#{water_heater_tz.name}'"
+          if water_heater_tz.spaces[0].spaceType.is_initialized
+            msg += " of space type '#{water_heater_tz.spaces[0].spaceType.get.standardsSpaceType.get}'"
+          end
+          msgs << msg + "."
             
         end
         

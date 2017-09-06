@@ -483,16 +483,42 @@ class Waterheater
         end
     end
     
-    def self.get_water_heater_location_auto(model, spaces, runner, space_type)
+    def self.get_water_heater_location_auto(model, unit_spaces, runner, space_types)
+        space = nil
         wh_tz = nil
-        # TODO: loop thru the array of ordered space types
-        spaces.each do |s|
-          next unless s.spaceType.get.standardsSpaceType.get == space_type
-          wh_tz = s.thermalZone.get
-          break
-        end
+        space_types.each do |space_type|
+          above_grade = true
+          attic = false
+          if space_type == Constants.FinishedBasementFoundationType
+            space_type = Constants.LivingSpaceType
+            above_grade = false
+          elsif space_type == Constants.CrawlFoundationType
+            space_type = Constants.CrawlSpaceType
+            above_grade = false
+          elsif space_type == Constants.FinishedAtticType
+            space_type = Constants.LivingSpaceType
+            attic = true
+          end
+          unit_spaces.each do |s|
+            next unless s.spaceType.get.standardsSpaceType.get == space_type
+            unless above_grade
+              next unless Geometry.space_is_below_grade(s)
+            end
+            if attic
+              next unless Geometry.is_attic(s)
+            end
+            space = s
+            break
+          end
+          if not space.nil?
+            wh_tz = space.thermalZone.get
+            break
+          else
+            runner.registerWarning("Could not find a space in '#{unit_spaces[0].buildingUnit.get.name}' with space type '#{space_type}'.")
+          end
+        end        
         if wh_tz.nil?
-          runner.registerWarning("Could not find a thermal zone with space type '#{space_type}'. Choosing a thermal zone based on BA climate zone.")
+          runner.registerWarning("Choosing a thermal zone based on BA climate zone.")
           #If auto is picked, get the BA climate zone, 
           #check if the building has a garage/basement, 
           #and assign the water heater location appropriately
@@ -503,7 +529,7 @@ class Waterheater
                   ba_cz_name = climateZone.value.to_s
               end
           end
-          living = Geometry.get_unit_space_type_finished_space(spaces, runner, space_type)
+          living = Geometry.get_unit_space_type_finished_space(spaces, runner, space_types)
           garage = Geometry.get_garage_spaces(spaces)
           fin_basement = Geometry.get_finished_basement_spaces(spaces)
           unfin_basement = Geometry.get_unfinished_basement_spaces(spaces)

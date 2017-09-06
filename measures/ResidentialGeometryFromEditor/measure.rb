@@ -74,13 +74,14 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     end
 
     scene = floorplan.get.toThreeScene(true)
-
-    new_model = OpenStudio::Model::modelFromThreeJS(scene)
+    rt = OpenStudio::Model::ThreeJSReverseTranslator.new
+    new_model = rt.modelFromThreeJS(scene)
     
-    if new_model.empty?
+    unless new_model.is_initialized
       runner.registerError("Cannot convert floorplan to model.")
       return false
     end
+    new_model = new_model.get
 
     runner.registerInitialCondition("Initial model has #{model.getPlanarSurfaceGroups.size} planar surface groups")
     
@@ -89,7 +90,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       g.remove
     end
     
-    new_model.get.getPlanarSurfaceGroups.each do |g| 
+    new_model.getPlanarSurfaceGroups.each do |g| 
       g.clone(model)
     end
 
@@ -110,7 +111,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     # set the space type standards fields based on what user wrote in the editor
     json["space_types"].each do |st|
       model.getSpaceTypes.each do |space_type|
-        next unless st["id"] == space_type.name.to_s
+        next unless st["name"] == space_type.name.to_s
         space_type.setStandardsSpaceType(st["name"])
       end
     end

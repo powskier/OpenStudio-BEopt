@@ -145,20 +145,20 @@ class ResidentialHotWaterHeaterTankElectric < OpenStudio::Measure::ModelMeasure
             end
 
             # Get space type
-            space_type = nil
+            space_types = []
             if water_heater_loc == Constants.Auto
-              space_type = Constants.GarageSpaceType # TODO: make this an array based on Jon's spreadsheet
+              space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
             else
               model.getSpaceTypes.each do |st|
                 next unless "Space Type: #{st.standardsSpaceType.get}" == water_heater_loc
-                space_type = st.standardsSpaceType.get
+                space_types << st.standardsSpaceType.get
                 break
               end
             end
             
             #If location is Auto, get the location
-            if water_heater_loc == Constants.Auto or not space_type.nil?
-                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner, space_type)
+            if water_heater_loc == Constants.Auto or not space_types.empty?
+                water_heater_tz = Waterheater.get_water_heater_location_auto(model, unit.spaces, runner, space_types)
                 if water_heater_tz.nil?
                     runner.registerError("The water heater cannot be assigned to a thermal zone. Please manually select which zone the water heater should be located in.")
                     return false
@@ -263,8 +263,11 @@ class ResidentialHotWaterHeaterTankElectric < OpenStudio::Measure::ModelMeasure
             volume = OpenStudio.convert(volume_si.value, volume_si.units.standardString, "gal").get
             te = heater.getHeaterThermalEfficiency
           
-            water_heaters << "Water heater '#{heatername}' added to plant loop '#{loopname}', with a capacity of #{capacity.round(1)} kW" +
-            " and an actual tank volume of #{volume.round(1)} gal, in thermal zone '#{heater.ambientTemperatureThermalZone.get.name}'."
+            msg = "Water heater '#{heatername}' added to plant loop '#{loopname}', with a capacity of #{capacity.round(1)} kW and an actual tank volume of #{volume.round(1)} gal, in thermal zone '#{heater.ambientTemperatureThermalZone.get.name}'"
+            if heater.ambientTemperatureThermalZone.get.spaces[0].spaceType.is_initialized
+              msg += " of space type '#{heater.ambientTemperatureThermalZone.get.spaces[0].spaceType.get.standardsSpaceType.get}'"
+            end
+            water_heaters << msg + "."
         end
         water_heaters
     end
