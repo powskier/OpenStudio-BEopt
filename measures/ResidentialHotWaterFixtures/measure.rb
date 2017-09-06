@@ -137,25 +137,43 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
             return false
         end
 
-        obj_name_sh = Constants.ObjectNameShower(unit.name.to_s)
-        obj_name_s = Constants.ObjectNameSink(unit.name.to_s)
-        obj_name_b = Constants.ObjectNameBath(unit.name.to_s)
-        obj_name_recirc_pump = Constants.ObjectNameHotWaterRecircPump(unit.name.to_s)
-    
-        # Remove any existing ssb
-        objects_to_remove = []
-        recirc_pump = nil
-        space.otherEquipment.each do |space_equipment|
-            next if space_equipment.name.to_s != obj_name_sh and space_equipment.name.to_s != obj_name_s and space_equipment.name.to_s != obj_name_b
-            objects_to_remove << space_equipment
-            objects_to_remove << space_equipment.otherEquipmentDefinition
-            if space_equipment.schedule.is_initialized
-                # Check if there is a recirc pump referencing this schedule
-                model.getElectricEquipments.each do |ee|
-                    next if ee.name.to_s != obj_name_recirc_pump
-                    next if not ee.schedule.is_initialized
-                    next if ee.schedule.get.handle.to_s != space_equipment.schedule.get.handle.to_s
-                    recirc_pump = ee
+        tot_sh_gpd = 0
+        tot_s_gpd = 0
+        tot_b_gpd = 0
+        msgs = []
+        units.each do |unit|
+            # Get unit beds/baths
+            nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
+            if nbeds.nil? or nbaths.nil?
+                return false
+            end
+            sch_unit_index = Geometry.get_unit_dhw_sched_index(model, unit, runner)
+            if sch_unit_index.nil?
+                return false
+            end
+
+            # Get space
+            space = Geometry.get_space_from_string(unit.spaces, space_r)
+            next if space.nil?
+
+            #Get plant loop
+            plant_loop = Waterheater.get_plant_loop_from_string(model.getPlantLoops, plant_loop_s, unit.spaces, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_"), runner)
+            if plant_loop.nil?
+                return false
+            end
+
+            obj_name_sh = Constants.ObjectNameShower(unit.name.to_s)
+            obj_name_s = Constants.ObjectNameSink(unit.name.to_s)
+            obj_name_b = Constants.ObjectNameBath(unit.name.to_s)
+        
+            # Remove any existing ssb
+            objects_to_remove = []
+            space.otherEquipment.each do |space_equipment|
+                next if space_equipment.name.to_s != obj_name_sh and space_equipment.name.to_s != obj_name_s and space_equipment.name.to_s != obj_name_b
+                objects_to_remove << space_equipment
+                objects_to_remove << space_equipment.otherEquipmentDefinition
+                if space_equipment.schedule.is_initialized
+                    objects_to_remove << space_equipment.schedule.get
                 end
                 objects_to_remove << space_equipment.schedule.get
             end
@@ -222,10 +240,14 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
                 plant_loop.addDemandBranchForComponent(water_use_connection)
             end
             
-        end
-        
-        # Showers
-        if sh_gpd > 0
+            # Showers
+            if sh_gpd > 0
+                
+                # Create schedule
+                sch_sh = HotWaterSchedule.new(model, runner, Constants.ObjectNameShower + " schedule", Constants.ObjectNameShower + " temperature schedule", nbeds, sch_unit_index, d_sh, "Shower", mixed_use_t, File.dirname(__FILE__))
+                if not sch_sh.validated?
+                    return false
+                end
             
             # Create schedule
             sch_sh = HotWaterSchedule.new(model, runner, Constants.ObjectNameShower + " schedule", Constants.ObjectNameShower + " temperature schedule", nbeds, sch_unit_index, "Shower", mixed_use_t, File.dirname(__FILE__))

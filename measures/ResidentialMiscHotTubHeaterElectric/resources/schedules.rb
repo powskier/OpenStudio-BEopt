@@ -391,7 +391,7 @@ end
 
 class HotWaterSchedule
 
-    def initialize(model, runner, sch_name, temperature_sch_name, num_bedrooms, days_shift, file_prefix, target_water_temperature, measure_dir, create_sch_object=true)
+    def initialize(model, runner, sch_name, temperature_sch_name, num_bedrooms, unit_index, days_shift, file_prefix, target_water_temperature, measure_dir, create_sch_object=true)
         @validated = true
         @model = model
         @runner = runner
@@ -405,7 +405,7 @@ class HotWaterSchedule
         
         timestep_minutes = (60/@model.getTimestep.numberOfTimestepsPerHour).to_i
         
-        data = loadMinuteDrawProfileFromFile(timestep_minutes, days_shift, measure_dir)
+        data = loadMinuteDrawProfileFromFile(timestep_minutes, unit_index, days_shift, measure_dir)
         @totflow, @maxflow, @ontime = loadDrawProfileStatsFromFile(measure_dir)
         if data.nil? or @totflow.nil? or @maxflow.nil? or @ontime.nil?
             @validated = false
@@ -449,7 +449,7 @@ class HotWaterSchedule
     
     private
     
-        def loadMinuteDrawProfileFromFile(timestep_minutes, days_shift, measure_dir)
+        def loadMinuteDrawProfileFromFile(timestep_minutes, unit_index, days_shift, measure_dir)
             data = []
             
             if @file_prefix.nil?
@@ -462,6 +462,9 @@ class HotWaterSchedule
                 @runner.registerError("Unable to find file: #{minute_draw_profile}")
                 return nil
             end
+            
+            #For MF homes, shift each unit by an additional weekday
+            days_shift = days_shift + 7 * (unit_index - 1)
             
             minutes_in_year = 8760*60
             

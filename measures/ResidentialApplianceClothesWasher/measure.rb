@@ -541,7 +541,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
         if cw_ann_e > 0
         
             # Create schedule
-            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameClothesWasher + " schedule", Constants.ObjectNameClothesWasher + " temperature schedule", nbeds, d_sh, "ClothesWasher", cw_water_temp, File.dirname(__FILE__))
+            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameClothesWasher + " schedule", Constants.ObjectNameClothesWasher + " temperature schedule", nbeds, sch_unit_index, d_sh, "ClothesWasher", cw_water_temp, File.dirname(__FILE__))
             if not sch.validated?
                 return false
             end

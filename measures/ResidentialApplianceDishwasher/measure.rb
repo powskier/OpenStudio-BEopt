@@ -436,7 +436,7 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
         if dw_ann > 0
             
             # Create schedule
-            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", Constants.ObjectNameDishwasher + " temperature schedule", nbeds, d_sh, "Dishwasher", wh_setpoint, File.dirname(__FILE__))
+            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", Constants.ObjectNameDishwasher + " temperature schedule", nbeds, sch_unit_index, d_sh, "Dishwasher", wh_setpoint, File.dirname(__FILE__))
             if not sch.validated?
                 return false
             end
