@@ -1318,6 +1318,7 @@ class Geometry
         "ResidentialHotWaterHeaterTanklessElectric"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
         "ResidentialHotWaterHeaterTanklessFuel"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
         "ResidentialHotWaterHeaterHeatPump"=>[Constants.FinishedBasementFoundationType, Constants.BasementSpaceType, Constants.GarageSpaceType, Constants.LivingSpaceType, Constants.LaundryRoomSpaceType, Constants.CrawlFoundationType, Constants.AtticSpaceType, Constants.FinishedAtticType],
+        "ResidentialGeometryNumOccupants"=>[Constants.LivingSpaceType, Constants.BedroomSpaceType]
       }
       return hierarchy[measure]
     end

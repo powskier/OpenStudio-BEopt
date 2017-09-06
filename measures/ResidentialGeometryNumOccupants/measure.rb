@@ -177,15 +177,48 @@ class AddResidentialOccupants < OpenStudio::Measure::ModelMeasure
       else
           unit_occ = unit_occ.to_f
       end
-
+      
+      # Get space type
+      space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
+      
+      unit_spaces = []
+      unit.spaces.each do |space|
+        if space.spaceType.is_initialized
+          if space.spaceType.get.standardsSpaceType.is_initialized
+            next unless space_types.include? space.spaceType.get.standardsSpaceType.get
+          end
+        end
+        space.people.each do |people|
+          next unless people.numberofPeopleSchedule.is_initialized
+          unit_spaces << space
+        end
+      end
+      if unit_spaces.empty?
+        unit.spaces.each do |unit_space|
+            unit_spaces << unit_space
+        end
+      end
+      
+      # Assign occupants to each space of the unit
+      spaces = []
+      space_types.each do |space_type|
+        unit_spaces.each do |space|
+          next unless space_type == space.spaceType.get.standardsSpaceType.get
+          spaces << space
+        end
+        break unless spaces.empty?
+      end
+      if spaces.empty?
+        runner.registerError("There are no spaces of space type '#{space_types.join("' or '")}'.")
+        return false
+      end
+      
       # Get FFA
-      ffa = Geometry.get_finished_floor_area_from_spaces(unit.spaces, false, runner)
+      ffa = Geometry.get_finished_floor_area_from_spaces(spaces, false, runner)
       if ffa.nil?
           return false
       end
       
-      # Assign occupants to each space of the unit
-      spaces = Geometry.get_finished_spaces(unit.spaces)      
       spaces.each do |space|
       
           space_obj_name = "#{Constants.ObjectNameOccupants(unit.name.to_s)}|#{space.name.to_s}"
@@ -251,9 +284,8 @@ class AddResidentialOccupants < OpenStudio::Measure::ModelMeasure
           
       end
 
-      if units.size > 1
-        runner.registerInfo("#{unit.name.to_s} has been assigned #{unit_occ.round(2)} occupant(s).")
-      end
+      runner.registerInfo("#{unit.name.to_s} has been assigned #{unit_occ.round(2)} occupant(s) across spaces of space type '#{spaces[0].spaceType.get.standardsSpaceType.get}'.")
+      
 
     end
     

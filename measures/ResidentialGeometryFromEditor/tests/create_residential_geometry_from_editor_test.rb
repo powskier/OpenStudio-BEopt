@@ -56,7 +56,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -65,7 +65,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_UA.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -74,7 +74,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_FA.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>2, "ThermalZone"=>2, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -83,7 +83,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFA_2unit.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>75, "Space"=>8, "SpaceType"=>3, "ThermalZone"=>6, "BuildingUnit"=>2}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>75, "Space"=>8, "SpaceType"=>3, "ThermalZone"=>6, "BuildingUnit"=>2, "BuildingStory"=>3}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -92,38 +92,38 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_4unit.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>24, "Space"=>4, "SpaceType"=>1, "ThermalZone"=>4, "BuildingUnit"=>4}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>24, "Space"=>4, "SpaceType"=>1, "ThermalZone"=>4, "BuildingUnit"=>4, "BuildingStory"=>2}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-
-  # def test_mf_with_corridor
-    # args_hash = {}
-    # args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_corr_12unit.json")
-    # expected_num_del_objects = {}
-    # expected_num_new_objects = {"Building"=>1, "Surface"=>102, "Space"=>14, "SpaceType"=>2, "ThermalZone"=>13, "BuildingUnit"=>12}
-    # expected_values = {}
-    # model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  # end
-
+=begin
+  def test_mf_with_corridor
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_corr_12unit.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>102, "Space"=>14, "SpaceType"=>2, "ThermalZone"=>13, "BuildingUnit"=>12, "BuildingStory"=>2}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+=end
   def test_sfd_multi_zone_floorplan
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "SFD_Multizone.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>80, "Space"=>12, "SpaceType"=>7, "ThermalZone"=>12, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
-  
-  # def test_mf_multi_zone_floorplan
-    # args_hash = {}
-    # args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_Multizone.json")
-    # expected_num_del_objects = {}
-    # expected_num_new_objects = {"Building"=>1, "Surface"=>159, "Space"=>21, "SpaceType"=>6, "ThermalZone"=>21, "BuildingUnit"=>1}
-    # expected_values = {}
-    # model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
-  # end
-
+=begin
+  def test_mf_multi_zone_floorplan
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "MF_Multizone.json")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>159, "Space"=>23, "SpaceType"=>7, "ThermalZone"=>23, "BuildingUnit"=>2, "BuildingStory"=>3}
+    expected_values = {}
+    model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end
+=end
   private
   
   def _test_error(osm_file, args_hash)

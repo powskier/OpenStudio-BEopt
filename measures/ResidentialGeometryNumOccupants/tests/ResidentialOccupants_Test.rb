@@ -22,7 +22,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {"NumOccupants"=>0}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
 
   def test_new_construction_auto
@@ -31,8 +31,8 @@ class AddResidentialOccupantsTest < MiniTest::Test
     args_hash["num_occ"] = Constants.Auto
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>2.64}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_values = {"NumOccupants"=>2.64, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
+    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
   def test_new_construction_fixed_3
@@ -41,8 +41,8 @@ class AddResidentialOccupantsTest < MiniTest::Test
     args_hash["num_occ"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>3}
-    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_values = {"NumOccupants"=>3, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
+    _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
   def test_retrofit_replace
@@ -51,14 +51,14 @@ class AddResidentialOccupantsTest < MiniTest::Test
     args_hash["num_occ"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>3}
-    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_values = {"NumOccupants"=>3, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
+    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     args_hash = {}
     args_hash["num_occ"] = "2"
     expected_num_del_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>2}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
+    expected_values = {"NumOccupants"=>2, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces+1)
   end
 
   def test_retrofit_remove
@@ -67,14 +67,14 @@ class AddResidentialOccupantsTest < MiniTest::Test
     args_hash["num_occ"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>3}
-    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    expected_values = {"NumOccupants"=>3, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
+    model = _test_measure(osm_geo_beds, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     args_hash = {}
     args_hash["num_occ"] = "0"
     expected_num_del_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
     expected_num_new_objects = {}
     expected_values = {"NumOccupants"=>0}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces+1)
   end
 
   def test_argument_error_num_occ_bad_string
@@ -159,7 +159,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     args_hash["num_occ"] = "1, 2, 3, auto"
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>9.39}
+    expected_values = {"NumOccupants"=>9.39, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
 
@@ -170,8 +170,27 @@ class AddResidentialOccupantsTest < MiniTest::Test
     args_hash["num_occ"] = "3"
     expected_num_del_objects = {}
     expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
-    expected_values = {"NumOccupants"=>3*num_units}
+    expected_values = {"NumOccupants"=>3*num_units, "SpaceType"=>[Constants.LivingSpaceType]*num_finished_spaces}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
+  end
+  
+  def test_sfd_multi_zone
+    num_finished_spaces = 2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"NumOccupants"=>2.05, "SpaceType"=>[Constants.BedroomSpaceType]*num_finished_spaces}
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Living_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+  end
+  
+  def test_mf_multi_zone
+    num_units = 2
+    num_finished_spaces = num_units*2
+    args_hash = {}
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"PeopleDefinition"=>num_finished_spaces, "People"=>num_finished_spaces, "ScheduleRuleset"=>2}
+    expected_values = {"NumOccupants"=>2.47*num_units, "SpaceType"=>[Constants.BedroomSpaceType]*num_finished_spaces}
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_0Living_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
   private
@@ -247,7 +266,7 @@ class AddResidentialOccupantsTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -267,17 +286,22 @@ class AddResidentialOccupantsTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"NumOccupants"=>0}
+    actual_values = {"NumOccupants"=>0, "SpaceType"=>[]}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "People"
                 actual_values["NumOccupants"] += new_object.peopleDefinition.numberofPeople.get
+                actual_values["SpaceType"] << new_object.space.get.spaceType.get.standardsSpaceType.get
             end
         end
     end
     assert_in_epsilon(expected_values["NumOccupants"], actual_values["NumOccupants"], 0.01)
+    if not expected_values["SpaceType"].nil?
+        assert_equal(1, actual_values["SpaceType"].uniq.size)
+        assert_equal(expected_values["SpaceType"], actual_values["SpaceType"])
+    end
 
     return model
   end

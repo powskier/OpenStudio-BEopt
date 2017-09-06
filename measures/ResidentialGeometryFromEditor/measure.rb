@@ -85,13 +85,11 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
 
     runner.registerInitialCondition("Initial model has #{model.getPlanarSurfaceGroups.size} planar surface groups")
     
-    # mega lame merge
-    model.getPlanarSurfaceGroups.each do |g|
-      g.remove
-    end
+    mm = OpenStudio::Model::ModelMerger.new
+    mm.mergeModels(model, new_model, rt.handleMapping)
     
-    new_model.getPlanarSurfaceGroups.each do |g| 
-      g.clone(model)
+    mm.warnings.each do |warnings|
+      runner.registerWarning(warnings.logMessage)
     end
 
     runner.registerFinalCondition("Final model has #{model.getPlanarSurfaceGroups.size} planar surface groups")
@@ -115,27 +113,12 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
         space_type.setStandardsSpaceType(st["name"])
       end
     end
-    
+
     # permit only expected space type names
     model.getSpaceTypes.each do |space_type|
       next if expected_space_types.include? space_type.standardsSpaceType.get
       runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'.")
       return false
-    end
-
-    # create and set thermal zones based on what the user wrote in the editor
-    json["thermal_zones"].each do |tz|
-      thermal_zone = OpenStudio::Model::ThermalZone.new(model)
-      thermal_zone.setName(tz["name"])
-      model.getSpaces.each do |space|
-        json["stories"].each do |stories|
-          stories["spaces"].each do |s|
-            next unless s["name"] == space.name.to_s
-            next unless s["thermal_zone_id"] == tz["id"]
-            space.setThermalZone(thermal_zone)
-          end
-        end
-      end
     end
 
     # for any spaces with no assigned zone, create (unless another space of the same space type has an assigned zone) a thermal zone based on the space type
@@ -158,6 +141,14 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       end
     end
     
+    # remove any unused space types
+    model.getSpaceTypes.each do |space_type|
+      if space_type.spaces.length == 0
+        space_type.remove
+        next
+      end
+    end
+    
     # ensure that all spaces in a zone are either all finished or all unfinished
     model.getThermalZones.each do |thermal_zone|
       if thermal_zone.spaces.length == 0
@@ -170,23 +161,10 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    # set the building unit on spaces based on what the user wrote in the editor
-    json["building_units"].each do |bu|
-      building_unit = OpenStudio::Model::BuildingUnit.new(model)
-      building_unit.setName(bu["name"])
-      building_unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, 0.5) # FIXME
-      model.getSpaces.each do |space|
-        json["stories"].each do |stories|
-          stories["spaces"].each do |s|
-            next unless s["name"] == space.name.to_s
-            next unless s["building_unit_id"] == bu["id"]
-            space.setBuildingUnit(building_unit)
-          end
-        end
-      end    
-    end
-
     # set some required meta information
+    model.getBuildingUnits.each do |building_unit|
+      building_unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, 0.5) # FIXME
+    end    
     if model.getBuildingUnits.length == 1
       model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeSingleFamilyDetached)
     else # SFA or MF

@@ -125,7 +125,7 @@ class ResidentialGasLighting < OpenStudio::Measure::ModelMeasure
         unit.spaces.each do |space|
           if space.spaceType.is_initialized
             if space.spaceType.get.standardsSpaceType.is_initialized
-              next unless space.spaceType.get.standardsSpaceType.get == space_types[0]
+              next unless space_types.include? space.spaceType.get.standardsSpaceType.get
             end
           end
           space.gasEquipment.each do |space_equipment|
