@@ -49,10 +49,19 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot load floorplan from '#{args_hash["floorplan_path"]}'.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Cannot load floorplan from '#{args_hash["floorplan_path"]}'.")
   end
   
-  def test_no_spaces_assigned_to_zones
+  def test_error_no_space_types
+    args_hash = {}
+    args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_space_types.json")
+    result = _test_error(nil, args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "No space types were created.")
+  end
+  
+  def test_no_zones_assigned_to_spaces
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}

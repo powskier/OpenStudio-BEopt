@@ -208,10 +208,6 @@ class AddResidentialOccupants < OpenStudio::Measure::ModelMeasure
         end
         break unless spaces.empty?
       end
-      if spaces.empty?
-        runner.registerError("There are no spaces of space type '#{space_types.join("' or '")}'.")
-        return false
-      end
       
       # Get FFA
       ffa = Geometry.get_finished_floor_area_from_spaces(spaces, false, runner)

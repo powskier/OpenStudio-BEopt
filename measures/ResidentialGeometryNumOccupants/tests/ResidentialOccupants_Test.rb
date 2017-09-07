@@ -90,6 +90,35 @@ class AddResidentialOccupantsTest < MiniTest::Test
     result = _test_error(osm_geo_beds, args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Number of Occupants must be either '#{Constants.Auto}' or a number greater than or equal to 0.")
   end
+  
+  def test_argument_error_occ_gain_negative
+    args_hash = {}
+    args_hash["occ_gain"] = "-1"
+    result = _test_error(osm_geo_beds, args_hash)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Internal gains cannot be negative.")
+  end
+  
+  def test_argument_error_sens_frac_negative
+    args_hash = {}
+    args_hash["sens_frac"] = "-1"
+    result = _test_error(osm_geo_beds, args_hash)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Sensible fraction must be greater than or equal to 0 and less than or equal to 1.")
+  end
+  
+  def test_argument_error_lat_frac_negative
+    args_hash = {}
+    args_hash["lat_frac"] = "-1"
+    result = _test_error(osm_geo_beds, args_hash)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Latent fraction must be greater than or equal to 0 and less than or equal to 1.")
+  end
+  
+  def test_argument_error_lat_frac_sens_frac_equal_one
+    args_hash = {}
+    args_hash["lat_frac"] = "0.5"
+    args_hash["sens_frac"] = "0.51"
+    result = _test_error(osm_geo_beds, args_hash)
+    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Sum of sensible and latent fractions must be less than or equal to 1.")
+  end
 
   def test_argument_error_num_occ_incorrect_num_elements
     args_hash = {}

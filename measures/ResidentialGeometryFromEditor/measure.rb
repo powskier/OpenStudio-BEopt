@@ -32,7 +32,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     arg = OpenStudio::Ruleset::OSArgument.makeStringArgument("floorplan_path", true)
     arg.setDisplayName("Floorplan Path")
     arg.setDescription("Path to the floorplan JSON.")
-    arg.setDefaultValue(File.join(File.dirname(__FILE__), "tests", "floorplan.json"))
+    arg.setDefaultValue(File.join("..", "floorplan.json"))
     args << arg
 
     return args
@@ -105,6 +105,12 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     OpenStudio::Model.matchSurfaces(spaces)
     
     json = JSON.parse(json)
+    
+    # error checking
+    unless json["space_types"].length > 0
+      runner.registerError("No space types were created.")
+      return false
+    end
 
     # set the space type standards fields based on what user wrote in the editor
     json["space_types"].each do |st|
@@ -117,7 +123,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     # permit only expected space type names
     model.getSpaceTypes.each do |space_type|
       next if expected_space_types.include? space_type.standardsSpaceType.get
-      runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'.")
+      runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'. User must select from: '#{expected_space_types.join("', '")}'.")
       return false
     end
 
