@@ -1201,5 +1201,20 @@ class Constants
   def self.WorkflowDescription
     return ' See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.'
   end
+  def self.ExpectedSpaceTypes
+    space_types = []
+    space_types << self.AtticSpaceType
+    space_types << self.BasementSpaceType
+    space_types << self.CorridorSpaceType
+    space_types << self.CrawlSpaceType
+    space_types << self.GarageSpaceType
+    space_types << self.LivingSpaceType
+    space_types << self.PierBeamSpaceType
+    space_types << self.KitchenSpaceType
+    space_types << self.BedroomSpaceType
+    space_types << self.BathroomSpaceType
+    space_types << self.LaundryRoomSpaceType
+    return space_types
+  end  
     
 end

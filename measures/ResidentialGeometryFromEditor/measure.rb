@@ -120,33 +120,6 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    # permit only expected space type names
-    model.getSpaceTypes.each do |space_type|
-      next if expected_space_types.include? space_type.standardsSpaceType.get
-      runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'. User must select from: '#{expected_space_types.join("', '")}'.")
-      return false
-    end
-
-    # for any spaces with no assigned zone, create (unless another space of the same space type has an assigned zone) a thermal zone based on the space type
-    model.getSpaceTypes.each do |space_type|
-      thermal_zone = nil
-      space_type.spaces.each do |space|
-        if thermal_zone.nil?
-          if not space.thermalZone.is_initialized            
-            thermal_zone = OpenStudio::Model::ThermalZone.new(model)
-            thermal_zone.setName(space_type.standardsSpaceType.get)
-          else
-            thermal_zone = space.thermalZone.get
-          end
-        end
-      end
-      space_type.spaces.each do |space|
-        unless space.thermalZone.is_initialized
-          space.setThermalZone(thermal_zone)
-        end
-      end
-    end
-    
     # remove any unused space types
     model.getSpaceTypes.each do |space_type|
       if space_type.spaces.length == 0
@@ -155,6 +128,24 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       end
     end
     
+    # permit only expected space type names
+    model.getSpaceTypes.each do |space_type|
+      next if Constants.ExpectedSpaceTypes.include? space_type.standardsSpaceType.get
+      runner.registerError("Unexpected space type name '#{space_type.standardsSpaceType.get}'. User must select from: '#{Constants.ExpectedSpaceTypes.join("', '")}'.")
+      return false
+    end
+
+    # for any spaces with no assigned zone, create (unless another space of the same space type has an assigned zone) a thermal zone based on the space type    
+    model.getSpaceTypes.each do |space_type|
+      space_type.spaces.each do |space|
+        unless space.thermalZone.is_initialized
+          thermal_zone = OpenStudio::Model::ThermalZone.new(model)
+          thermal_zone.setName(space.name.to_s)
+          space.setThermalZone(thermal_zone)
+        end
+      end
+    end
+
     # ensure that all spaces in a zone are either all finished or all unfinished
     model.getThermalZones.each do |thermal_zone|
       if thermal_zone.spaces.length == 0
@@ -164,6 +155,16 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
       unless thermal_zone.spaces.map {|space| Geometry.space_is_finished(space)}.uniq.size == 1
         runner.registerError("'#{thermal_zone.name}' has a mix of finished and unfinished spaces.")
         return false
+      end
+    end
+    
+    # assume no building unit means SFD
+    unless model.getBuildingUnits.length > 0
+      unit = OpenStudio::Model::BuildingUnit.new(model)
+      unit.setBuildingUnitType(Constants.BuildingUnitTypeResidential)
+      unit.setName(Constants.ObjectNameBuildingUnit)
+      model.getSpaces.each do |space|
+        space.setBuildingUnit(unit)
       end
     end
 
@@ -215,21 +216,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
 
   end
   
-  def expected_space_types
-    space_types = []
-    space_types << Constants.AtticSpaceType
-    space_types << Constants.BasementSpaceType
-    space_types << Constants.CorridorSpaceType
-    space_types << Constants.CrawlSpaceType
-    space_types << Constants.GarageSpaceType
-    space_types << Constants.LivingSpaceType
-    space_types << Constants.PierBeamSpaceType
-    space_types << Constants.KitchenSpaceType
-    space_types << Constants.BedroomSpaceType
-    space_types << Constants.BathroomSpaceType
-    space_types << Constants.LaundryRoomSpaceType
-    return space_types
-  end
+
   
 end
 

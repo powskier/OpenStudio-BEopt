@@ -31,7 +31,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     result = _test_error(nil, args_hash)
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Unexpected space type name 'graage'.")    
+    assert_includes(result.errors.map{ |x| x.logMessage }, "Unexpected space type name 'graage'. User must select from: '#{Constants.ExpectedSpaceTypes.join("', '")}'.")    
   end
   
   def test_error_mix_of_finished_and_unfinished_spaces_in_a_zone
@@ -65,7 +65,7 @@ class ResidentialGeometryFromEditor_Test < MiniTest::Unit::TestCase
     args_hash = {}
     args_hash["floorplan_path"] = File.join(File.dirname(__FILE__), "no_spaces_assigned_to_zones.json")
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>3, "BuildingUnit"=>1, "BuildingStory"=>3}
+    expected_num_new_objects = {"Building"=>1, "Surface"=>40, "Space"=>4, "SpaceType"=>3, "ThermalZone"=>4, "BuildingUnit"=>1, "BuildingStory"=>3}
     expected_values = {}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
