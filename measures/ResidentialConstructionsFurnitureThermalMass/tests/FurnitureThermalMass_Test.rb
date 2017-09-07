@@ -5,71 +5,31 @@ require 'minitest/autorun'
 require_relative '../measure.rb'
 require 'fileutils'
 
-class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
+class ProcessThermalMassFurnitureTest < MiniTest::Test
 
   def osm_geo
-    return "SFD_2000sqft_2story_FB_UA.osm"
-  end
-  
-  def test_argument_error_thick_in_negative
-    args_hash = {}
-    args_hash["thick_in"] = -1
-    result = _test_error(osm_geo, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Thickness must be greater than 0.")
-  end
-    
-  def test_argument_error_cond_negative
-    args_hash = {}
-    args_hash["cond"] = -1
-    result = _test_error(osm_geo, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Conductivity must be greater than 0.")
-  end
-
-  def test_argument_error_dens_negative
-    args_hash = {}
-    args_hash["dens"] = -1
-    result = _test_error(osm_geo, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Density must be greater than 0.")
-  end
-  
-  def test_argument_error_specheat_negative
-    args_hash = {}
-    args_hash["specheat"] = -1
-    result = _test_error(osm_geo, args_hash)
-    assert_equal(result.errors.map{ |x| x.logMessage }[0], "Specific Heat must be greater than 0.")
+    return "SFD_2000sqft_2story_UB_GRG_UA.osm"
   end
 
   def test_retrofit_replace
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.1154577, "LayerDensity"=>544.68, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "InternalMassDefinition"=>4, "InternalMass"=>4}
+    expected_values = {"LayerThickness"=>0.1524+0.1524+0.1524+0.1524, "LayerConductivity"=>0.1154577+0.1154577+0.1154577+0.1154577, "LayerDensity"=>640.8+640.8+640.8+640.8, "LayerSpecificHeat"=>1214.23+1214.23+1214.23+1214.23}
     model = _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
-    args_hash["thick_in"] = 2
-    args_hash["cond"] = 4.75
-    args_hash["dens"] = 100
-    args_hash["specheat"] = 0.223
-    expected_num_del_objects = {"Material"=>1, "Construction"=>1}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.0508, "LayerConductivity"=>0.6851875000000001, "LayerDensity"=>1602, "LayerSpecificHeat"=>933.701, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
-  end
-
-  def test_apply_to_specific_surface
-    args_hash = {}
-    args_hash["surface"] = "Surface 1"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"Material"=>1, "Construction"=>1}
-    expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.1154577, "LayerDensity"=>544.68, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)  
+    args_hash["mass"] = 9
+    expected_num_del_objects = {"Material"=>4, "Construction"=>4, "InternalMassDefinition"=>4, "InternalMass"=>4}
+    expected_num_new_objects = {"Material"=>4, "Construction"=>4, "InternalMassDefinition"=>4, "InternalMass"=>4}
+    expected_values = {"LayerThickness"=>0.16192+0.16192+0.16192+0.16192, "LayerConductivity"=>0.1154577+0.1154577+0.1154577+0.1154577, "LayerDensity"=>640.8+640.8+640.8+640.8, "LayerSpecificHeat"=>1214.23+1214.23+1214.23+1214.23}
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private
   
   def _test_error(osm_file, args_hash)
     # create an instance of the measure
-    measure = ProcessConstructionsFoundationsFloorsThermalMass.new
+    measure = ProcessThermalMassFurniture.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -105,7 +65,7 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
   
   def _test_na(osm_file, args_hash)
     # create an instance of the measure
-    measure = ProcessConstructionsFoundationsFloorsThermalMass.new
+    measure = ProcessThermalMassFurniture.new
 
     # create an instance of a runner
     runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
@@ -141,7 +101,7 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
 
   def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     # create an instance of the measure
-    measure = ProcessConstructionsFoundationsFloorsThermalMass.new
+    measure = ProcessThermalMassFurniture.new
 
     # check for standard methods
     assert(!measure.name.empty?)
@@ -174,7 +134,7 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -191,7 +151,7 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
     
-    actual_values = {"LayerThickness"=>0, "LayerConductivity"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0, "LayerIndex"=>0, "SurfacesWithConstructions"=>0}
+    actual_values = {"LayerThickness"=>0, "LayerConductivity"=>0, "LayerDensity"=>0, "LayerSpecificHeat"=>0}
     all_new_objects.each do |obj_type, new_objects|
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
@@ -202,18 +162,6 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
                 actual_values["LayerConductivity"] += new_object.conductivity
                 actual_values["LayerDensity"] += new_object.density
                 actual_values["LayerSpecificHeat"] += new_object.specificHeat
-            elsif obj_type == "Construction"
-                next if !all_new_objects.keys.include?("Material")
-                all_new_objects["Material"].each do |new_material|
-                    new_material = new_material.to_StandardOpaqueMaterial.get
-                    actual_values["LayerIndex"] += new_object.getLayerIndices(new_material)[0]
-                end
-                model.getSurfaces.each do |surface|
-                  if surface.construction.is_initialized
-                    next unless surface.construction.get == new_object
-                    actual_values["SurfacesWithConstructions"] += 1
-                  end
-                end
             end
         end
     end
@@ -221,8 +169,6 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
     assert_in_epsilon(expected_values["LayerConductivity"], actual_values["LayerConductivity"], 0.01)
     assert_in_epsilon(expected_values["LayerDensity"], actual_values["LayerDensity"], 0.01)
     assert_in_epsilon(expected_values["LayerSpecificHeat"], actual_values["LayerSpecificHeat"], 0.01)
-    assert_in_epsilon(expected_values["LayerIndex"], actual_values["LayerIndex"], 0.01)
-    assert_in_epsilon(expected_values["SurfacesWithConstructions"], actual_values["SurfacesWithConstructions"], 0.01)
     
     return model
   end
