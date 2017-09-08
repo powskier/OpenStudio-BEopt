@@ -43,7 +43,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 16, 1)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 17, 1)
   end
 
   private
@@ -108,14 +108,6 @@ class UtilityBillCalculationsTest < MiniTest::Test
     model.addObjects(request_model.objects)
     model.save(model_out_path(test_name), true)
 
-    osw_path = File.join(run_dir(test_name), "in.osw")
-    osw_path = File.absolute_path(osw_path)
-
-    workflow = OpenStudio::WorkflowJSON.new
-    workflow.setSeedFile(File.absolute_path(model_out_path(test_name)))
-    workflow.setWeatherFile(File.absolute_path(epw_path))
-    workflow.saveAs(osw_path)
-
     if !File.exist?("#{run_dir(test_name)}")
       FileUtils.mkdir_p("#{run_dir(test_name)}")
     end
@@ -125,6 +117,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     end
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/utilities.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/by_nsrdb.csv", "#{resources_dir(test_name)}")
+    FileUtils.cp("#{File.dirname(__FILE__)}/../resources/Natural gas.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/result.json", "#{resources_dir(test_name)}")
     
     return model
@@ -158,7 +151,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     assert(idf_output_requests.size == 0)
 
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
-    model = setup_test(test_name, idf_output_requests)
+    setup_test(test_name, idf_output_requests)
 
     assert(File.exist?(model_out_path(test_name)))
 
@@ -239,6 +232,9 @@ class UtilityBillCalculationsTest < MiniTest::Test
       Dir.chdir(start_dir)
     end
 
+    # show the output
+    # show_output(result)    
+    
     # make sure the report file exists
     assert(File.exist?(timeseries_path(test_name)))
 

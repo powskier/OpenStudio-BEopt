@@ -90,83 +90,94 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     cols = CSV.read(File.expand_path(File.join(run_dir, "enduse_timeseries.csv"))).transpose
     elec_load = nil
     elec_generated = nil
+    gas_load = nil
     cols.each do |col|
       if col[0].include? "Electricity:Facility"
         elec_load = col[1..-1]
       elsif col[0].include? "PV:Electricity"
         elec_generated = col[1..-1]
+      elsif col[0].include? "Gas:Facility"
+        gas_load = col[1..-1]
       end
     end
+    
+    resources_dir = nil
+    Dir.entries(run_dir).each do |entry|
+      if entry.include? "UtilityBillCalculations"
+        resources_dir = File.expand_path(File.join(run_dir, entry, "resources"))
+      end
+    end
+    
+    cols = CSV.read(File.expand_path(File.join(resources_dir, "by_nsrdb.csv"))).transpose
+    weather_file = runner.lastOpenStudioModel.get.getSite.weatherFile.get
     
     # tariffs
     tariffs = {}
     if not json_file_path.nil?
-    
+
       tariff = JSON.parse(File.read(json_file_path), :symbolize_names=>true)[:items][0]
-      tariffs[tariff[:label]] = tariff
+      tariffs[tariff[:label]] = [tariff[:eiaid].to_s, tariff]
+      
+      ids = cols[20].collect { |i| i.to_s }
+      indexes = ids.each_index.select{|i| ids[i] == tariff[:eiaid].to_s}
+      utility_ids = {}
+      indexes.each do |ix|
+        if utility_ids.keys.include? cols[20][ix]
+          utility_ids[cols[20][ix]] << cols[0][ix]
+        else
+           utility_ids[cols[20][ix]] = [cols[0][ix]]
+        end
+      end
       
     elsif not api_key.nil?
-
-      resources_dir = nil
-      Dir.entries(run_dir).each do |entry|
-        if entry.include? "UtilityBillCalculations"
-          resources_dir = File.expand_path(File.join(run_dir, entry, "resources"))
-        end
-      end    
-
-      cols = CSV.read(File.expand_path(File.join(resources_dir, "by_nsrdb.csv"))).transpose
       
-      weather_file = runner.lastOpenStudioModel.get.getSite.weatherFile.get      
       closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to resstock epw
-      puts "Nearest ResStock usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}"
-
+      runner.registerInfo("Nearest ResStock usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
+      
       usafs = cols[1].collect { |i| i.to_s }
       indexes = usafs.each_index.select{|i| usafs[i] == closest_usaf}
-      utility_ids = []
+      utility_ids = {}
       indexes.each do |ix|
-        utility_ids << cols[20][ix]
+        if utility_ids.keys.include? cols[20][ix]
+          utility_ids[cols[20][ix]] << cols[0][ix]
+        else
+           utility_ids[cols[20][ix]] = [cols[0][ix]]
+        end
       end
-      utility_ids = utility_ids.uniq # get all unique utility_ids (eia_ids) contained in this usaf
     
       utility_ixs = []
       cols = CSV.read(File.expand_path(File.join(resources_dir, "utilities.csv")), {:encoding=>'ISO-8859-1'}).transpose
       cols.each do |col|
         unless col[0].nil?
           if col[0].include? "eiaid"
-            eia_ids = col.collect { |i| i.to_i.to_s }
-            
-            utility_ids.each do |utility_id|
+            eia_ids = col.collect { |i| i.to_i.to_s }            
+            utility_ids.keys.each do |utility_id|
               utility_ix = col.index(utility_id)
               if utility_ix.nil?
                 runner.registerWarning("Could not find EIA Utility ID: #{utility_id}.")
               else
-                utility_ixs << utility_ix
+                utility_ixs << [utility_id, utility_ix]
               end
             end
           end
         end
       end
       
-      utility_ixs.each do |utility_ix|
+      utility_ixs.each do |utility_id, utility_ix|
         getpage = cols[3][utility_ix]
         runner.registerInfo("Processing api request on getpage=#{getpage}.")
         uri = URI('http://api.openei.org/utility_rates?')
         params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
         uri.query = URI.encode_www_form(params)
         response = Net::HTTP.get_response(uri)
-        tariffs[getpage] = JSON.parse(response.body, :symbolize_names=>true)[:items][0]
-        
-        # File.open('result.json', 'w') do |f|
-          # f.write(JSON.parse(response.body, :symbolize_names=>true)[:items][0].to_json)
-        # end
+        tariffs[getpage] = [utility_id, JSON.parse(response.body, :symbolize_names=>true)[:items][0]]
       end
       
     else
       runner.registerError("Did not supply an API Key or a JSON File Path.")
       return false
     end
-    
-    value_to_register = []
+
     tariffs.each do |getpage, tariff|
     
       # utilityrate3
@@ -178,12 +189,12 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
       SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
       SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
-      SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[:fixedmonthlycharge]) # $
-      unless tariff[:demandratestructure].nil?
-        SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[:demandweekdayschedule]))
-        SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[:demandweekendschedule]))
+      SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[1][:fixedmonthlycharge]) # $
+      unless tariff[1][:demandratestructure].nil?
+        SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[1][:demandweekdayschedule]))
+        SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[1][:demandweekendschedule]))
         SscApi.set_number(p_data, 'ur_dc_enable', 1)
-        tariff[:demandratestructure].each_with_index do |period, i|
+        tariff[1][:demandratestructure].each_with_index do |period, i|
           period.each_with_index do |tier, j|
             unless tier[:adj].nil?
               SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate] + tier[:adj])
@@ -199,9 +210,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         end
       end
       SscApi.set_number(p_data, 'ur_ec_enable', 1)
-      SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[:energyweekdayschedule]))
-      SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[:energyweekendschedule]))
-      tariff[:energyratestructure].each_with_index do |period, i|
+      SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[1][:energyweekdayschedule]))
+      SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[1][:energyweekendschedule]))
+      tariff[1][:energyratestructure].each_with_index do |period, i|
         period.each_with_index do |tier, j|
           unless tier[:adj].nil?
             SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate] + tier[:adj])
@@ -251,16 +262,28 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       # puts "annual demand charges: $#{(demand_charges_tou + demand_charges_fixed).round(2)}"
       # puts "annual energy charges: $#{(energy_charges_tou + energy_charges_flat).round(2)}"
       # puts "annual utility bill: $#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
-      
-      value_to_register << "#{getpage}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
+
+      runner.registerValue(utility_ids[tariff[0]] * "_", (utility_bills.inject(0){ |sum, x| sum + x }).round(2))
       
     end
     
-    puts value_to_register
-    runner.registerValue("Annual Utility Bill", value_to_register.join(", "))
-    
+    cols = CSV.read(File.expand_path(File.join(resources_dir, "Natural gas.csv")), {:encoding=>'ISO-8859-1'})[3..-1].transpose
+    cols[0].each_with_index do |state, i|
+      next unless state == weather_file.stateProvinceRegion
+      report_output(runner, "utility_bill.total_site_natural_gas", gas_load, "kBtu", "therm", cols[1][i])
+      break
+    end
+
     return true
  
+  end
+  
+  def report_output(runner, name, vals, os_units, desired_units, rate)
+    total_val = 0.0
+    vals.each do |val|
+        total_val += val.to_f
+    end
+    runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f).round(2))
   end
   
   def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)
@@ -272,10 +295,8 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
       km = haversine(bldg_lat.to_f, bldg_lon.to_f, usaf[19].to_f, usaf[18].to_f)
       distances << km
-    end
-    
-    return usafs[distances.index(distances.min)][1]
-    
+    end    
+    return usafs[distances.index(distances.min)][1]    
   end
 
   def haversine(lat1, lon1, lat2, lon2)
