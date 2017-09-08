@@ -184,7 +184,7 @@ class AddResidentialOccupants < OpenStudio::Measure::ModelMeasure
       bedroom_spaces = []
       space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
       space_types.each do |space_type|
-        spaces = Geometry.get_space_from_string(unit.spaces, "", runner, [space_type])
+        spaces = Geometry.get_space_from_string(unit.spaces, nil, runner, [space_type])
         spaces.each do |space|
           next unless space.spaceType.get.standardsSpaceType.get == space_type
           if space.spaceType.get.standardsSpaceType.get == Constants.LivingSpaceType

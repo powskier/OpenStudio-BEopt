@@ -142,7 +142,7 @@ class ResidentialWellPump < OpenStudio::Measure::ModelMeasure
         end        
         
         # Get space
-        spaces = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_types)
+        spaces = Geometry.get_space_from_string(unit_spaces.uniq, nil, runner, space_types)
         next if spaces.empty?
         space = spaces[0]
     
