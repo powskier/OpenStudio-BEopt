@@ -483,7 +483,7 @@ class Waterheater
         end
     end
     
-    def self.get_water_heater_location_auto(model, unit_spaces, runner, space_types)
+    def self.get_water_heater_location_auto(model, unit_spaces, runner, space_types)        
         space = nil
         wh_tz = nil
         space_types.each do |space_type|
@@ -522,17 +522,16 @@ class Waterheater
           #If auto is picked, get the BA climate zone, 
           #check if the building has a garage/basement, 
           #and assign the water heater location appropriately
-          climateZones = model.getClimateZones
           ba_cz_name = ""
-          climateZones.climateZones.each do |climateZone|
+          model.getClimateZones.climateZones.each do |climateZone|
               if climateZone.institution == Constants.BuildingAmericaClimateZone
                   ba_cz_name = climateZone.value.to_s
               end
           end
-          living = Geometry.get_unit_space_type_finished_space(spaces, runner, space_types)
-          garage = Geometry.get_garage_spaces(spaces)
-          fin_basement = Geometry.get_finished_basement_spaces(spaces)
-          unfin_basement = Geometry.get_unfinished_basement_spaces(spaces)
+          living = Geometry.get_unit_space_type_finished_space(unit_spaces, runner, space_types)
+          garage = Geometry.get_garage_spaces(unit_spaces)
+          fin_basement = Geometry.get_finished_basement_spaces(unit_spaces)
+          unfin_basement = Geometry.get_unfinished_basement_spaces(unit_spaces)
           if ba_cz_name == Constants.BAZoneHotDry or ba_cz_name == Constants.BAZoneHotHumid
               #check if the building has a garage
               if garage.length > 0

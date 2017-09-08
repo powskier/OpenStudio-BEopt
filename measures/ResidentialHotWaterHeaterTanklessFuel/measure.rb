@@ -177,6 +177,13 @@ class ResidentialHotWaterHeaterTanklessFuel < OpenStudio::Measure::ModelMeasure
             space_types = []
             if water_heater_loc == Constants.Auto
               space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
+              model.getClimateZones.climateZones.each do |climateZone|
+                if climateZone.institution == Constants.BuildingAmericaClimateZone
+                  unless [Constants.BAZoneHotDry, Constants.BAZoneHotHumid].include? climateZone.value.to_s
+                    space_types.delete(Constants.GarageSpaceType)
+                  end
+                end
+              end
             else
               model.getSpaceTypes.each do |st|
                 next unless "Space Type: #{st.standardsSpaceType.get}" == water_heater_loc

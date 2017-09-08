@@ -142,8 +142,9 @@ class ResidentialHotTubPump < OpenStudio::Measure::ModelMeasure
         end
         
         # Get space
-        space = Geometry.get_space_from_string(unit_spaces.uniq, nil, runner, space_types)
-        next if space.nil?
+        spaces = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_types)
+        next if spaces.empty?
+        space = spaces[0]
     
         # Remove any existing hot tub pump
         objects_to_remove = []

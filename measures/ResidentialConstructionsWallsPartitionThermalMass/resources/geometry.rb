@@ -234,7 +234,7 @@ class Geometry
     end
 
     def self.get_unit_space_type_finished_space(unit_spaces, runner, space_types)
-        space = nil
+        spaces = []
         space_types.each do |space_type|
           above_grade = true
           if space_type == Constants.FinishedBasementFoundationType
@@ -246,41 +246,22 @@ class Geometry
             unless above_grade
               next unless self.space_is_below_grade(s)
             end
-            space = s
-            break
+            spaces << s
           end
-          break unless space.nil?
-          runner.registerWarning("Could not find a space in '#{unit_spaces[0].buildingUnit.get.name}' with space type '#{space_type}'.")
+          break unless spaces.empty?
+          runner.registerWarning("Could not find any spaces in '#{unit_spaces[0].buildingUnit.get.name}' with space type '#{space_type}'.")
         end
-        if space.nil?
-          runner.registerWarning("Choosing an arbitrary finished space on the lowest above-grade story.")
-          # For the specified unit, chooses an arbitrary finished space on the lowest above-grade story.
-          # If no above-grade finished spaces are available, reverts to an arbitrary below-grade finished space.
-          space = nil
-          # Get lowest above-grade space
-          bldg_min_z = 100000
+        if spaces.empty?
+          runner.registerWarning("Choosing arbitrary finished spaces.")
           unit_spaces.each do |s|
-              next if self.space_is_below_grade(s)
               next if self.space_is_unfinished(s)
-              space_min_z = self.getSurfaceZValues(s.surfaces).min + OpenStudio::convert(s.zOrigin,"m","ft").get
-              next if space_min_z >= bldg_min_z
-              bldg_min_z = space_min_z
-              space = s
-          end
-          if space.nil?
-              # Try below-grade space
-              unit_spaces.each do |s|
-                  next if self.space_is_above_grade(s)
-                  next if self.space_is_unfinished(s)
-                  space = s
-                  break
-              end
+              spaces << s
           end
         end
-        if space.nil?
-          runner.registerWarning("Could not find a finished space for '#{unit_spaces[0].buildingUnit.get.name}'.")
+        if spaces.empty?
+          runner.registerWarning("Could not find any finished spaces in '#{unit_spaces[0].buildingUnit.get.name}'.")
         end
-        return space
+        return spaces
     end
     
     def self.get_floor_area_from_spaces(spaces, apply_multipliers=false, runner=nil)
@@ -563,8 +544,9 @@ class Geometry
         end
         if space.nil? and !runner.nil?
             runner.registerWarning("Could not find space with the name '#{space_s.gsub("Space: ", "")}' for '#{spaces[0].buildingUnit.get.name}'.")
+            return []
         end
-        return space
+        return [space]
     end
 
     def self.get_thermal_zone_from_string(zones, thermalzone_s, runner=nil)

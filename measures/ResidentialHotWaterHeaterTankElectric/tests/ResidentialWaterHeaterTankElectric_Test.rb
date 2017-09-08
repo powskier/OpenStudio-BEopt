@@ -395,14 +395,14 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
     expected_values = {"TankVolume"=>num_units*50, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "ThermalZone"=>args_hash["location"]}
-    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*3)
+    _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*2)
   end
   
   def test_sfd_multi_zone_auto
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "ScheduleConstant"=>2}
-    expected_values = {"TankVolume"=>40, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>"Space Type: #{Constants.GarageSpaceType}"}
+    expected_values = {"TankVolume"=>40, "InputCapacity"=>4.5, "ThermalEfficiency"=>1.0, "TankUA"=>2.21, "Setpoint"=>125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
     _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 2)
   end
   
@@ -420,7 +420,7 @@ class ResidentialHotWaterHeaterTankElectricTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterHeaterMixed"=>num_units, "PlantLoop"=>num_units, "PumpVariableSpeed"=>num_units, "ScheduleConstant"=>2*num_units}
-    expected_values = {"TankVolume"=>num_units*35, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>"Space Type: #{Constants.GarageSpaceType}"}
+    expected_values = {"TankVolume"=>num_units*35, "InputCapacity"=>num_units*4.5, "ThermalEfficiency"=>num_units*1.0, "TankUA"=>num_units*2.21, "Setpoint"=>num_units*125, "OnCycle"=>0, "OffCycle"=>0, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
     _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*2)
   end
   

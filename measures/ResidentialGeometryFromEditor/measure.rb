@@ -32,7 +32,7 @@ class ResidentialGeometryFromEditor < OpenStudio::Measure::ModelMeasure
     arg = OpenStudio::Ruleset::OSArgument.makeStringArgument("floorplan_path", true)
     arg.setDisplayName("Floorplan Path")
     arg.setDescription("Path to the floorplan JSON.")
-    arg.setDefaultValue(File.join("..", "floorplan.json"))
+    arg.setDefaultValue(File.join(File.dirname(__FILE__), "tests", "SFD_Multizone.json"))
     args << arg
 
     return args

@@ -32,22 +32,24 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   end
   
   def test_new_construction_standard
+    num_finished_spaces = 3
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 7)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces, 7)
   end
   
   def test_new_construction_varying_mults
+    num_finished_spaces = 3
     args_hash = {}
     args_hash["shower_mult"] = 0.0
     args_hash["sink_mult"] = 0.5
     args_hash["bath_mult"] = 1.5
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>2, "OtherEquipment"=>2, "WaterUseEquipmentDefinition"=>2, "WaterUseEquipment"=>2, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>2}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>2*num_finished_spaces, "OtherEquipment"=>2*num_finished_spaces, "WaterUseEquipmentDefinition"=>2*num_finished_spaces, "WaterUseEquipment"=>2*num_finished_spaces, "ScheduleFixedInterval"=>2*num_finished_spaces, "ScheduleConstant"=>2*num_finished_spaces}
     expected_values = {"Annual_kwh"=>107.7, "HotWater_gpd"=>23, "Space"=>args_hash["space"]}
-    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 7)
+    _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces, 7)
   end
   
   def test_new_construction_basement
@@ -60,35 +62,37 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   end
 
   def test_retrofit_replace
+    num_finished_spaces = 3
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60, "Space"=>args_hash["space"]}
-    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 7)
+    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces, 7)
     args_hash = {}
     args_hash["shower_mult"] = 0.0
     args_hash["sink_mult"] = 0.5
     args_hash["bath_mult"] = 1.5
-    expected_num_del_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>2, "OtherEquipment"=>2, "WaterUseEquipmentDefinition"=>2, "WaterUseEquipment"=>2, "ScheduleFixedInterval"=>2, "ScheduleConstant"=>2}
+    expected_num_del_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>2*num_finished_spaces, "OtherEquipment"=>2*num_finished_spaces, "WaterUseEquipmentDefinition"=>2*num_finished_spaces, "WaterUseEquipment"=>2*num_finished_spaces, "ScheduleFixedInterval"=>2*num_finished_spaces, "ScheduleConstant"=>2*num_finished_spaces}
     expected_values = {"Annual_kwh"=>107.7, "HotWater_gpd"=>23, "Space"=>args_hash["space"]}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 7)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces+num_finished_spaces, 7)
   end
     
   def test_retrofit_remove
+    num_finished_spaces = 3
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60, "Space"=>args_hash["space"]}
-    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 7)
+    model = _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces, 7)
     args_hash = {}
     args_hash["shower_mult"] = 0.0
     args_hash["sink_mult"] = 0.0
     args_hash["bath_mult"] = 0.0
-    expected_num_del_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_num_del_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
     expected_num_new_objects = {}
     expected_values = {"Annual_kwh"=>0, "HotWater_gpd"=>0, "Space"=>args_hash["space"]}
-    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 7)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces, 7)
   end
   
   def test_argument_error_shower_mult_negative
@@ -131,12 +135,13 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   end
 
   def test_single_family_attached_new_construction
+    num_finished_spaces = 8
     num_units = 4
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_units*3, "OtherEquipment"=>num_units*3, "WaterUseEquipmentDefinition"=>num_units*3, "WaterUseEquipment"=>num_units*3, "ScheduleFixedInterval"=>num_units*3, "ScheduleConstant"=>num_units*3}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_finished_spaces*3, "OtherEquipment"=>num_finished_spaces*3, "WaterUseEquipmentDefinition"=>num_finished_spaces*3, "WaterUseEquipment"=>num_finished_spaces*3, "ScheduleFixedInterval"=>num_finished_spaces*3, "ScheduleConstant"=>num_finished_spaces*3}
     expected_values = {"Annual_kwh"=>num_units*445.1, "HotWater_gpd"=>num_units*60, "Space"=>args_hash["space"]}
-    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*7)
+    _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces, num_units*7)
   end
 
   def test_single_family_attached_new_construction_finished_basement
@@ -159,38 +164,46 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   end
   
   def test_sfd_multi_zone_auto
+    num_kitchen_spaces = 1
+    num_bathroom_spaces = 2
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>4, "OtherEquipment"=>4, "WaterUseEquipmentDefinition"=>4, "WaterUseEquipment"=>4, "ScheduleFixedInterval"=>4, "ScheduleConstant"=>4}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "OtherEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleFixedInterval"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleConstant"=>num_kitchen_spaces*1+num_bathroom_spaces*3}
     expected_values = {"Annual_kwh"=>370.9, "HotWater_gpd"=>50, "SpaceType"=>args_hash["space"]}
-    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 2)
+    _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_kitchen_spaces+num_bathroom_spaces)
   end
   
   def test_sfd_multi_zone_kitchen
+    num_kitchen_spaces = 1
+    num_bathroom_spaces = 0
     args_hash = {}
     args_hash["space"] = "Space Type: #{Constants.KitchenSpaceType}"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
-    expected_values = {"Annual_kwh"=>370.9, "HotWater_gpd"=>50, "SpaceType"=>args_hash["space"]}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "OtherEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleFixedInterval"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleConstant"=>num_kitchen_spaces*1+num_bathroom_spaces*3}
+    expected_values = {"Annual_kwh"=>80.2, "HotWater_gpd"=>20.8, "SpaceType"=>args_hash["space"]}
     _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   def test_mf_multi_zone_auto
+    num_kitchen_spaces = 2
+    num_bathroom_spaces = 3
     num_units = 2
     args_hash = {}
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_units*4, "OtherEquipment"=>num_units*4, "WaterUseEquipmentDefinition"=>num_units*4, "WaterUseEquipment"=>num_units*4, "ScheduleFixedInterval"=>num_units*4, "ScheduleConstant"=>num_units*4}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "OtherEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleFixedInterval"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleConstant"=>num_kitchen_spaces*1+num_bathroom_spaces*3}
     expected_values = {"Annual_kwh"=>num_units*370.9, "HotWater_gpd"=>num_units*50, "SpaceType"=>args_hash["space"]}
-    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*2)
+    _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_kitchen_spaces+num_bathroom_spaces)
   end
   
   def test_mf_multi_zone_kitchen
+    num_kitchen_spaces = 2
+    num_bathroom_spaces = 0
     num_units = 2
     args_hash = {}
     args_hash["space"] = "Space Type: #{Constants.KitchenSpaceType}"
     expected_num_del_objects = {}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_units*3, "OtherEquipment"=>num_units*3, "WaterUseEquipmentDefinition"=>num_units*3, "WaterUseEquipment"=>num_units*3, "ScheduleFixedInterval"=>num_units*3, "ScheduleConstant"=>num_units*3}
-    expected_values = {"Annual_kwh"=>num_units*370.9, "HotWater_gpd"=>num_units*50, "SpaceType"=>args_hash["space"]}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "OtherEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipmentDefinition"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "WaterUseEquipment"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleFixedInterval"=>num_kitchen_spaces*1+num_bathroom_spaces*3, "ScheduleConstant"=>num_kitchen_spaces*1+num_bathroom_spaces*3}
+    expected_values = {"Annual_kwh"=>num_units*80.2, "HotWater_gpd"=>num_units*20.8, "SpaceType"=>args_hash["space"]}
     _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver_GasWHTank.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units)
   end
   
@@ -265,7 +278,7 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
-
+    
     # show the output
     # show_output(result)
 

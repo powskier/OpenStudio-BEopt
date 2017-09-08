@@ -263,8 +263,9 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
         end
 
         # Get space
-        space = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_types)
-        next if space.nil?
+        spaces = Geometry.get_space_from_string(unit_spaces.uniq, space_r, runner, space_types)
+        next if spaces.empty?
+        space = spaces[0]
 		
         #Get plant loop
         plant_loop = Waterheater.get_plant_loop_from_string(model.getPlantLoops, plant_loop_s, unit.spaces, Constants.ObjectNameWaterHeater(unit.name.to_s.gsub("unit", "u")).gsub("|","_"), runner)

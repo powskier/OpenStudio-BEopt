@@ -414,15 +414,15 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
         expected_num_del_objects = {}
         expected_num_new_objects = {"WaterHeaterStratified"=>1*num_units, "PlantLoop"=>1*num_units, "PumpVariableSpeed"=>1*num_units, "WaterHeaterHeatPumpWrappedCondenser"=>1*num_units, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1*num_units, "FanOnOff"=>1*num_units, "OtherEquipment"=>2*num_units, "OtherEquipmentDefinition"=>2*num_units, "EnergyManagementSystemSensor"=>9*num_units, "EnergyManagementSystemActuator"=>7*num_units, "EnergyManagementSystemTrendVariable"=>3*num_units, "EnergyManagementSystemProgram"=>2*num_units, "EnergyManagementSystemProgramCallingManager"=>1*num_units, "ScheduleConstant"=>6*num_units+1, "ScheduleRuleset"=>7*num_units, "OutputVariable"=>16}
         expected_values = {"TankVolume"=>45*num_units, "Heater1Height"=>0.732*num_units, "Heater2Height"=>0.129*num_units, "TankU"=>1.13*num_units, "OnCycle"=>3*num_units, "OffCycle"=>3*num_units, "CondBottom"=>0.0870*num_units, "CondTop"=>0.560*num_units, "AirflowRate"=>0.0854*num_units, "Sensor1Height"=>0.818*num_units, "Sensor2Height"=>0.818*num_units, "Cap"=>1400*num_units, "COP"=>2.8*num_units, "SHR"=>0.88*num_units, "WBTemp"=>13.08*num_units, "FanEff"=>0.235*num_units, "ThermalZone"=>args_hash["location"]}
-        _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*3)
+        _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*2)
     end
   
     def test_sfd_multi_zone_auto
       args_hash = {}
       expected_num_del_objects = {}
       expected_num_new_objects = {"WaterHeaterStratified"=>1, "PlantLoop"=>1, "PumpVariableSpeed"=>1, "WaterHeaterHeatPumpWrappedCondenser"=>1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>1, "FanOnOff"=>1, "OtherEquipment"=>2, "OtherEquipmentDefinition"=>2, "EnergyManagementSystemSensor"=>9, "EnergyManagementSystemActuator"=>7, "EnergyManagementSystemTrendVariable"=>3, "EnergyManagementSystemProgram"=>2, "EnergyManagementSystemProgramCallingManager"=>1, "ScheduleConstant"=>6+1, "ScheduleRuleset"=>7, "OutputVariable"=>16}
-      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "SpaceType"=>"Space Type: #{Constants.GarageSpaceType}"}
-      _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 3)
+      expected_values = {"TankVolume"=>45, "Heater1Height"=>0.732, "Heater2Height"=>0.129, "TankU"=>1.13, "OnCycle"=>3, "OffCycle"=>3, "CondBottom"=>0.0870, "CondTop"=>0.560, "AirflowRate"=>0.0854, "Sensor1Height"=>0.818, "Sensor2Height"=>0.818, "Cap"=>1400, "COP"=>2.8, "SHR"=>0.88, "WBTemp"=>13.08, "FanEff"=>0.235, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
+      _test_measure("SFD_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1, 2)
     end
     
     def test_sfd_multi_zone_garage
@@ -439,8 +439,8 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
       args_hash = {}
       expected_num_del_objects = {}
       expected_num_new_objects = {"WaterHeaterStratified"=>num_units*1, "PlantLoop"=>num_units*1, "PumpVariableSpeed"=>num_units*1, "WaterHeaterHeatPumpWrappedCondenser"=>num_units*1, "CoilWaterHeatingAirToWaterHeatPumpWrapped"=>num_units*1, "FanOnOff"=>num_units*1, "OtherEquipment"=>num_units*2, "OtherEquipmentDefinition"=>num_units*2, "EnergyManagementSystemSensor"=>num_units*9, "EnergyManagementSystemActuator"=>num_units*7, "EnergyManagementSystemTrendVariable"=>num_units*3, "EnergyManagementSystemProgram"=>num_units*2, "EnergyManagementSystemProgramCallingManager"=>num_units*1, "ScheduleConstant"=>num_units*6+1, "ScheduleRuleset"=>num_units*7, "OutputVariable"=>16}
-      expected_values = {"TankVolume"=>num_units*45, "Heater1Height"=>num_units*0.732, "Heater2Height"=>num_units*0.129, "TankU"=>num_units*1.13, "OnCycle"=>num_units*3, "OffCycle"=>num_units*3, "CondBottom"=>num_units*0.0870, "CondTop"=>num_units*0.560, "AirflowRate"=>num_units*0.0854, "Sensor1Height"=>num_units*0.818, "Sensor2Height"=>num_units*0.818, "Cap"=>num_units*1400, "COP"=>num_units*2.8, "SHR"=>num_units*0.88, "WBTemp"=>num_units*13.08, "FanEff"=>num_units*0.235, "SpaceType"=>"Space Type: #{Constants.GarageSpaceType}"}
-      _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*3)
+      expected_values = {"TankVolume"=>num_units*45, "Heater1Height"=>num_units*0.732, "Heater2Height"=>num_units*0.129, "TankU"=>num_units*1.13, "OnCycle"=>num_units*3, "OffCycle"=>num_units*3, "CondBottom"=>num_units*0.0870, "CondTop"=>num_units*0.560, "AirflowRate"=>num_units*0.0854, "Sensor1Height"=>num_units*0.818, "Sensor2Height"=>num_units*0.818, "Cap"=>num_units*1400, "COP"=>num_units*2.8, "SHR"=>num_units*0.88, "WBTemp"=>num_units*13.08, "FanEff"=>num_units*0.235, "SpaceType"=>"Space Type: #{Constants.LivingSpaceType}"}
+      _test_measure("MF_2units_Multizone_2story_SL_UA_GRG_2Bed_2Bath_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units, num_units*2)
     end
     
     def test_mf_multi_zone_garage
