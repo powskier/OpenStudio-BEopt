@@ -33,17 +33,17 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 2)
   end  
   
   def test_api_key_valid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["api_key"] = "eY6hepGi6hrIt7yg1Ds8Mt7A9GlnsWC1kg8M1n8n"
+    args_hash["api_key"] = "eY6hepGi6hrIt7yg1Ds8Mt7A9GlnsWC1kg8M1n8n" # eY6hepGi6hrIt7yg1Ds8Mt7A9GlnsWC1kg8M1n8n zIZUwvgnqfpLrBHzZRzHTo7U4CbkSfZeRsOsm711 WwTHJw8lk9thZ0CSlJ5evuIAuR6Br3dOrcQdXr0q vc2A8oAFiTrLeeJ49W2jwWyal4qQpdvYVYo1dh24
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 17, 1)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 19, 1)
   end
 
   private
