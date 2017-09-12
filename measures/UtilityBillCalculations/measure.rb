@@ -106,6 +106,8 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     elec_load = nil
     elec_generated = nil
     gas_load = nil
+    oil_load = nil
+    prop_load = nil
     cols.each do |col|
       if col[0].include? "Electricity:Facility"
         elec_load = col[1..-1]
@@ -113,6 +115,10 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         elec_generated = col[1..-1]
       elsif col[0].include? "Gas:Facility"
         gas_load = col[1..-1]
+      elsif col[0].include? "FuelOil#1:Facility"
+        oil_load = col[1..-1]
+      elsif col[0].include? "Propane:Facility"
+        prop_load = col[1..-1]
       end
     end
     
@@ -296,12 +302,18 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     runner.registerValue("total_electricity", electricity_bills.join("|"))
     runner.registerInfo("Registering electricity bills.")
     
-    fuels = ["Natural gas"]
+    fuels = ["Natural gas", "Oil", "Propane"]
     fuels.each do |fuel|
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{fuel}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
       cols[0].each_with_index do |state, i|
         next unless state == weather_file.stateProvinceRegion
-        report_output(runner, "total_#{fuel.downcase}", gas_load, "kBtu", "therm", cols[1][i], fuel)
+        if fuel == "Natural gas" and not gas_load.nil?
+          report_output(runner, "total_#{fuel.downcase}", gas_load, "kBtu", "therm", cols[1][i], fuel)
+        elsif fuel == "Oil" and not oil_load.nil?
+          report_output(runner, "total_#{fuel.downcase}", oil_load, "kBtu", "gal", cols[1][i], fuel)
+        elsif fuel == "Propane" and not prop_load.nil?
+          report_output(runner, "total_#{fuel.downcase}", prop_load, "kBtu", "gal", cols[1][i], fuel)
+        end
         break
       end
     end
@@ -315,7 +327,15 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     vals.each do |val|
         total_val += val.to_f
     end
-    runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f).round(2))
+    unless desired_units == "gal"
+      runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f).round(2))
+    else
+      if name.include? "oil"
+        runner.registerValue(name, (total_val * 1000.0 * 139000 * rate.to_f).round(2))
+      elsif name.include? "propane"
+        runner.registerValue(name, (total_val * 1000.0 * 91600 * rate.to_f).round(2))
+      end
+    end
     runner.registerInfo("Registering #{fuel.downcase} utility bills.")
   end
   
