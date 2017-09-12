@@ -59,7 +59,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     buildstock_outputs = [
                           "total_natural_gas",
                           "total_propane",
-                          "total_fuel_oil"
+                          "total_oil"
                          ]    
     buildstock_outputs.each do |output|
         result << OpenStudio::Measure::OSOutput.makeDoubleOutput(output)
