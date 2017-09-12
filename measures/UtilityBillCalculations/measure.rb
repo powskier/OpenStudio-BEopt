@@ -331,9 +331,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f).round(2))
     else
       if name.include? "oil"
-        runner.registerValue(name, (total_val * 1000.0 * 139000 * rate.to_f).round(2))
+        runner.registerValue(name, (total_val * 1000.0 / 139000 * rate.to_f).round(2))
       elsif name.include? "propane"
-        runner.registerValue(name, (total_val * 1000.0 * 91600 * rate.to_f).round(2))
+        runner.registerValue(name, (total_val * 1000.0 / 91600 * rate.to_f).round(2))
       end
     end
     runner.registerInfo("Registering #{fuel.downcase} utility bills.")
