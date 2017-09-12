@@ -211,8 +211,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
       SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
       SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
-      next if tariff[1][:fixedmonthlycharge].nil?
-      SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[1][:fixedmonthlycharge]) # $
+      unless tariff[1][:fixedmonthlycharge].nil?
+        SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[1][:fixedmonthlycharge]) # $
+      end
       unless tariff[1][:demandratestructure].nil?
         SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[1][:demandweekdayschedule]))
         SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[1][:demandweekendschedule]))
@@ -290,7 +291,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       electricity_bills << "#{tariff[0]}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
       
     end
-    
+
     runner.registerValue("grid_cells", grid_cells.join("|"))
     runner.registerValue("total_electricity", electricity_bills.join("|"))
     runner.registerInfo("Registering electricity bills.")
