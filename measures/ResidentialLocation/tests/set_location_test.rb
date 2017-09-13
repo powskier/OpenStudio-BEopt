@@ -40,16 +40,25 @@ class SetResidentialEPWFileTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {"SiteGroundTemperatureDeep"=>1, "RunPeriodControlDaylightSavingTime"=>1, "SiteGroundTemperatureBuildingSurface"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1, "YearDescription"=>1}
-    expected_values = {"StartDate"=>"2009-Apr-07", "EndDate"=>"2009-Oct-26"}
+    expected_values = {"StartDate"=>"2009-Apr-07", "EndDate"=>"2009-Oct-26", "Year"=>""}
     model = _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
     args_hash = {}
     args_hash["dst_start_date"] = "April 8"
     args_hash["dst_end_date"] = "October 27"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {"StartDate"=>"2009-Apr-08", "EndDate"=>"2009-Oct-27"}
+    expected_values = {"StartDate"=>"2009-Apr-08", "EndDate"=>"2009-Oct-27", "Year"=>""}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)      
   end
+  
+  def test_set_year_for_amy_epw
+    args_hash = {}
+    args_hash["weather_file_name"] = "DuPage_17043_725300_880860.epw"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SiteGroundTemperatureDeep"=>1, "RunPeriodControlDaylightSavingTime"=>1, "SiteGroundTemperatureBuildingSurface"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1, "YearDescription"=>1}
+    expected_values = {"StartDate"=>"2012-Apr-07", "EndDate"=>"2012-Oct-26", "Year"=>"2012"}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6, 2)
+  end  
   
   private
   
@@ -117,7 +126,7 @@ class SetResidentialEPWFileTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
@@ -143,6 +152,8 @@ class SetResidentialEPWFileTest < MiniTest::Test
             if obj_type == "RunPeriodControlDaylightSavingTime"
                 assert_equal(expected_values["StartDate"], new_object.startDate.to_s)
                 assert_equal(expected_values["EndDate"], new_object.endDate.to_s)
+            elsif obj_type == "YearDescription"
+                assert_equal(expected_values["Year"], new_object.calendarYear.to_s)
             end
         end
     end
