@@ -78,7 +78,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloorsTest < MiniTest::Test
   
   def test_apply_to_specific_surface
     args_hash = {}
-    args_hash["surface"] = "Surface 15"
+    args_hash["surface"] = "Surface 28"
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.0489547873864979, "LayerDensity"=>106.36479, "LayerSpecificHeat"=>1151.685130657429, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}

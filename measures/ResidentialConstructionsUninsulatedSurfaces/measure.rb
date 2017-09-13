@@ -197,7 +197,11 @@ class ProcessConstructionsUninsulatedSurfaces < OpenStudio::Measure::ModelMeasur
         roof_const.add_layer(Material.DefaultRoofMaterial, false) # roof material added in separate measure
         roof_const.add_layer(Material.DefaultRoofSheathing, false) # sheathing added in separate measure
         roof_const.add_layer([mat_framing, mat_cavity], true, "StudAndAirRoof")
-        roof_const.add_layer(Material.AirFilmRoof(Geometry.calculate_avg_roof_pitch(roof_spaces)), false)
+        if Geometry.calculate_avg_roof_pitch(roof_spaces).nil?
+          roof_const.add_layer(Material.AirFilmRoof(0), false)
+        else
+          roof_const.add_layer(Material.AirFilmRoof(Geometry.calculate_avg_roof_pitch(roof_spaces)), false)
+        end
 
         # Create and assign construction to surfaces
         if not roof_const.create_and_assign_constructions(roof_surfaces, runner, model, name="UnfinUninsExtRoof")

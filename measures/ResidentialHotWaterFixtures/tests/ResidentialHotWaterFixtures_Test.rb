@@ -83,11 +83,12 @@ class ResidentialHotWaterFixturesTest < MiniTest::Test
   end
   
   def test_retrofit_replace2
+    num_finished_spaces = 3
     args_hash = {}
-    expected_num_del_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
-    expected_num_new_objects = {"OtherEquipmentDefinition"=>3, "OtherEquipment"=>3, "WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleFixedInterval"=>3, "ScheduleConstant"=>3}
+    expected_num_del_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
+    expected_num_new_objects = {"OtherEquipmentDefinition"=>3*num_finished_spaces, "OtherEquipment"=>3*num_finished_spaces, "WaterUseEquipmentDefinition"=>3*num_finished_spaces, "WaterUseEquipment"=>3*num_finished_spaces, "ScheduleFixedInterval"=>3*num_finished_spaces, "ScheduleConstant"=>3*num_finished_spaces}
     expected_values = {"Annual_kwh"=>445.1, "HotWater_gpd"=>60, "Space"=>args_hash["space"]}
-    model = _test_measure(osm_geo_beds_loc_tankwh_fixtures_recircdist, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+    model = _test_measure(osm_geo_beds_loc_tankwh_fixtures_recircdist, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_finished_spaces+num_finished_spaces, 7)
   end
     
   def test_retrofit_remove

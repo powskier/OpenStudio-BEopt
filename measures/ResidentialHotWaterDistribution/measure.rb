@@ -141,9 +141,6 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
             return false
         end
 
-        obj_name_sh = Constants.ObjectNameShower(unit.name.to_s)
-        obj_name_s = Constants.ObjectNameSink(unit.name.to_s)
-        obj_name_b = Constants.ObjectNameBath(unit.name.to_s)
         obj_name_sh_dist = Constants.ObjectNameShowerDist(unit.name.to_s)
         obj_name_s_dist = Constants.ObjectNameSinkDist(unit.name.to_s)
         obj_name_b_dist = Constants.ObjectNameBathDist(unit.name.to_s)
@@ -195,6 +192,9 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
         bath_wu_def = nil
         dist_space = nil
         unit.spaces.each do |space|
+            obj_name_sh = "#{Constants.ObjectNameShower(unit.name.to_s)}|#{space.name}"
+            obj_name_s = "#{Constants.ObjectNameSink(unit.name.to_s)}|#{space.name}"
+            obj_name_b = "#{Constants.ObjectNameBath(unit.name.to_s)}|#{space.name}"
             space.waterUseEquipment.each do |space_equipment|
                 if space_equipment.name.to_s == obj_name_sh
                     shower_max = space_equipment.waterUseEquipmentDefinition.peakFlowRate
@@ -436,17 +436,23 @@ class ResidentialHotWaterDistribution < OpenStudio::Measure::ModelMeasure
         sch_sh_temperatureSchedule = nil
         sch_s_temperatureSchedule = nil
         sch_b_temperatureSchedule = nil
-        model.getWaterUseEquipments.each do |space_equipment|
-            if space_equipment.name.to_s == obj_name_sh
-                sch_sh_schedule = space_equipment.flowRateFractionSchedule.get
-                sch_sh_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
-            elsif space_equipment.name.to_s == obj_name_s
-                sch_s_schedule = space_equipment.flowRateFractionSchedule.get
-                sch_s_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
-            elsif space_equipment.name.to_s == obj_name_b
-                sch_b_schedule = space_equipment.flowRateFractionSchedule.get
-                sch_b_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
-            end
+       
+        unit.spaces.each do |space|
+          obj_name_sh = "#{Constants.ObjectNameShower(unit.name.to_s)}|#{space.name}"
+          obj_name_s = "#{Constants.ObjectNameSink(unit.name.to_s)}|#{space.name}"
+          obj_name_b = "#{Constants.ObjectNameBath(unit.name.to_s)}|#{space.name}"
+          model.getWaterUseEquipments.each do |space_equipment|
+              if space_equipment.name.to_s == obj_name_sh
+                  sch_sh_schedule = space_equipment.flowRateFractionSchedule.get
+                  sch_sh_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
+              elsif space_equipment.name.to_s == obj_name_s
+                  sch_s_schedule = space_equipment.flowRateFractionSchedule.get
+                  sch_s_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
+              elsif space_equipment.name.to_s == obj_name_b
+                  sch_b_schedule = space_equipment.flowRateFractionSchedule.get
+                  sch_b_temperatureSchedule = space_equipment.waterUseEquipmentDefinition.targetTemperatureSchedule.get
+              end
+          end
         end
 
         

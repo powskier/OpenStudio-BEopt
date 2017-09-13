@@ -32,6 +32,7 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloors < OpenStudio::Measur
     surfaces.each do |surface|
       surfaces_args << surface.name.to_s
     end
+    puts surfaces_args
     surface = OpenStudio::Measure::OSArgument::makeChoiceArgument("surface", surfaces_args, false)
     surface.setDisplayName("Surface(s)")
     surface.setDescription("Select the surface(s) to assign constructions.")
