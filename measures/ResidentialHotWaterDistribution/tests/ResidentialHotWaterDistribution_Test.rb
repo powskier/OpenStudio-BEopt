@@ -191,7 +191,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeTimer
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>47.95, "SinkDailyWater_gpd"=>40.45, "BathDailyWater_gpd"=>28.56, "InternalLoadAnnual_MBtu"=>8.904, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -204,7 +204,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeTimer
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>33.28, "SinkDailyWater_gpd"=>25.33, "BathDailyWater_gpd"=>14.29, "InternalLoadAnnual_MBtu"=>4.542, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -217,7 +217,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeDemand
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>28.85, "SinkDailyWater_gpd"=>22.58, "BathDailyWater_gpd"=>9.57, "InternalLoadAnnual_MBtu"=>2.085, "RecircPumpAnnual_kWh"=>2.03, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -230,7 +230,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeDemand
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>25.55, "SinkDailyWater_gpd"=>18.62, "BathDailyWater_gpd"=>6.67, "InternalLoadAnnual_MBtu"=>1.599, "RecircPumpAnnual_kWh"=>1.65, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -243,7 +243,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeTimer
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>46.92, "SinkDailyWater_gpd"=>38.81, "BathDailyWater_gpd"=>28.41, "InternalLoadAnnual_MBtu"=>6.714, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -256,7 +256,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeTimer
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>32.38, "SinkDailyWater_gpd"=>23.78, "BathDailyWater_gpd"=>14.14, "InternalLoadAnnual_MBtu"=>3.425, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -269,7 +269,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeDemand
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>27.83, "SinkDailyWater_gpd"=>20.85, "BathDailyWater_gpd"=>9.42, "InternalLoadAnnual_MBtu"=>1.572, "RecircPumpAnnual_kWh"=>2.03, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -282,7 +282,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeDemand
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>24.55, "SinkDailyWater_gpd"=>16.99, "BathDailyWater_gpd"=>6.53, "InternalLoadAnnual_MBtu"=>1.206, "RecircPumpAnnual_kWh"=>1.65, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
@@ -362,7 +362,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     model = _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["recirc_type"] = Constants.RecircTypeTimer
     expected_num_del_objects = {"WaterUseEquipment"=>3, "OtherEquipment"=>1}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>47.95, "SinkDailyWater_gpd"=>40.45, "BathDailyWater_gpd"=>28.56, "InternalLoadAnnual_MBtu"=>8.904, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
@@ -375,11 +375,11 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["recirc_type"] = Constants.RecircTypeTimer
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
-    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>47.95, "SinkDailyWater_gpd"=>40.45, "BathDailyWater_gpd"=>28.56, "InternalLoadAnnual_MBtu"=>8.904, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     model = _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash["recirc_type"] = Constants.RecircTypeNone
-    expected_num_del_objects = {"WaterUseEquipment"=>3, "OtherEquipment"=>1, "ElectricEquipment"=>1, "ScheduleFixedInterval"=>1}
+    expected_num_del_objects = {"WaterUseEquipment"=>3, "OtherEquipment"=>1, "ElectricEquipment"=>1}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
     expected_values = {"ShowerDailyWater_gpd"=>28.01, "SinkDailyWater_gpd"=>24.98, "BathDailyWater_gpd"=>7.01, "InternalLoadAnnual_MBtu"=>1.553, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)  
