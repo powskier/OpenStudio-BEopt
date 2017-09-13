@@ -18,20 +18,24 @@ class DoorAreaTest < MiniTest::Test
   def test_no_door_area
     args_hash = {}
     args_hash["door_area"] = 0
-    result = _test_measure(osm_geo, args_hash, 0, 0, 0)
+    expected_values = {"Constructions"=>0}
+    result = _test_measure(osm_geo, args_hash, 0, 0, 0, expected_values)
   end
 
   def test_sfd_new_construction_rotated
     args_hash = {}
-    model = _test_measure(osm_geo_rotated, args_hash, 0, 20, 0)
+    expected_values = {"Constructions"=>0}
+    model = _test_measure(osm_geo_rotated, args_hash, 0, 20, 0, expected_values)
   end
   
   def test_sfd_retrofit_replace
     args_hash = {}
-    model = _test_measure(osm_geo, args_hash, 0, 20, 0)
+    expected_values = {"Constructions"=>0}
+    model = _test_measure(osm_geo, args_hash, 0, 20, 0, expected_values)
     args_hash = {}
     args_hash["door_area"] = 30
-    _test_measure(model, args_hash, 20, 30, 0)
+    expected_values = {"Constructions"=>0}
+    _test_measure(model, args_hash, 20, 30, 0, expected_values)
   end
 
   def test_argument_error_invalid_door_area
@@ -44,19 +48,29 @@ class DoorAreaTest < MiniTest::Test
   def test_single_family_attached_new_construction
     num_units = 4
     args_hash = {}
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, 0, 20*num_units, 0)
+    expected_values = {"Constructions"=>0}
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, 0, 20*num_units, 0, expected_values)
   end
 
   def test_multifamily_new_construction_interior_corridor
     num_units = 8
     args_hash = {}
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, 0, 0, 20*num_units)
+    expected_values = {"Constructions"=>0}
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, 0, 0, 20*num_units, expected_values)
   end
   
   def test_multifamily_new_construction_exterior_corridor
     num_units = 8
     args_hash = {}
-    _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, 0, 20*num_units, 0)
+    expected_values = {"Constructions"=>0}
+    _test_measure("MF_8units_1story_SL_Denver_ExteriorCorridor.osm", args_hash, 0, 20*num_units, 0, expected_values)
+  end  
+  
+  def test_sfd_retrofit_replace_one_construction
+    args_hash = {}
+    args_hash["door_area"] = 30
+    expected_values = {"Constructions"=>1}
+    _test_measure("SFD_2000sqft_2story_SL_GRG_UA_Doors_OneConstruction.osm", args_hash, 20, 30, 0, expected_values)  
   end
   
   private
@@ -95,7 +109,7 @@ class DoorAreaTest < MiniTest::Test
     
   end
   
-  def _test_measure(osm_file_or_model, args_hash, expected_door_area_removed, expected_exterior_door_area_added, expected_corridor_door_area_added)
+  def _test_measure(osm_file_or_model, args_hash, expected_door_area_removed, expected_exterior_door_area_added, expected_corridor_door_area_added, expected_values)
     # create an instance of the measure
     measure = CreateResidentialDoorArea.new
 
@@ -177,6 +191,22 @@ class DoorAreaTest < MiniTest::Test
     assert_in_epsilon(expected_corridor_door_area_added, new_corridor_door_area, 0.01)
     assert_in_epsilon(expected_door_area_removed, del_door_area, 0.01)
 
+    model.getSurfaces.each do |surface|
+      assert(surface.netArea > 0)
+    end
+    
+    actual_values = {"Constructions"=>0}
+    constructions = []
+    model.getSubSurfaces.each do |sub_surface|
+      if sub_surface.construction.is_initialized
+        if not constructions.include? sub_surface.construction.get
+          constructions << sub_surface.construction.get
+          actual_values["Constructions"] += 1
+        end
+      end
+    end    
+    assert_equal(expected_values["Constructions"], actual_values["Constructions"])    
+    
     return model
   end  
   

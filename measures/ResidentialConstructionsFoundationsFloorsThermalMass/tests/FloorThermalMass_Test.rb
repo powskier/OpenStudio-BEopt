@@ -44,16 +44,16 @@ class ProcessConstructionsFoundationsFloorsThermalMassTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.015875, "LayerConductivity"=>0.1154577, "LayerDensity"=>544.68, "LayerSpecificHeat"=>1214.23, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    model = _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
     args_hash = {}
     args_hash["thick_in"] = 2
     args_hash["cond"] = 4.75
     args_hash["dens"] = 100
     args_hash["specheat"] = 0.223
-    expected_num_del_objects = {}
+    expected_num_del_objects = {"Material"=>1, "Construction"=>1}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerThickness"=>0.0508, "LayerConductivity"=>0.6851875000000001, "LayerDensity"=>1602, "LayerSpecificHeat"=>933.701, "LayerIndex"=>0, "SurfacesWithConstructions"=>4}
-    _test_measure(osm_geo, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)    
   end
 
   def test_apply_to_specific_surface

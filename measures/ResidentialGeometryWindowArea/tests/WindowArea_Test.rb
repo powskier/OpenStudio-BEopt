@@ -16,7 +16,11 @@ class WindowAreaTest < MiniTest::Test
   def osm_geo_rotated
     return "SFD_2000sqft_2story_FB_GRG_UA_Southwest.osm"
   end
-
+  
+  def osm_geo_door_area
+    return "SFD_1000sqft_1story_FB_GRG_UA_DoorArea.osm"
+  end
+  
   def test_no_window_area
     args_hash = {}
     args_hash["front_wwr"] = 0
@@ -31,18 +35,27 @@ class WindowAreaTest < MiniTest::Test
 
   def test_sfd_new_construction_rotated
     args_hash = {}
-    model = _test_measure(osm_geo_rotated, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1])
+    expected_values = {"Constructions"=>0}
+    model = _test_measure(osm_geo_rotated, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], expected_values)
   end
-
+  
+  def test_sfd_new_construction_door_area
+    args_hash = {}
+    expected_values = {"Constructions"=>0}
+    model = _test_measure(osm_geo_door_area, args_hash, [0, 0, 0, 0], [0.0, 59.0, 32.8, 15.5], expected_values)
+  end
+  
   def test_sfd_retrofit_replace
     args_hash = {}
-    model = _test_measure(osm_geo, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1])
+    expected_values = {"Constructions"=>0}
+    model = _test_measure(osm_geo, args_hash, [0, 0, 0, 0], [81.5, 110.3, 70.0, 55.1], expected_values)
     args_hash = {}
     args_hash["front_wwr"] = 0.12
     args_hash["left_wwr"] = 0.12
-    _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [54.3, 110.3, 46.4, 55.1])
+    expected_values = {"Constructions"=>0}
+    _test_measure(model, args_hash, [81.5, 110.3, 70.0, 55.1], [54.3, 110.3, 46.4, 55.1], expected_values)
   end
-
+  
   def test_argument_error_invalid_window_area_front_lt_0
     args_hash = {}
     args_hash["front_wwr"] = -20
@@ -168,8 +181,9 @@ class WindowAreaTest < MiniTest::Test
     num_units = 4
     args_hash = {}
     args_hash["back_wwr"] = 0.12
-    args_hash["right_wwr"] = 0.12    
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8])
+    args_hash["right_wwr"] = 0.12
+    expected_values = {"Constructions"=>0}
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], expected_values)
   end
   
   def test_single_family_attached_new_construction_areas
@@ -183,33 +197,53 @@ class WindowAreaTest < MiniTest::Test
     args_hash["back_area"] = 57.6
     args_hash["left_area"] = 43.2
     args_hash["right_area"] = 28.8
-    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8])
+    expected_values = {"Constructions"=>0}
+    _test_measure("SFA_4units_1story_FB_UA_Denver.osm", args_hash, [0, 0, 0, 0, 0], [86.4, 57.6, 43.2, 28.8], expected_values)
   end
   
   def test_single_family_attached_new_construction_offset
     num_units = 4
     args_hash = {}
     args_hash["back_wwr"] = 0.12
-    args_hash["right_wwr"] = 0.12    
-    _test_measure("SFA_4units_1story_SL_UA_Offset.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 87.01, 58.0])
+    args_hash["right_wwr"] = 0.12
+    expected_values = {"Constructions"=>0}
+    _test_measure("SFA_4units_1story_SL_UA_Offset.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 87.01, 58.0], expected_values)
   end  
 
   def test_multifamily_new_construction
     num_units = 8
     args_hash = {}
     args_hash["back_wwr"] = 0.12
-    args_hash["right_wwr"] = 0.12    
-    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46])
+    args_hash["right_wwr"] = 0.12
+    expected_values = {"Constructions"=>0}
+    _test_measure("MF_8units_1story_SL_Denver.osm", args_hash, [0, 0, 0, 0, 0], [122.19, 81.46, 122.19, 81.46], expected_values)
   end
   
   def test_multifamily_new_construction_inset
     num_units = 8
     args_hash = {}
     args_hash["back_wwr"] = 0.12
-    args_hash["right_wwr"] = 0.12    
-    _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63])
+    args_hash["right_wwr"] = 0.12
+    expected_values = {"Constructions"=>0}
+    _test_measure("MF_8units_1story_SL_Inset.osm", args_hash, [0, 0, 0, 0, 0], [124.61, 83.07, 176.45, 117.63], expected_values)
   end
 
+  def test_sfd_retrofit_replace_one_construction
+    args_hash = {}
+    args_hash["front_wwr"] = 0.12
+    args_hash["left_wwr"] = 0.12
+    expected_values = {"Constructions"=>1}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_OneConstruction.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], expected_values)  
+  end
+  
+  def test_sfd_retrofit_replace_four_constructions
+    args_hash = {}
+    args_hash["front_wwr"] = 0.12
+    args_hash["left_wwr"] = 0.12
+    expected_values = {"Constructions"=>4}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver_Windows_FourConstructions.osm", args_hash, [128.8, 128.8, 64.6, 64.4], [85.9, 128.8, 42.9, 64.6], expected_values)  
+  end  
+  
   private
   
   def _test_error(osm_file, args_hash)
@@ -242,7 +276,7 @@ class WindowAreaTest < MiniTest::Test
     
   end
   
-  def _test_measure(osm_file_or_model, args_hash, expected_fblr_win_area_removed, expected_fblr_win_area_added)
+  def _test_measure(osm_file_or_model, args_hash, expected_fblr_win_area_removed, expected_fblr_win_area_added, expected_values)
     # create an instance of the measure
     measure = SetResidentialWindowArea.new
 
@@ -280,6 +314,10 @@ class WindowAreaTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
+    # save the model to test output directory
+    # output_file_path = OpenStudio::Path.new(File.dirname(__FILE__) + "/output/test.osm")
+    # model.save(output_file_path,true)    
+    
     # show the output
     #show_output(result)
 
@@ -316,7 +354,7 @@ class WindowAreaTest < MiniTest::Test
     del_objects.each do |window|
         del_win_area[Geometry.get_facade_for_surface(window)] += OpenStudio.convert(window.grossArea, "m^2", "ft^2").get
     end
-    
+
     assert_in_epsilon(expected_fblr_win_area_added[0], new_win_area[Constants.FacadeFront], 0.01)
     assert_in_epsilon(expected_fblr_win_area_added[1], new_win_area[Constants.FacadeBack], 0.01)
     assert_in_epsilon(expected_fblr_win_area_added[2], new_win_area[Constants.FacadeLeft], 0.01)
@@ -326,6 +364,22 @@ class WindowAreaTest < MiniTest::Test
     assert_in_epsilon(expected_fblr_win_area_removed[1], del_win_area[Constants.FacadeBack], 0.01)
     assert_in_epsilon(expected_fblr_win_area_removed[2], del_win_area[Constants.FacadeLeft], 0.01)
     assert_in_epsilon(expected_fblr_win_area_removed[3], del_win_area[Constants.FacadeRight], 0.01)
+
+    model.getSurfaces.each do |surface|
+      assert(surface.netArea > 0)
+    end
+    
+    actual_values = {"Constructions"=>0}
+    constructions = []
+    model.getSubSurfaces.each do |sub_surface|
+      if sub_surface.construction.is_initialized
+        if not constructions.include? sub_surface.construction.get
+          constructions << sub_surface.construction.get
+          actual_values["Constructions"] += 1
+        end
+      end
+    end    
+    assert_equal(expected_values["Constructions"], actual_values["Constructions"])
     
     return model
   end  
