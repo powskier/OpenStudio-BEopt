@@ -192,8 +192,9 @@ class ResidentialHotWaterHeaterTankFuel < OpenStudio::Measure::ModelMeasure
               space_types = Geometry.space_type_hierarchy(File.basename(File.dirname(__FILE__)))
               model.getClimateZones.climateZones.each do |climateZone|
                 if climateZone.institution == Constants.BuildingAmericaClimateZone
-                  unless [Constants.BAZoneHotDry, Constants.BAZoneHotHumid].include? climateZone.value.to_s
+                  unless [Constants.BAZoneHotDry, Constants.BAZoneHotHumid].include? climateZone.value.to_s                    
                     space_types.delete(Constants.GarageSpaceType)
+                    space_types.insert(space_types.find_index(Constants.AtticSpaceType), Constants.GarageSpaceType)
                   end
                 end
               end
