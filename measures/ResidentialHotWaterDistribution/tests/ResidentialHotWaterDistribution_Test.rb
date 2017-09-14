@@ -114,7 +114,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3}
-    expected_values = {"ShowerDailyWater_gpd"=>24.16, "SinkDailyWater_gpd"=>20.62, "BathDailyWater_gpd"=>6.19, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>24.16, "SinkDailyWater_gpd"=>21.04, "BathDailyWater_gpd"=>6.44, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -127,7 +127,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3}
-    expected_values = {"ShowerDailyWater_gpd"=>23.44, "SinkDailyWater_gpd"=>19.53, "BathDailyWater_gpd"=>6.13, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>23.74, "SinkDailyWater_gpd"=>20.15, "BathDailyWater_gpd"=>6.40, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -166,7 +166,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3}
-    expected_values = {"ShowerDailyWater_gpd"=>23.74, "SinkDailyWater_gpd"=>20.32, "BathDailyWater_gpd"=>5.98, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>24.06, "SinkDailyWater_gpd"=>20.80, "BathDailyWater_gpd"=>6.04, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -179,7 +179,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3}
-    expected_values = {"ShowerDailyWater_gpd"=>23.04, "SinkDailyWater_gpd"=>19.24, "BathDailyWater_gpd"=>5.91, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>23.44, "SinkDailyWater_gpd"=>19.96, "BathDailyWater_gpd"=>5.98, "InternalLoadAnnual_MBtu"=>0, "RecircPumpAnnual_kWh"=>0, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -244,7 +244,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
-    expected_values = {"ShowerDailyWater_gpd"=>46.92, "SinkDailyWater_gpd"=>38.81, "BathDailyWater_gpd"=>28.41, "InternalLoadAnnual_MBtu"=>6.714, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>46.92, "SinkDailyWater_gpd"=>39.91, "BathDailyWater_gpd"=>28.41, "InternalLoadAnnual_MBtu"=>6.714, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -257,7 +257,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
-    expected_values = {"ShowerDailyWater_gpd"=>32.38, "SinkDailyWater_gpd"=>23.78, "BathDailyWater_gpd"=>14.14, "InternalLoadAnnual_MBtu"=>3.425, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>32.38, "SinkDailyWater_gpd"=>25.05, "BathDailyWater_gpd"=>14.14, "InternalLoadAnnual_MBtu"=>3.425, "RecircPumpAnnual_kWh"=>193, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -270,7 +270,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 0
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
-    expected_values = {"ShowerDailyWater_gpd"=>27.83, "SinkDailyWater_gpd"=>20.85, "BathDailyWater_gpd"=>9.42, "InternalLoadAnnual_MBtu"=>1.572, "RecircPumpAnnual_kWh"=>2.03, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>27.83, "SinkDailyWater_gpd"=>21.78, "BathDailyWater_gpd"=>9.42, "InternalLoadAnnual_MBtu"=>1.572, "RecircPumpAnnual_kWh"=>2.03, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
@@ -283,7 +283,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     args_hash["dist_ins"] = 2
     expected_num_del_objects = {}
     expected_num_new_objects = {"WaterUseEquipmentDefinition"=>3, "WaterUseEquipment"=>3, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1}
-    expected_values = {"ShowerDailyWater_gpd"=>24.55, "SinkDailyWater_gpd"=>16.99, "BathDailyWater_gpd"=>6.53, "InternalLoadAnnual_MBtu"=>1.206, "RecircPumpAnnual_kWh"=>1.65, "RecircPumpFractionLost"=>0}
+    expected_values = {"ShowerDailyWater_gpd"=>24.55, "SinkDailyWater_gpd"=>18.11, "BathDailyWater_gpd"=>6.53, "InternalLoadAnnual_MBtu"=>1.206, "RecircPumpAnnual_kWh"=>1.65, "RecircPumpFractionLost"=>0}
     _test_measure(osm_geo_beds_loc_tankwh_fixtures, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
 
@@ -523,7 +523,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    #show_output(result)
+    # show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
