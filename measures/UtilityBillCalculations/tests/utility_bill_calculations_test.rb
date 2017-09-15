@@ -35,17 +35,17 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_values = {}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 4)
   end  
-  
+=begin  
   def test_api_key_valid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["api_key"] = "eY6hepGi6hrIt7yg1Ds8Mt7A9GlnsWC1kg8M1n8n" # eY6hepGi6hrIt7yg1Ds8Mt7A9GlnsWC1kg8M1n8n zIZUwvgnqfpLrBHzZRzHTo7U4CbkSfZeRsOsm711 WwTHJw8lk9thZ0CSlJ5evuIAuR6Br3dOrcQdXr0q vc2A8oAFiTrLeeJ49W2jwWyal4qQpdvYVYo1dh24
+    args_hash["api_key"] = ""
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 21, 1)
   end
-
+=end
   private
 
   def model_in_path_default
@@ -233,7 +233,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     end
 
     # show the output
-    # show_output(result)    
+    show_output(result)    
     
     # make sure the report file exists
     assert(File.exist?(timeseries_path(test_name)))
