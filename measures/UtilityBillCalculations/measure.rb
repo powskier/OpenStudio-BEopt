@@ -34,19 +34,18 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     args << arg    
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("api_key", false)
-    arg.setDisplayName("EIA API Key")
-    arg.setDescription("Call the API and find EIA ID(s) matching the epw.")
+    arg.setDisplayName("API Key")
+    arg.setDescription("Call the API and pull JSON tariff file(s) with EIA ID corresponding to the EPW region.")
     args << arg
     
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("json_file_path", false)
-    arg.setDisplayName("JSON File Path")
-    arg.setDescription("Provide this instead of calling the API.")
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_directory", false)
+    arg.setDisplayName("Tariff Directory")
+    arg.setDescription("Absolute (or relative) directory to tariff files.")
     args << arg
     
-    arg = OpenStudio::Measure::OSArgument::makeDoubleArgument("analysis_period", false)
-    arg.setDisplayName("Analysis Period")
-    arg.setUnits("yrs")
-    arg.setDefaultValue(1)
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_file_name", false)
+    arg.setDisplayName("Tariff File Name")
+    arg.setDescription("Name of the JSON tariff file. Leave blank if pulling JSON tariff file(s) with EIA ID corresponding to the EPW region.")
     args << arg
     
     return args
@@ -87,22 +86,29 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     run_dir = runner.getStringArgumentValue("run_dir", user_arguments)
     api_key = runner.getOptionalStringArgumentValue("api_key", user_arguments)
     api_key.is_initialized ? api_key = api_key.get : api_key = nil
-    json_file_path = runner.getOptionalStringArgumentValue("json_file_path", user_arguments)
-    json_file_path.is_initialized ? json_file_path = json_file_path.get : json_file_path = nil
-    analysis_period = runner.getDoubleArgumentValue("analysis_period",user_arguments)
-    
-    unless json_file_path.nil?
-      unless (Pathname.new json_file_path).absolute?
-        json_file_path = File.expand_path(File.join(File.dirname(__FILE__), json_file_path))
-      end 
-      unless File.exists?(json_file_path) and json_file_path.downcase.end_with? ".json"
-        runner.registerError("'#{json_file_path}' does not exist or is not a .json file.")
+    tariff_directory = runner.getOptionalStringArgumentValue("tariff_directory", user_arguments)
+    tariff_directory.is_initialized ? tariff_directory = tariff_directory.get : tariff_directory = nil
+    tariff_file_name = runner.getOptionalStringArgumentValue("tariff_file_name", user_arguments)
+    tariff_file_name.is_initialized ? tariff_file_name = tariff_file_name.get : tariff_file_name = nil    
+
+    unless tariff_file_name.nil?
+      unless (Pathname.new tariff_directory).absolute?
+        tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
+      end
+      tariff_file_name = File.join(tariff_directory, tariff_file_name)
+      unless File.exists?(tariff_file_name) and tariff_file_name.downcase.end_with? ".json"
+        runner.registerError("'#{tariff_file_name}' does not exist or is not a JSON file.")
         return false
       end
     end
     
     # load profile
-    cols = CSV.read(File.expand_path(File.join(run_dir, "enduse_timeseries.csv"))).transpose
+    timeseries_file = File.expand_path(File.join(run_dir, "enduse_timeseries.csv"))
+    unless File.exists?(timeseries_file)
+      runner.registerWarning("'#{timeseries_file}' does not exist.")
+      return true
+    end    
+    cols = CSV.read(timeseries_file).transpose
     elec_load = nil
     elec_generated = nil
     gas_load = nil
@@ -130,25 +136,30 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     weather_file = runner.lastOpenStudioModel.get.getSite.weatherFile.get
     
     # tariffs
-    tariffs = {}
-    if not json_file_path.nil?
+    tariffs = []
+    rate_ids = {}
 
-      tariff = JSON.parse(File.read(json_file_path), :symbolize_names=>true)[:items][0]
-      tariffs[tariff[:label]] = [tariff[:eiaid].to_s, tariff]
+    if not tariff_file_name.nil?
       
-      ids = cols[20].collect { |i| i.to_s }
+      tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)[:items][0]
+      tariffs << tariff
+      
+      utility_id, getpage = File.basename(tariff_file_name).split("_")
+      rate_ids[tariff[:eiaid].to_s] = [tariff[:label].to_s]
+      
+      ids = cols[4].collect { |i| i.to_s }
       indexes = ids.each_index.select{|i| ids[i] == tariff[:eiaid].to_s}
       utility_ids = {}
       indexes.each do |ix|
-        if utility_ids.keys.include? cols[20][ix]
-          utility_ids[cols[20][ix]] << cols[0][ix]
+        if utility_ids.keys.include? cols[4][ix]
+          utility_ids[cols[4][ix]] << cols[0][ix]
         else
-           utility_ids[cols[20][ix]] = [cols[0][ix]]
+          utility_ids[cols[4][ix]] = [cols[0][ix]]
         end
       end
       
-    elsif not api_key.nil?
-      
+    else
+    
       closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to resstock epw
       runner.registerInfo("Nearest ResStock usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
       
@@ -156,57 +167,100 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       indexes = usafs.each_index.select{|i| usafs[i] == closest_usaf}
       utility_ids = {}
       indexes.each do |ix|
-        next if cols[20][ix].nil?
-        cols[20][ix].split("|").each do |utility_id|        
+        next if cols[4][ix].nil?
+        cols[4][ix].split("|").each do |utility_id|
+          next if utility_id == "no data"
           if utility_ids.keys.include? utility_id
             utility_ids[utility_id] << cols[0][ix]
           else
-             utility_ids[utility_id] = [cols[0][ix]]
+            utility_ids[utility_id] = [cols[0][ix]]
           end
         end
       end
-    
-      utility_ixs = []
+
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
       cols.each do |col|
         unless col[0].nil?
-          if col[0].include? "eiaid"
-            eia_ids = col.collect { |i| i.to_i.to_s }            
-            utility_ids.keys.each do |utility_id|
-              utility_ix = col.index(utility_id)
-              if utility_ix.nil?
-                runner.registerWarning("Could not find EIA Utility ID: #{utility_id}.")
+          next unless col[0].include? "eiaid"
+          utility_ids.keys.each do |utility_id|
+            utility_ixs = col.each_index.select{|i| col[i] == utility_id}
+            utility_ixs.each do |utility_ix|
+              if rate_ids.keys.include? utility_id
+                rate_ids[utility_id] << cols[3][utility_ix]
               else
-                utility_ixs << [utility_id, utility_ix]
+                rate_ids[utility_id] = [cols[3][utility_ix]]
               end
             end
           end
         end
       end
+    
+    end
+    
+    uri = URI('http://api.openei.org/utility_rates?')
+    if not tariff_directory.nil?
+    
+      rate_ids.each do |utility_id, getpages|
+        getpages.each do |getpage|
       
-      utility_ixs.each do |utility_id, utility_ix|
-        getpage = cols[3][utility_ix]
-        runner.registerInfo("Processing api request on getpage=#{getpage}.")
-        uri = URI('http://api.openei.org/utility_rates?')
-        params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
-        uri.query = URI.encode_www_form(params)
-        response = Net::HTTP.get_response(uri)
-        response = JSON.parse(response.body, :symbolize_names=>true)
-        if response.keys.include? :error
-          runner.registerError(response[:error][:message])
-          return false
+          runner.registerInfo("Searching cached dir on #{utility_id}_#{getpage}.json.")
+          unless (Pathname.new tariff_directory).absolute?
+            tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
+          end
+          tariff_file_name = File.join(tariff_directory, "#{utility_id}_#{getpage}.json")
+          if File.exists?(tariff_file_name)
+
+            tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)[:items][0]
+            tariffs << tariff
+
+          else
+          
+            runner.registerInfo("Could not find #{utility_id}_#{getpage}.json in cached dir.")
+
+            if not api_key.nil?
+              
+              tariff = make_api_request(api_key, uri, tariff_file_name, runner)
+              if tariff.nil?
+                return false
+              end
+              tariffs << tariff
+
+            else
+            
+              runner.registerInfo("Did not supply an API Key, skipping #{utility_id}_#{getpage}.")
+            
+            end
+            
+          end
+          
         end
-        tariffs[getpage] = [utility_id, response[:items][0]]
-      end
+      end 
       
-    else
-      runner.registerError("Did not supply an API Key or a JSON File Path.")
+    elsif not api_key.nil?
+      
+      rate_ids.each do |utility_id, getpages|
+        getpages.each do |getpage|
+
+          getpage = cols[3][utility_ix]
+          tariff = make_api_request(api_key, uri, tariff_file_name, runner)
+          if tariff.nil?
+            return false
+          end
+          tariffs << tariff
+          
+        end
+      end
+
+    elsif tariff_file_name.nil?
+
+      runner.registerError("Did not supply an API Key, Tariff Directory, or Tariff File Name.")
       return false
+
     end
     
     grid_cells = []
     electricity_bills = []
-    tariffs.each do |getpage, tariff|
+    tariffs.each do |tariff|
     
       # utilityrate3
       p_data = SscApi.create_data_object
@@ -217,14 +271,14 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
       SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
       SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
-      unless tariff[1][:fixedmonthlycharge].nil?
-        SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[1][:fixedmonthlycharge]) # $
+      unless tariff[:fixedmonthlycharge].nil?
+        SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[:fixedmonthlycharge]) # $
       end
-      unless tariff[1][:demandratestructure].nil?
-        SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[1][:demandweekdayschedule]))
-        SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[1][:demandweekendschedule]))
+      unless tariff[:demandratestructure].nil?
+        SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[:demandweekdayschedule]))
+        SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[:demandweekendschedule]))
         SscApi.set_number(p_data, 'ur_dc_enable', 1)
-        tariff[1][:demandratestructure].each_with_index do |period, i|
+        tariff[:demandratestructure].each_with_index do |period, i|
           period.each_with_index do |tier, j|
             unless tier[:adj].nil?
               SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate] + tier[:adj])
@@ -240,9 +294,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         end
       end
       SscApi.set_number(p_data, 'ur_ec_enable', 1)
-      SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[1][:energyweekdayschedule]))
-      SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[1][:energyweekendschedule]))
-      tariff[1][:energyratestructure].each_with_index do |period, i|
+      SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[:energyweekdayschedule]))
+      SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[:energyweekendschedule]))
+      tariff[:energyratestructure].each_with_index do |period, i|
         period.each_with_index do |tier, j|
           unless tier[:adj].nil?
             SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate] + tier[:adj])
@@ -292,9 +346,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       # puts "annual demand charges: $#{(demand_charges_tou + demand_charges_fixed).round(2)}"
       # puts "annual energy charges: $#{(energy_charges_tou + energy_charges_flat).round(2)}"
       # puts "annual utility bill: $#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
-
-      grid_cells << utility_ids[tariff[0]] * ";"
-      electricity_bills << "#{tariff[0]}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
+      
+      grid_cells << utility_ids[tariff[:eiaid].to_s] * ";"
+      electricity_bills << "#{tariff[:eiaid].to_s}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
       
     end
 
@@ -322,6 +376,25 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
  
   end
   
+  def make_api_request(api_key, uri, tariff_file_name, runner)
+    utility_id, getpage = File.basename(tariff_file_name).split("_")
+    runner.registerInfo("Making api request on getpage=#{getpage}.")
+    params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
+    uri.query = URI.encode_www_form(params)
+    response = Net::HTTP.get_response(uri)
+    response = JSON.parse(response.body, :symbolize_names=>true)
+    unless File.exists?(tariff_file_name)
+      File.open(tariff_file_name, "w") do |f|
+        f.write(response)
+      end
+    end
+    if response.keys.include? :error
+      runner.registerError(response[:error][:message])
+      return nil
+    end
+    return response[:items][0]
+  end
+  
   def report_output(runner, name, vals, os_units, desired_units, rate, fuel)
     total_val = 0.0
     vals.each do |val|
@@ -339,14 +412,14 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     runner.registerInfo("Registering #{fuel.downcase} utility bills.")
   end
   
-  def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)
+  def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)    
     distances = [1000000]
     usafs.each do |usaf|
-      if (bldg_lat.to_f - usaf[19].to_f).abs > 1 and (bldg_lon.to_f - usaf[18].to_f).abs > 1 # reduce the set to save some time
+      if (bldg_lat.to_f - usaf[3].to_f).abs > 1 and (bldg_lon.to_f - usaf[2].to_f).abs > 1 # reduce the set to save some time
         distances << 100000
         next
       end
-      km = haversine(bldg_lat.to_f, bldg_lon.to_f, usaf[19].to_f, usaf[18].to_f)
+      km = haversine(bldg_lat.to_f, bldg_lon.to_f, usaf[3].to_f, usaf[2].to_f)
       distances << km
     end    
     return usafs[distances.index(distances.min)][1]    
