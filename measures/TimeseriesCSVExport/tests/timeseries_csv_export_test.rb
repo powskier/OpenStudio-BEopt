@@ -13,7 +13,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 85, measure.fuel_types.length*measure.end_uses.length)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 100, measure.fuel_types.length*measure.end_uses.length)
   end  
   
   def test_leap_year_and_output_vars
@@ -23,7 +23,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 97, 90, measure.fuel_types.length*measure.end_uses.length+measure.output_vars.length)
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", measure.fuel_types.length*measure.end_uses.length+7, 105, measure.fuel_types.length*measure.end_uses.length+measure.output_vars.length)
   end
 
   private
