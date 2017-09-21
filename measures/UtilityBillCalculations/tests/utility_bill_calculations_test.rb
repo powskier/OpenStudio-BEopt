@@ -10,7 +10,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_json_path_invalid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./tests"
+    args_hash["tariff_directory"] = "./tests/tariffs"
     args_hash["tariff_file_name"] = "result.txt"
     result = _test_error_or_NA(nil, args_hash, __method__)
     assert(result.errors.size == 1)
@@ -21,16 +21,16 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_error_no_api_key_or_tariff_file_name
     args_hash = {}
     args_hash["run_dir"] = "."
-    result = _test_error_or_NA("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, __method__)
-    assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "Did not supply an API Key, Tariff Directory, or Tariff File Name.")
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 121)
   end  
   
   def test_tariff_file_name_valid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./tests"
+    args_hash["tariff_directory"] = "./tests/tariffs"
     args_hash["tariff_file_name"] = "3138_56abe466682bea2792b96ec0.json"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
@@ -41,23 +41,24 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_tariff_directory_valid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./tests"
+    args_hash["tariff_directory"] = "./tests/tariffs"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 120)
   end
-=begin  
-  def test_api_key_valid
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["api_key"] = ""
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 21, 1)
-  end
-=end
+
+  # def test_api_key_valid
+    # args_hash = {}
+    # args_hash["run_dir"] = "."
+    # args_hash["api_key"] = ""
+    # args_hash["tariff_directory"] = "./tests/lib/tariffs"
+    # expected_num_del_objects = {}
+    # expected_num_new_objects = {}
+    # expected_values = {}
+    # _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 21, 1)
+  # end
+
   private
 
   def model_in_path_default

@@ -41,6 +41,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_directory", false)
     arg.setDisplayName("Tariff Directory")
     arg.setDescription("Absolute (or relative) directory to tariff files.")
+    arg.setDefaultValue("../lib/tariffs")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_file_name", false)
@@ -91,15 +92,20 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     tariff_file_name = runner.getOptionalStringArgumentValue("tariff_file_name", user_arguments)
     tariff_file_name.is_initialized ? tariff_file_name = tariff_file_name.get : tariff_file_name = nil    
 
+    unless (Pathname.new tariff_directory).absolute?
+      tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
+    end
+    
     unless tariff_file_name.nil?
-      unless (Pathname.new tariff_directory).absolute?
-        tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
-      end
       tariff_file_name = File.join(tariff_directory, tariff_file_name)
       unless File.exists?(tariff_file_name) and tariff_file_name.downcase.end_with? ".json"
         runner.registerError("'#{tariff_file_name}' does not exist or is not a JSON file.")
         return false
       end
+    end
+
+    if !File.exist?(tariff_directory)
+      FileUtils.mkdir_p(tariff_directory)
     end
     
     # load profile
@@ -221,7 +227,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
               
               tariff = make_api_request(api_key, uri, tariff_file_name, runner)
               if tariff.nil?
-                return false
+                next
               end
               tariffs << tariff
 
@@ -234,27 +240,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
           end
           
         end
-      end 
-      
-    elsif not api_key.nil?
-      
-      rate_ids.each do |utility_id, getpages|
-        getpages.each do |getpage|
-
-          getpage = cols[3][utility_ix]
-          tariff = make_api_request(api_key, uri, tariff_file_name, runner)
-          if tariff.nil?
-            return false
-          end
-          tariffs << tariff
-          
-        end
       end
-
-    elsif tariff_file_name.nil?
-
-      runner.registerError("Did not supply an API Key, Tariff Directory, or Tariff File Name.")
-      return false
 
     end
     
@@ -262,105 +248,104 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     electricity_bills = []
     tariffs.each do |tariff|
     
-      # utilityrate3
-      p_data = SscApi.create_data_object
-      SscApi.set_number(p_data, 'analysis_period', 1)
-      SscApi.set_array(p_data, 'degradation', [0])
-      SscApi.set_array(p_data, 'gen', elec_generated) # kW
-      SscApi.set_array(p_data, 'load', elec_load) # kW
-      SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
-      SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
-      SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
-      unless tariff[:fixedmonthlycharge].nil?
-        SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[:fixedmonthlycharge]) # $
-      end
-      unless tariff[:demandratestructure].nil?
-        SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[:demandweekdayschedule]))
-        SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[:demandweekendschedule]))
-        SscApi.set_number(p_data, 'ur_dc_enable', 1)
-        tariff[:demandratestructure].each_with_index do |period, i|
+      begin
+    
+        # utilityrate3
+        p_data = SscApi.create_data_object
+        SscApi.set_number(p_data, 'analysis_period', 1)
+        SscApi.set_array(p_data, 'degradation', [0])
+        SscApi.set_array(p_data, 'gen', elec_generated) # kW
+        SscApi.set_array(p_data, 'load', elec_load) # kW
+        SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
+        SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
+        SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
+        unless tariff[:fixedmonthlycharge].nil?
+          SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[:fixedmonthlycharge]) # $
+        end
+        unless tariff[:demandratestructure].nil?
+          SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[:demandweekdayschedule]))
+          SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[:demandweekendschedule]))
+          SscApi.set_number(p_data, 'ur_dc_enable', 1)
+          tariff[:demandratestructure].each_with_index do |period, i|
+            period.each_with_index do |tier, j|
+              unless tier[:adj].nil?
+                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate] + tier[:adj])
+              else
+                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate])
+              end
+              unless tier[:max].nil?
+                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", tier[:max])
+              else
+                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", 1000000000.0)
+              end
+            end
+          end
+        end
+        SscApi.set_number(p_data, 'ur_ec_enable', 1)
+        SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[:energyweekdayschedule]))
+        SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[:energyweekendschedule]))
+        tariff[:energyratestructure].each_with_index do |period, i|
           period.each_with_index do |tier, j|
             unless tier[:adj].nil?
-              SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate] + tier[:adj])
+              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate] + tier[:adj])
             else
-              SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate])
+              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate])
+            end
+            unless tier[:sell].nil?
+              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_sr", tier[:sell])
             end
             unless tier[:max].nil?
-              SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", tier[:max])
+              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", tier[:max])
             else
-              SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", 1000000000.0)
-            end
+              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", 1000000000.0)
+            end        
           end
         end
+        
+        p_mod = SscApi.create_module("utilityrate3")
+        SscApi.execute_module(p_mod, p_data)
+        
+        # demand charges fixed
+        demand_charges_fixed = SscApi.get_array(p_data, 'charge_w_sys_dc_fixed')[1]
+        
+        # demand charges tou
+        demand_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_dc_tou')[1]
+        
+        # energy charges flat
+        energy_charges_flat = SscApi.get_array(p_data, 'charge_w_sys_ec_flat')[1]
+        
+        # energy charges tou
+        energy_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_ec')[1]
+        
+        # annual bill
+        utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')
+        
+        grid_cells << utility_ids[tariff[:eiaid].to_s] * ";"
+        electricity_bills << "#{tariff[:label].to_s}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
+        
+      rescue => error
+      
+        runner.registerWarning("#{error.backtrace}.")
+        
       end
-      SscApi.set_number(p_data, 'ur_ec_enable', 1)
-      SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[:energyweekdayschedule]))
-      SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[:energyweekendschedule]))
-      tariff[:energyratestructure].each_with_index do |period, i|
-        period.each_with_index do |tier, j|
-          unless tier[:adj].nil?
-            SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate] + tier[:adj])
-          else
-            SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate])
-          end
-          unless tier[:sell].nil?
-            SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_sr", tier[:sell])
-          end
-          unless tier[:max].nil?
-            SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", tier[:max])
-          else
-            SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", 1000000000.0)
-          end        
-        end
-      end
-      
-      p_mod = SscApi.create_module("utilityrate3")
-      # SscApi.set_print(false)
-      SscApi.execute_module(p_mod, p_data)
-      
-      # demand charges fixed
-      demand_charges_fixed = SscApi.get_array(p_data, 'charge_w_sys_dc_fixed')[1]
-      # runner.registerInfo("Registering $#{demand_charges_fixed} for fixed annual demand charges.")    
-      
-      # demand charges tou
-      demand_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_dc_tou')[1]
-      # runner.registerInfo("Registering $#{demand_charges_tou} for tou annual demand charges.")
-      
-      # demand charges
-      # runner.registerValue("Annual Demand Charge", demand_charges_tou + demand_charges_fixed)
-      
-      # energy charges flat
-      energy_charges_flat = SscApi.get_array(p_data, 'charge_w_sys_ec_flat')[1]
-      # runner.registerInfo("Registering $#{energy_charges_flat} for flat annual energy charges.")    
-      
-      # energy charges tou
-      energy_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_ec')[1]
-      # runner.registerInfo("Registering $#{energy_charges_tou} for tou annual energy charges.")
-      
-      # energy charges
-      # runner.registerValue("Annual Energy Charge", energy_charges_tou + energy_charges_flat)
-      
-      # annual bill
-      utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')
-      
-      # puts "annual demand charges: $#{(demand_charges_tou + demand_charges_fixed).round(2)}"
-      # puts "annual energy charges: $#{(energy_charges_tou + energy_charges_flat).round(2)}"
-      # puts "annual utility bill: $#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
-      
-      grid_cells << utility_ids[tariff[:eiaid].to_s] * ";"
-      electricity_bills << "#{tariff[:eiaid].to_s}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
       
     end
 
-    runner.registerValue("grid_cells", grid_cells.join("|"))
-    runner.registerValue("total_electricity", electricity_bills.join("|"))
-    runner.registerInfo("Registering electricity bills.")
+    unless electricity_bills.empty?
+      runner.registerValue("grid_cells", grid_cells.join("|"))
+      runner.registerValue("total_electricity", electricity_bills.join("|"))
+      runner.registerInfo("Registering electricity bills.")
+    end
     
     fuels = ["Natural gas", "Oil", "Propane"]
     fuels.each do |fuel|
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{fuel}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
-      cols[0].each_with_index do |state, i|
-        next unless state == weather_file.stateProvinceRegion
+      cols[0].each_with_index do |rate_state, i|
+        weather_file_state = weather_file.stateProvinceRegion
+        if state_name_to_code.keys.include? weather_file_state
+          weather_file_state = state_name_to_code[weather_file_state]
+        end
+        next unless rate_state == weather_file_state
         if fuel == "Natural gas" and not gas_load.nil?
           report_output(runner, "total_#{fuel.downcase}", gas_load, "kBtu", "therm", cols[1][i], fuel)
         elsif fuel == "Oil" and not oil_load.nil?
@@ -383,16 +368,30 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     uri.query = URI.encode_www_form(params)
     response = Net::HTTP.get_response(uri)
     response = JSON.parse(response.body, :symbolize_names=>true)
-    unless File.exists?(tariff_file_name)
+    if response.keys.include? :error
+      runner.registerError(response[:error][:message])
+      return nil
+    else
       File.open(tariff_file_name, "w") do |f|
         f.write(response)
       end
     end
-    if response.keys.include? :error
-      runner.registerError(response[:error][:message])
-      return nil
-    end
     return response[:items][0]
+  end
+  
+  def state_name_to_code
+    return {"Alabama"=>"AL", "Alaska"=>"AK", "Arizona"=>"AZ", "Arkansas"=>"AR","California"=>"CA",
+            "Colorado"=>"CO", "Connecticut"=>"CT", "Delaware"=>"DE", "District of Columbia"=>"DC",
+            "Florida"=>"FL", "Georgia"=>"GA", "Hawaii"=>"HI", "Idaho"=>"ID", "Illinois"=>"IL",
+            "Indiana"=>"IN", "Iowa"=>"IA","Kansas"=>"KS", "Kentucky"=>"KY", "Louisiana"=>"LA",
+            "Maine"=>"ME","Maryland"=>"MD", "Massachusetts"=>"MA", "Michigan"=>"MI", "Minnesota"=>"MN",
+            "Mississippi"=>"MS", "Missouri"=>"MO", "Montana"=>"MT","Nebraska"=>"NE", "Nevada"=>"NV",
+            "New Hampshire"=>"NH", "NewJersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY",
+            "North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
+            "Oregon"=>"OR", "Pennsylvania"=>"PA", "Puerto Rico"=>"PR", "Rhode Island"=>"RI",
+            "South Carolina"=>"SC", "South Dakota"=>"SD", "Tennessee"=>"TN", "Texas"=>"TX",
+            "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV",
+            "Wisconsin"=>"WI", "Wyoming"=>"WY"}
   end
   
   def report_output(runner, name, vals, os_units, desired_units, rate, fuel)
