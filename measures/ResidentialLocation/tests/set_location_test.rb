@@ -51,15 +51,6 @@ class SetResidentialEPWFileTest < MiniTest::Test
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)      
   end
   
-  def test_set_year_for_amy_epw
-    args_hash = {}
-    args_hash["weather_file_name"] = "DuPage_17043_725300_880860.epw"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {"SiteGroundTemperatureDeep"=>1, "RunPeriodControlDaylightSavingTime"=>1, "SiteGroundTemperatureBuildingSurface"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1, "YearDescription"=>1}
-    expected_values = {"StartDate"=>"2012-Apr-07", "EndDate"=>"2012-Oct-26", "Year"=>"2012"}
-    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6, 2)
-  end  
-  
   private
   
   def _test_error_or_NA(osm_file_or_model, args_hash)
