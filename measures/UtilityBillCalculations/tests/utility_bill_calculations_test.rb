@@ -24,7 +24,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 121)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 120)
   end  
   
   def test_tariff_file_name_valid
@@ -52,7 +52,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     # args_hash = {}
     # args_hash["run_dir"] = "."
     # args_hash["api_key"] = ""
-    # args_hash["tariff_directory"] = "./tests/lib/tariffs"
+    # args_hash["tariff_directory"] = "./tests/tariffs"
     # expected_num_del_objects = {}
     # expected_num_new_objects = {}
     # expected_values = {}

@@ -41,7 +41,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_directory", false)
     arg.setDisplayName("Tariff Directory")
     arg.setDescription("Absolute (or relative) directory to tariff files.")
-    arg.setDefaultValue("../lib/tariffs")
+    arg.setDefaultValue("./resources/tariffs")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_file_name", false)

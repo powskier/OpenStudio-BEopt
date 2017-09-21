@@ -514,3 +514,33 @@ def get_osms_listed_in_test(testrb)
     osms = str.scan(/\w+\.osm/)
     return osms.uniq
 end
+
+desc 'update urdb tariffs in utility bill measure'
+task :update_tariffs do
+  require 'csv'
+  require 'net/http'
+  api_key = nil
+  STDOUT.puts "API Key:"
+  api_key = STDIN.gets.strip
+  return if api_key.nil?
+  uri = URI('http://api.openei.org/utility_rates?')
+  rows = CSV.read("./measures/UtilityBillCalculations/resources/utilities.csv", {:encoding=>'ISO-8859-1'})
+  rows.each_with_index do |row, i|
+    next if i == 0
+    utility_id = row[1]
+    getpage = row[3]
+    params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
+    uri.query = URI.encode_www_form(params)
+    response = Net::HTTP.get_response(uri)
+    response = JSON.parse(response.body, :symbolize_names=>true)
+    if response.keys.include? :error
+      puts "#{utility_id}_#{getpage}: #{response[:error][:message]}."
+    else
+      tariff_file_name = "./measures/UtilityBillCalculations/resources/#{utility_id}_#{getpage}.json"
+      File.open(tariff_file_name, "w") do |f|
+        f.write(response)
+      end
+    end
+  end  
+
+end
