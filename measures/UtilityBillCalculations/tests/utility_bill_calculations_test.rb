@@ -24,28 +24,18 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 122)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 44)
   end  
   
   def test_tariff_file_name_valid
     args_hash = {}
     args_hash["run_dir"] = "."
     args_hash["tariff_directory"] = "./tests/tariffs"
-    args_hash["tariff_file_name"] = "3138_56abe466682bea2792b96ec0.json"
+    args_hash["tariff_file_name"] = "3138_539fc46eec4f024c27d8c6ed.json"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
-  end
-  
-  def test_tariff_directory_valid
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./tests/tariffs"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 120)
   end
   
   def test_override_state_rates
@@ -61,18 +51,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_new_objects = {}
     expected_values = {}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 4)
-  end  
-
-  # def test_api_key_valid
-    # args_hash = {}
-    # args_hash["run_dir"] = "."
-    # args_hash["api_key"] = ""
-    # args_hash["tariff_directory"] = "./tests/tariffs"
-    # expected_num_del_objects = {}
-    # expected_num_new_objects = {}
-    # expected_values = {}
-    # _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 21, 1)
-  # end
+  end
 
   private
 

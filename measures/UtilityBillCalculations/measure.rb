@@ -139,12 +139,12 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     oil_rate.is_initialized ? oil_rate = oil_rate.get : oil_rate = nil
     prop_rate = runner.getOptionalStringArgumentValue("prop_rate", user_arguments)
     prop_rate.is_initialized ? prop_rate = prop_rate.get : prop_rate = nil
-    
-    if tariff_directory == "./resources/tariffs"
+
+    if tariff_directory == "./resources/tariffs" and elec_fixed == 0 and elec_rate.nil?
       unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
       unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/tariffs"))
     end
-    
+
     unless (Pathname.new tariff_directory).absolute?
       tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
     end
@@ -200,8 +200,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
     if not tariff_file_name.nil?
       
-      tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)[:items][0]
-      tariffs << tariff
+      if File.exists?(tariff_file_name)
+        tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)[:items][0]
+      end
       
       utility_id, getpage = File.basename(tariff_file_name).split("_")
       rate_ids[tariff[:eiaid].to_s] = [tariff[:label].to_s]
@@ -256,47 +257,44 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     
     end
 
-    if not tariff_directory.nil?
+    rate_ids.each do |utility_id, getpages|
+      getpages.each do |getpage|
+    
+        runner.registerInfo("Searching cached dir on #{utility_id}_#{getpage}.json.")
+        unless (Pathname.new tariff_directory).absolute?
+          tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
+        end
+        tariff_file_name = File.join(tariff_directory, "#{utility_id}_#{getpage}.json")
 
-      rate_ids.each do |utility_id, getpages|
-        getpages.each do |getpage|
-      
-          runner.registerInfo("Searching cached dir on #{utility_id}_#{getpage}.json.")
-          unless (Pathname.new tariff_directory).absolute?
-            tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
-          end
-          tariff_file_name = File.join(tariff_directory, "#{utility_id}_#{getpage}.json")
-          if File.exists?(tariff_file_name)
+        if File.exists?(tariff_file_name)
 
-            tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)[:items][0]
+          tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)[:items][0]
+          tariffs << tariff
+
+        else
+        
+          runner.registerInfo("Could not find #{utility_id}_#{getpage}.json in cached dir.")
+
+          if not api_key.nil?
+            
+            tariff = make_api_request(api_key, tariff_file_name, runner)
+            if tariff.nil?
+              next
+            end
             tariffs << tariff
 
           else
           
-            runner.registerInfo("Could not find #{utility_id}_#{getpage}.json in cached dir.")
-
-            if not api_key.nil?
-              
-              tariff = make_api_request(api_key, tariff_file_name, runner)
-              if tariff.nil?
-                next
-              end
-              tariffs << tariff
-
-            else
-            
-              runner.registerInfo("Did not supply an API Key, skipping #{utility_id}_#{getpage}.")
-            
-            end
-            
+            runner.registerInfo("Did not supply an API Key, skipping #{utility_id}_#{getpage}.")
+          
           end
           
         end
+        
       end
-
     end
     
-    if not elec_fixed.nil? or not elec_rate.nil?
+    if not elec_fixed == 0 or not elec_rate.nil?
       tariffs = []
     end
     
