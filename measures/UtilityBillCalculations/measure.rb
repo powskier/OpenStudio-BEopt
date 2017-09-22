@@ -49,6 +49,42 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     arg.setDescription("Name of the JSON tariff file. Leave blank if pulling JSON tariff file(s) with EIA ID corresponding to the EPW region.")
     args << arg
     
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_fixed", false)
+    arg.setDisplayName("Electricity Fixed Cost")
+    arg.setUnits("$")
+    arg.setDescription("Total fixed cost of electricity.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_rate", false)
+    arg.setDisplayName("Electricity Unit Cost")
+    arg.setUnits("$/kWh")
+    arg.setDescription("Price per kWh for electricity.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_fixed", false)
+    arg.setDisplayName("Natural Gas Fixed Cost")
+    arg.setUnits("$")
+    arg.setDescription("Total fixed cost of natural gas.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_rate", false)
+    arg.setDisplayName("Natural Gas Unit Cost")
+    arg.setUnits("$/therm")
+    arg.setDescription("Price per therm for natural gas.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("oil_rate", false)
+    arg.setDisplayName("Fuel Oil Unit Cost")
+    arg.setUnits("$/gal")
+    arg.setDescription("Price per gallon for fuel oil.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("prop_rate", false)
+    arg.setDisplayName("Propane Unit Cost")
+    arg.setUnits("$/gal")
+    arg.setDescription("Price per gallon for propane.")
+    args << arg
+    
     return args
   end
   
@@ -90,8 +126,25 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     tariff_directory = runner.getOptionalStringArgumentValue("tariff_directory", user_arguments)
     tariff_directory.is_initialized ? tariff_directory = tariff_directory.get : tariff_directory = nil
     tariff_file_name = runner.getOptionalStringArgumentValue("tariff_file_name", user_arguments)
-    tariff_file_name.is_initialized ? tariff_file_name = tariff_file_name.get : tariff_file_name = nil    
-
+    tariff_file_name.is_initialized ? tariff_file_name = tariff_file_name.get : tariff_file_name = nil
+    elec_fixed = runner.getOptionalStringArgumentValue("elec_fixed", user_arguments)
+    elec_fixed.is_initialized ? elec_fixed = elec_fixed.get : elec_fixed = 0
+    elec_rate = runner.getOptionalStringArgumentValue("elec_rate", user_arguments)
+    elec_rate.is_initialized ? elec_rate = elec_rate.get : elec_rate = nil
+    ng_fixed = runner.getOptionalStringArgumentValue("ng_fixed", user_arguments)
+    ng_fixed.is_initialized ? ng_fixed = ng_fixed.get : ng_fixed = 0
+    ng_rate = runner.getOptionalStringArgumentValue("ng_rate", user_arguments)
+    ng_rate.is_initialized ? ng_rate = ng_rate.get : ng_rate = nil
+    oil_rate = runner.getOptionalStringArgumentValue("oil_rate", user_arguments)
+    oil_rate.is_initialized ? oil_rate = oil_rate.get : oil_rate = nil
+    prop_rate = runner.getOptionalStringArgumentValue("prop_rate", user_arguments)
+    prop_rate.is_initialized ? prop_rate = prop_rate.get : prop_rate = nil
+    
+    if tariff_directory == "./resources/tariffs"
+      unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+      unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/tariffs"))
+    end
+    
     unless (Pathname.new tariff_directory).absolute?
       tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
     end
@@ -164,7 +217,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         end
       end
       
-    else
+    elsif elec_fixed == 0 and elec_rate.nil?
     
       closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to resstock epw
       runner.registerInfo("Nearest ResStock usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
@@ -202,10 +255,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
     
     end
-    
-    uri = URI('http://api.openei.org/utility_rates?')
+
     if not tariff_directory.nil?
-    
+
       rate_ids.each do |utility_id, getpages|
         getpages.each do |getpage|
       
@@ -225,7 +277,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
             if not api_key.nil?
               
-              tariff = make_api_request(api_key, uri, tariff_file_name, runner)
+              tariff = make_api_request(api_key, tariff_file_name, runner)
               if tariff.nil?
                 next
               end
@@ -242,6 +294,10 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         end
       end
 
+    end
+    
+    if not elec_fixed.nil? or not elec_rate.nil?
+      tariffs = []
     end
     
     grid_cells = []
@@ -305,19 +361,11 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         p_mod = SscApi.create_module("utilityrate3")
         SscApi.execute_module(p_mod, p_data)
         
-        # demand charges fixed
         demand_charges_fixed = SscApi.get_array(p_data, 'charge_w_sys_dc_fixed')[1]
-        
-        # demand charges tou
         demand_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_dc_tou')[1]
-        
-        # energy charges flat
         energy_charges_flat = SscApi.get_array(p_data, 'charge_w_sys_ec_flat')[1]
-        
-        # energy charges tou
         energy_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_ec')[1]
-        
-        # annual bill
+
         utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')
         
         grid_cells << utility_ids[tariff[:eiaid].to_s] * ";"
@@ -337,8 +385,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       runner.registerInfo("Registering electricity bills.")
     end
     
-    fuels = ["Natural gas", "Oil", "Propane"]
+    fuels = ["Electricity", "Natural gas", "Oil", "Propane"]
     fuels.each do |fuel|
+      rate = nil
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{fuel}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
       cols[0].each_with_index do |rate_state, i|
         weather_file_state = weather_file.stateProvinceRegion
@@ -346,34 +395,63 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
           weather_file_state = state_name_to_code[weather_file_state]
         end
         next unless rate_state == weather_file_state
-        if fuel == "Natural gas" and not gas_load.nil?
-          report_output(runner, "total_#{fuel.downcase}", gas_load, "kBtu", "therm", cols[1][i], fuel)
+        if fuel == "Electricity" and not elec_load.nil? and electricity_bills.empty?
+          if elec_rate.nil?
+            rate = cols[1][i]
+          else
+            rate = elec_rate
+          end
+          report_output(runner, "total_#{fuel.downcase}", elec_load, "kWh", "kWh", rate, fuel, elec_fixed)
+        elsif fuel == "Natural gas" and not gas_load.nil?
+          if ng_rate.nil?
+            rate = cols[1][i]
+          else
+            rate = ng_rate
+          end
+          report_output(runner, "total_#{fuel.downcase}", gas_load, "kBtu", "therm", rate, fuel, ng_fixed)
         elsif fuel == "Oil" and not oil_load.nil?
-          report_output(runner, "total_#{fuel.downcase}", oil_load, "kBtu", "gal", cols[1][i], fuel)
+          if oil_rate.nil?
+            rate = cols[1][i]
+          else
+            rate = oil_rate
+          end
+          report_output(runner, "total_#{fuel.downcase}", oil_load, "kBtu", "gal", rate, fuel)
         elsif fuel == "Propane" and not prop_load.nil?
-          report_output(runner, "total_#{fuel.downcase}", prop_load, "kBtu", "gal", cols[1][i], fuel)
+          if prop_rate.nil?
+            rate = cols[1][i]
+          else
+            rate = prop_rate
+          end
+          report_output(runner, "total_#{fuel.downcase}", prop_load, "kBtu", "gal", rate, fuel)
         end
         break
       end
     end
 
+    FileUtils.rm_rf("#{File.dirname(__FILE__)}/resources/tariffs")
+    
     return true
  
   end
   
-  def make_api_request(api_key, uri, tariff_file_name, runner)
+  def make_api_request(api_key, tariff_file_name, runner)
     utility_id, getpage = File.basename(tariff_file_name).split("_")
     runner.registerInfo("Making api request on getpage=#{getpage}.")
     params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
+    uri = URI('https://api.openei.org/utility_rates?')
     uri.query = URI.encode_www_form(params)
-    response = Net::HTTP.get_response(uri)
+    request = Net::HTTP::Get.new(uri.request_uri)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    response = http.request(request)
     response = JSON.parse(response.body, :symbolize_names=>true)
     if response.keys.include? :error
       runner.registerError(response[:error][:message])
       return nil
     else
       File.open(tariff_file_name, "w") do |f|
-        f.write(response)
+        f.write(response.to_json)
       end
     end
     return response[:items][0]
@@ -394,18 +472,18 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
             "Wisconsin"=>"WI", "Wyoming"=>"WY"}
   end
   
-  def report_output(runner, name, vals, os_units, desired_units, rate, fuel)
+  def report_output(runner, name, vals, os_units, desired_units, rate, fuel, fixed=0)
     total_val = 0.0
     vals.each do |val|
         total_val += val.to_f
     end
     unless desired_units == "gal"
-      runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f).round(2))
+      runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f + fixed.to_f).round(2))
     else
       if name.include? "oil"
-        runner.registerValue(name, (total_val * 1000.0 / 139000 * rate.to_f).round(2))
+        runner.registerValue(name, (total_val * 1000.0 / 139000 * rate.to_f + fixed.to_f).round(2))
       elsif name.include? "propane"
-        runner.registerValue(name, (total_val * 1000.0 / 91600 * rate.to_f).round(2))
+        runner.registerValue(name, (total_val * 1000.0 / 91600 * rate.to_f + fixed.to_f).round(2))
       end
     end
     runner.registerInfo("Registering #{fuel.downcase} utility bills.")

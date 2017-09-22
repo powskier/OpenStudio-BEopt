@@ -181,6 +181,8 @@ class TimeseriesCSVExportTest < MiniTest::Test
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
     
+    FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
+    
     return model
   end  
   

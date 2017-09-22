@@ -24,7 +24,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 120)
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 122)
   end  
   
   def test_tariff_file_name_valid
@@ -47,6 +47,21 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_values = {}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 120)
   end
+  
+  def test_override_state_rates
+    args_hash = {}
+    args_hash["run_dir"] = "."
+    args_hash["elec_fixed"] = "20"
+    args_hash["elec_rate"] = "0.11"
+    args_hash["ng_fixed"] = "20"
+    args_hash["ng_rate"] = "1.50"
+    args_hash["oil_rate"] = "2.25"
+    args_hash["prop_rate"] = "2.50"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 4)
+  end  
 
   # def test_api_key_valid
     # args_hash = {}
@@ -184,6 +199,8 @@ class UtilityBillCalculationsTest < MiniTest::Test
       Dir.chdir(start_dir)
     end
       
+    FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
+      
     return result
     
   end  
@@ -274,6 +291,8 @@ class UtilityBillCalculationsTest < MiniTest::Test
       
         end
     end
+    
+    FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
     
     return model
   end  
