@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>residential_dishwasher</name>
   <uid>09ea4570-4666-4a55-812f-5e90091f5325</uid>
-  <version_id>4e7edb55-131f-4317-96b5-c4d5544c3bb2</version_id>
-  <version_modified>20170913T203108Z</version_modified>
+  <version_id>045aeacb-5914-496a-863a-dc6f288ad10b</version_id>
+  <version_modified>20170922T152408Z</version_modified>
   <xml_checksum>126F1C43</xml_checksum>
   <class_name>ResidentialDishwasher</class_name>
   <display_name>Set Residential Dishwasher</display_name>
@@ -146,9 +146,9 @@
       </choices>
     </argument>
     <argument>
-      <name>days_shift</name>
-      <display_name>Number of days to shift the hot water draw profile by</display_name>
-      <description>Number of days by which to shift the domestic hot water profile. Draw profiles are shifted to ensure that there aren't too many coincident events when doing ResStock runs or runs in multiple units.</description>
+      <name>schedule_day_shift</name>
+      <display_name>Schedule Day Shift</display_name>
+      <description>Draw profiles are shifted to prevent coincident hot water events when performing portfolio analyses. For multifamily buildings, draw profiles for each unit are automatically shifted by one week.</description>
       <type>Integer</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -270,16 +270,22 @@
       <checksum>5CD21305</checksum>
     </file>
     <file>
-      <filename>schedules.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>D26673FB</checksum>
-    </file>
-    <file>
       <filename>waterheater.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>1C144F9B</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>6A82C5DA</checksum>
+    </file>
+    <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>7BFE5DD7</checksum>
     </file>
     <file>
       <version>
@@ -290,43 +296,37 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>3DC8E6D0</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>6A82C5DA</checksum>
+      <checksum>93CA79E8</checksum>
     </file>
     <file>
       <filename>DishwasherSchedule_1bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>D1CC0F2A</checksum>
+      <checksum>42A2D406</checksum>
     </file>
     <file>
       <filename>DishwasherSchedule_2bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>CEC085E1</checksum>
+      <checksum>8C62EE2B</checksum>
     </file>
     <file>
       <filename>DishwasherSchedule_3bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>C31D730D</checksum>
+      <checksum>9575CF98</checksum>
     </file>
     <file>
       <filename>DishwasherSchedule_4bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>0E81224A</checksum>
+      <checksum>E645EB0E</checksum>
     </file>
     <file>
       <filename>DishwasherSchedule_5bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>F3E76D21</checksum>
+      <checksum>33CBAEFF</checksum>
     </file>
   </files>
 </measure>

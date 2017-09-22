@@ -463,7 +463,7 @@ class HotWaterSchedule
                 return nil
             end
             
-            #For MF homes, shift each unit by an additional weekday
+            #For MF homes, shift each unit by an additional week
             days_shift = days_shift + 7 * (unit_index - 1)
             
             minutes_in_year = 8760*60

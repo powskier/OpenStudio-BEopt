@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>residential_hot_water_fixtures</name>
   <uid>6159fd36-6bfa-4907-9200-9cb852d50799</uid>
-  <version_id>59e9b2c4-eedf-4c96-9315-6b52e920428f</version_id>
-  <version_modified>20170913T203438Z</version_modified>
+  <version_id>57f7d1e0-8ab3-4b1e-aeb7-c31361573e9a</version_id>
+  <version_modified>20170922T152410Z</version_modified>
   <xml_checksum>A6ACD89C</xml_checksum>
   <class_name>ResidentialHotWaterFixtures</class_name>
   <display_name>Set Residential Hot Water Fixtures</display_name>
@@ -68,9 +68,9 @@
       </choices>
     </argument>
     <argument>
-      <name>days_shift</name>
-      <display_name>Number of days to shift the hot water draw profile by</display_name>
-      <description>Number of days by which to shift the domestic hot water profile. Draw profiles are shifted to ensure that there aren't too many coincident events when doing ResStock runs or runs in multiple units.</description>
+      <name>schedule_day_shift</name>
+      <display_name>Schedule Day Shift</display_name>
+      <description>Draw profiles are shifted to prevent coincident hot water events when performing portfolio analyses. For multifamily buildings, draw profiles for each unit are automatically shifted by one week.</description>
       <type>Integer</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
@@ -180,12 +180,6 @@
       <checksum>5CD21305</checksum>
     </file>
     <file>
-      <filename>schedules.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>D26673FB</checksum>
-    </file>
-    <file>
       <filename>waterheater.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -204,94 +198,100 @@
       <checksum>2CB02C1E</checksum>
     </file>
     <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>7BFE5DD7</checksum>
+    </file>
+    <file>
       <filename>BathSchedule_1bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>C6AFE28D</checksum>
+      <checksum>3C6A8C60</checksum>
     </file>
     <file>
       <filename>BathSchedule_2bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>3C59C918</checksum>
+      <checksum>CEFC541C</checksum>
     </file>
     <file>
       <filename>BathSchedule_3bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>B046AA71</checksum>
+      <checksum>57D7F74B</checksum>
     </file>
     <file>
       <filename>BathSchedule_4bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>1C7EDCAE</checksum>
+      <checksum>C51E3A16</checksum>
     </file>
     <file>
       <filename>BathSchedule_5bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>A3551C14</checksum>
+      <checksum>6F86EAD4</checksum>
     </file>
     <file>
       <filename>ShowerSchedule_1bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>09704F0B</checksum>
+      <checksum>828DF304</checksum>
     </file>
     <file>
       <filename>ShowerSchedule_2bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>F5FC2894</checksum>
+      <checksum>956B5CA4</checksum>
     </file>
     <file>
       <filename>ShowerSchedule_3bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>6A824AA9</checksum>
+      <checksum>AD8F1670</checksum>
     </file>
     <file>
       <filename>ShowerSchedule_4bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>184277ED</checksum>
+      <checksum>CA8DB85D</checksum>
     </file>
     <file>
       <filename>ShowerSchedule_5bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>A883D9DF</checksum>
+      <checksum>247CDEAC</checksum>
     </file>
     <file>
       <filename>SinkSchedule_1bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>661BE0F1</checksum>
+      <checksum>77CD2EBB</checksum>
     </file>
     <file>
       <filename>SinkSchedule_2bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>317B126C</checksum>
+      <checksum>0EA74EDC</checksum>
     </file>
     <file>
       <filename>SinkSchedule_3bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>E81312D3</checksum>
+      <checksum>76715C77</checksum>
     </file>
     <file>
       <filename>SinkSchedule_4bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>1E8784F6</checksum>
+      <checksum>7200A642</checksum>
     </file>
     <file>
       <filename>SinkSchedule_5bed.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
-      <checksum>00103212</checksum>
+      <checksum>D13CEA26</checksum>
     </file>
     <file>
       <version>
@@ -302,7 +302,7 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>2D88CE21</checksum>
+      <checksum>E50D173F</checksum>
     </file>
   </files>
 </measure>

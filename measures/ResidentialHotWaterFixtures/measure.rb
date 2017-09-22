@@ -82,31 +82,31 @@ class ResidentialHotWaterFixtures < OpenStudio::Measure::ModelMeasure
         args << plant_loop
         
         #make an argument for the number of days to shift the draw profile by
-        days_shift = OpenStudio::Measure::OSArgument::makeIntegerArgument("days_shift",true)
-        days_shift.setDisplayName("Number of days to shift the hot water draw profile by")
-        days_shift.setDescription("Number of days by which to shift the domestic hot water profile. Draw profiles are shifted to ensure that there aren't too many coincident events when doing ResStock runs or runs in multiple units.")
-        days_shift.setDefaultValue(0)
-        args << days_shift
+        schedule_day_shift = OpenStudio::Measure::OSArgument::makeIntegerArgument("schedule_day_shift",true)
+        schedule_day_shift.setDisplayName("Schedule Day Shift")
+        schedule_day_shift.setDescription("Draw profiles are shifted to prevent coincident hot water events when performing portfolio analyses. For multifamily buildings, draw profiles for each unit are automatically shifted by one week.")
+        schedule_day_shift.setDefaultValue(0)
+        args << schedule_day_shift
 
-		return args
-	end #end the arguments method
+        return args
+    end #end the arguments method
 
-	#define what happens when the measure is run
-	def run(model, runner, user_arguments)
-		super(model, runner, user_arguments)
+    #define what happens when the measure is run
+    def run(model, runner, user_arguments)
+        super(model, runner, user_arguments)
 
-		#use the built-in error checking 
-		if not runner.validateUserArguments(arguments(model), user_arguments)
-			return false
-		end
+        #use the built-in error checking 
+        if not runner.validateUserArguments(arguments(model), user_arguments)
+            return false
+        end
 
-		#assign the user inputs to variables
+        #assign the user inputs to variables
         sh_mult = runner.getDoubleArgumentValue("shower_mult",user_arguments)
         s_mult = runner.getDoubleArgumentValue("sink_mult", user_arguments)
         b_mult = runner.getDoubleArgumentValue("bath_mult", user_arguments)
         space_r = runner.getStringArgumentValue("space",user_arguments)
         plant_loop_s = runner.getStringArgumentValue("plant_loop", user_arguments)
-        d_sh = runner.getIntegerArgumentValue("days_shift",user_arguments)
+        d_sh = runner.getIntegerArgumentValue("schedule_day_shift",user_arguments)
         
         #Check for valid and reasonable inputs
         if sh_mult < 0
