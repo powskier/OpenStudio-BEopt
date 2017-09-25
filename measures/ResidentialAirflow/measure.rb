@@ -1509,11 +1509,13 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         surface_property_convection_coefficients.setConvectionCoefficient1Type("Value")
         surface_property_convection_coefficients.setConvectionCoefficient1(999)
       end
-        
+
       if ducts.has_forced_air_equipment  
         
         air_demand_inlet_node = nil
         supply_fan = nil
+        living_zone_return_air_node = nil
+
         model.getAirLoopHVACs.each do |air_loop|
           next unless air_loop.thermalZones.include? unit.living_zone # get the correct air loop for this unit
           air_demand_inlet_node = air_loop.demandInletNode
@@ -1524,12 +1526,26 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
           end
           break
         end
-        living_zone_return_air_node = unit.living_zone.returnAirModelObject().get
+
+        if air_demand_inlet_node.nil? and supply_fan.nil? # for mshp
+          model.getZoneHVACTerminalUnitVariableRefrigerantFlows.each do |tu_vrf|
+            air_demand_inlet_node = tu_vrf.outletNode.get
+            supply_fan = tu_vrf.supplyAirFan
+          end
+        end
         
         unit.living_zone.setReturnPlenum(ra_duct_zone)
         unless unit.finished_basement_zone.nil?
           unit.finished_basement_zone.setReturnPlenum(ra_duct_zone)
         end
+        
+        if unit.living_zone.returnAirModelObject.is_initialized
+          living_zone_return_air_node = unit.living_zone.returnAirModelObject.get
+        else
+          living_zone_return_air_node = unit.living_zone.zoneAirNode # TODO: no, it's not this
+        end
+        
+        puts living_zone_return_air_node
         
       end
       
@@ -2553,7 +2569,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   
   def _processDuctsForUnit(model, runner, ducts, building, unit)
   
-    if ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil?
+    # if ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil?
+    if ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? and HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
     end        
@@ -2567,12 +2584,18 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       ducts.has_ducts = false
     end      
     
-    unless HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
-      ducts.duct_location_zone = unit.living_zone
-      ducts.duct_location_name = unit.living_zone.name.to_s
-      ducts.has_ducts = false
-      runner.registerWarning("Duct losses are currently neglected when simulating mini-split heat pumps. Set Ducts to None or In Finished Space to avoid this warning message.")
-    end     
+    # unless HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
+      # ducts.duct_location_zone = unit.living_zone
+      # ducts.duct_location_name = unit.living_zone.name.to_s
+      # ducts.has_ducts = false
+      # runner.registerWarning("Duct losses are currently neglected when simulating mini-split heat pumps. Set Ducts to None or In Finished Space to avoid this warning message.")
+    # end
+    # unless HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
+      # ducts.duct_location_zone = unit.living_zone
+      # ducts.duct_location_name = unit.living_zone.name.to_s
+      # ducts.has_ducts = false
+      # runner.registerWarning("Duct losses are currently neglected when simulating mini-split heat pumps. Set Ducts to None or In Finished Space to avoid this warning message.")
+    # end    
     
     # Set has_uncond_ducts to False if ducts are in a conditioned space,
     # otherwise True    
@@ -2584,6 +2607,9 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     ducts.has_forced_air_equipment = false
     model.getAirLoopHVACs.each do |air_loop|
       next unless air_loop.thermalZones.include? unit.living_zone
+      ducts.has_forced_air_equipment = true
+    end
+    if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
       ducts.has_forced_air_equipment = true
     end
     
