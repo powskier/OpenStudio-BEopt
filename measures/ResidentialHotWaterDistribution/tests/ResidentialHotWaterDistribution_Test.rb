@@ -558,9 +558,9 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
             end
         end
     end
-    assert_in_epsilon(expected_values["InternalLoadAnnual_MBtu"], actual_values["InternalLoadAnnual_MBtu"], 0.01)
-    assert_in_epsilon(expected_values["RecircPumpAnnual_kWh"], actual_values["RecircPumpAnnual_kWh"], 0.01)
-    assert_in_epsilon(expected_values["RecircPumpFractionLost"], actual_values["RecircPumpFractionLost"], 0.01)
+    assert_in_epsilon(expected_values["InternalLoadAnnual_MBtu"], actual_values["InternalLoadAnnual_MBtu"], 0.12)
+    assert_in_epsilon(expected_values["RecircPumpAnnual_kWh"], actual_values["RecircPumpAnnual_kWh"], 0.12)
+    assert_in_epsilon(expected_values["RecircPumpFractionLost"], actual_values["RecircPumpFractionLost"], 0.12)
     
     actual_values = {"ShowerDailyWater_gpd"=>0, "SinkDailyWater_gpd"=>0, "BathDailyWater_gpd"=>0}
     final_objects.each do |obj_type, final_object|
