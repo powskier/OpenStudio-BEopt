@@ -7,6 +7,14 @@ require 'fileutils'
 
 class ResidentialAirflowTest < MiniTest::Test
 
+  def test_ducted_mini_split_heat_pump_with_return_ducting
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    args_hash["duct_location"] = Constants.AtticZone
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "All ducted MSHPs should be modeled with only supply ducting due to OpenStudio limitations. Please ensure that all arguments related to the return ducting are set to 0 in the airflow measure.")
+  end
+
   def test_no_hvac_equip
     args_hash = {}
     expected_num_del_objects = {}
@@ -292,16 +300,29 @@ class ResidentialAirflowTest < MiniTest::Test
     expected_values = {"erv_priority"=>nil, "terrain_type"=>"Suburbs", "duct_location"=>"unfinished attic zone", "infiltration_c"=>0.0696580370384, "infiltration_cs"=>0.0862380821416, "infiltration_cw"=>0.128435824905, "natvent_cs"=>0.000179260407789, "natvent_cw"=>0.000282172823794, "duct_leak_supply"=>0.136963386963, "duct_leak_return"=>0.1000999001, "f_oa"=>0.0368634868631, "faneff_wh"=>0.47194744, "fan_frac_to_space"=>0, "ra_duct_volume"=>90}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)    
   end
-   
-  def test_ducted_mini_split_heat_pump
+
+  def test_unducted_mini_split_heat_pump
     args_hash = {}
     args_hash["has_hvac_flue"] = "true" 
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ScheduleRuleset"=>7, "ScheduleRule"=>84, "Surface"=>6, "EnergyManagementSystemSubroutine"=>1, "EnergyManagementSystemProgramCallingManager"=>2, "EnergyManagementSystemProgram"=>3, "EnergyManagementSystemSensor"=>21, "EnergyManagementSystemActuator"=>17, "EnergyManagementSystemGlobalVariable"=>23, "AirLoopHVACReturnPlenum"=>1, "OtherEquipmentDefinition"=>10, "OtherEquipment"=>10, "ThermalZone"=>1, "ZoneMixing"=>2, "OutputVariable"=>14, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>1, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6, "EnergyManagementSystemOutputVariable"=>1}
+    expected_num_new_objects = {"ScheduleRuleset"=>7, "ScheduleRule"=>84, "Surface"=>6, "EnergyManagementSystemProgramCallingManager"=>2, "EnergyManagementSystemProgram"=>3, "EnergyManagementSystemSensor"=>12, "EnergyManagementSystemActuator"=>5, "EnergyManagementSystemGlobalVariable"=>2, "ThermalZone"=>1, "OutputVariable"=>14, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>1, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6, "EnergyManagementSystemOutputVariable"=>1}
     expected_values = {"erv_priority"=>nil, "terrain_type"=>"Suburbs", "duct_location"=>nil, "infiltration_c"=>0.0696580370384, "infiltration_cs"=>0.0862380821416, "infiltration_cw"=>0.128435824905, "natvent_cs"=>0.000179260407789, "natvent_cw"=>0.000282172823794, "duct_leak_supply"=>0, "duct_leak_return"=>0, "f_oa"=>0, "faneff_wh"=>0.47194744, "fan_frac_to_space"=>0, "ra_duct_volume"=>0}
+    _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 2)
+  end
+  
+  def test_ducted_mini_split_heat_pump
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    args_hash["duct_location"] = Constants.AtticZone
+    args_hash["duct_return_frac"] = 0
+    args_hash["duct_ah_return_frac"] = 0
+    args_hash["duct_return_area_mult"] = 0
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>7, "ScheduleRule"=>84, "Surface"=>6, "EnergyManagementSystemSubroutine"=>1, "EnergyManagementSystemProgramCallingManager"=>2, "EnergyManagementSystemProgram"=>3, "EnergyManagementSystemSensor"=>20, "EnergyManagementSystemActuator"=>17, "EnergyManagementSystemGlobalVariable"=>23, "OtherEquipmentDefinition"=>10, "OtherEquipment"=>10, "ThermalZone"=>1, "ZoneMixing"=>2, "OutputVariable"=>14, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>1, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6, "EnergyManagementSystemOutputVariable"=>1}
+    expected_values = {"erv_priority"=>nil, "terrain_type"=>"Suburbs", "duct_location"=>"unfinished attic zone", "infiltration_c"=>0.0696580370384, "infiltration_cs"=>0.0862380821416, "infiltration_cw"=>0.128435824905, "natvent_cs"=>0.000179260407789, "natvent_cw"=>0.000282172823794, "duct_leak_supply"=>0.2055475763868066, "duct_leak_return"=>0, "f_oa"=>0.2055475763868066, "faneff_wh"=>0.47194744, "fan_frac_to_space"=>0, "ra_duct_volume"=>0}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)
-  end      
-   
+  end        
+
   def test_duct_location_frac
     args_hash = {}
     args_hash["has_hvac_flue"] = "true" 
@@ -408,8 +429,8 @@ class ResidentialAirflowTest < MiniTest::Test
     expected_num_new_objects = {"ScheduleRuleset"=>num_units*7, "ScheduleRule"=>num_units*84, "EnergyManagementSystemProgramCallingManager"=>num_units*2, "EnergyManagementSystemProgram"=>num_units*3, "EnergyManagementSystemSensor"=>num_units*12, "EnergyManagementSystemActuator"=>num_units*5, "EnergyManagementSystemGlobalVariable"=>num_units*2, "OutputVariable"=>14, "SpaceInfiltrationDesignFlowRate"=>num_units*2, "ElectricEquipmentDefinition"=>num_units*3, "ElectricEquipment"=>num_units*3, "Surface"=>num_units*6, "Material"=>1, "Space"=>num_units*1, "AirLoopHVACReturnPlenum"=>num_units*1, "ThermalZone"=>num_units*1, "Construction"=>1, "SurfacePropertyConvectionCoefficients"=>num_units*6, "EnergyManagementSystemOutputVariable"=>num_units}
     expected_values = {"erv_priority"=>nil, "terrain_type"=>"Suburbs", "duct_location"=>"unfinished attic zone", "infiltration_c"=>0.0465692660323, "infiltration_cs"=>0.0497586232311, "infiltration_cw"=>0.128435824905, "natvent_cs"=>0.0000896302038946, "natvent_cw"=>0.000199526317171, "duct_leak_supply"=>0, "duct_leak_return"=>0, "f_oa"=>0.0998001998002, "faneff_wh"=>0.47194744, "fan_frac_to_space"=>0, "ra_duct_volume"=>0}
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, num_units)
-  end
-
+  end 
+  
   private
   
   def _test_error(osm_file_or_model, args_hash)
@@ -485,7 +506,7 @@ class ResidentialAirflowTest < MiniTest::Test
       assert(line.length <= 100)
     end
     
-    show_output(result)
+    # show_output(result)
     
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)

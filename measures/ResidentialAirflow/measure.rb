@@ -647,7 +647,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       ductSystemEfficiency = ductSystemEfficiency.to_f
     else
       ductSystemEfficiency = nil
-    end
+    end  
     
     @infMethodRes = 'RESIDENTIAL'
     @infMethodASHRAE = 'ASHRAE-ENHANCED'
@@ -903,6 +903,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
       if unit.living_zone.nil?
         runner.registerError("Unable to identify the living zone for #{building_unit.name}.")
+        return false
+      end
+
+      if not HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? and ducts.DuctLocation != "none" and ducts.DuctLocation != Constants.Auto and ( ducts.DuctReturnLeakageFractionOfTotal != 0 or ducts.DuctAHReturnLeakageFractionOfTotal != 0 or ducts.DuctReturnSurfaceAreaMultiplier != 0 )
+        runner.registerError("All ducted MSHPs should be modeled with only supply ducting due to OpenStudio limitations. Please ensure that all arguments related to the return ducting are set to 0 in the airflow measure.")
         return false
       end
       
@@ -1541,11 +1546,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         
         if unit.living_zone.returnAirModelObject.is_initialized
           living_zone_return_air_node = unit.living_zone.returnAirModelObject.get
-        else
-          living_zone_return_air_node = unit.living_zone.zoneAirNode # TODO: no, it's not this
         end
-        
-        puts living_zone_return_air_node
         
       end
       
@@ -1696,22 +1697,32 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         air_handler_tout_sensor.setName(air_handler_tout + " s")
         air_handler_tout_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
         
-        return_air_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_temp_output_var)
-        return_air_t_sensor.setName(return_air_t + " s")
-        return_air_t_sensor.setKeyName(living_zone_return_air_node.name.to_s)
+        if not living_zone_return_air_node.nil?
+          return_air_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_temp_output_var)
+          return_air_t_sensor.setName(return_air_t + " s")
+          return_air_t_sensor.setKeyName(living_zone_return_air_node.name.to_s)
+        else
+          return_air_t_sensor = tin_sensor
+        end
         
         air_handler_wout_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
         air_handler_wout_sensor.setName(air_handler_wout + " s")
         air_handler_wout_sensor.setKeyName(air_demand_inlet_node.name.to_s)        
         
-        return_air_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
-        return_air_w_sensor.setName(return_air_w + " s")
-        return_air_w_sensor.setKeyName(living_zone_return_air_node.name.to_s)
+        if not living_zone_return_air_node.nil?
+          return_air_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, system_node_humidity_ratio_output_var)
+          return_air_w_sensor.setName(return_air_w + " s")
+          return_air_w_sensor.setKeyName(living_zone_return_air_node.name.to_s)
+        else
+          return_air_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
+          return_air_w_sensor.setName(return_air_w + " s")
+          return_air_w_sensor.setKeyName(unit.living_zone.name.to_s)
+        end
     
         air_handler_t_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_air_temp_output_var)
         air_handler_t_sensor.setName(air_handler_t + " s")
         air_handler_t_sensor.setKeyName(ducts.duct_location_name)        
-        
+
         air_handler_w_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, zone_mean_air_humidity_ratio_output_var)
         air_handler_w_sensor.setName(air_handler_w + " s")
         air_handler_w_sensor.setKeyName(ducts.duct_location_name)
@@ -2147,7 +2158,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
             lkage_floor = 0.25          
           end
           if lkage_ceiling + lkage_walls + lkage_floor !=  1
-            runner.registerError("Invalid air lkage distribution specified (#{lkage_ceiling}, #{lkage_walls}, #{lkage_floor}); does not add up to 1.")
+            runner.registerError("Invalid air leakage distribution specified (#{lkage_ceiling}, #{lkage_walls}, #{lkage_floor}); does not add up to 1.")
             return false
           end
           infil.R_i = (lkage_ceiling + lkage_floor)
@@ -2569,36 +2580,22 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   
   def _processDuctsForUnit(model, runner, ducts, building, unit)
   
-    # if ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil?
-    if ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? and HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
+    if ( ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? and HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? ) or ( ducts.DuctLocation ==  Constants.Auto and not HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? )
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
-    end        
+    end
     
     ducts.duct_location_zone, ducts.duct_location_name = get_duct_location(runner, ducts.DuctLocation, building, unit)
 
-    ducts.has_ducts = true  
+    ducts.has_ducts = true
     if ducts.duct_location_name == "none" or not ducts.DuctSystemEfficiency.nil?
       ducts.duct_location_zone = unit.living_zone
       ducts.duct_location_name = unit.living_zone.name.to_s
       ducts.has_ducts = false
-    end      
-    
-    # unless HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
-      # ducts.duct_location_zone = unit.living_zone
-      # ducts.duct_location_name = unit.living_zone.name.to_s
-      # ducts.has_ducts = false
-      # runner.registerWarning("Duct losses are currently neglected when simulating mini-split heat pumps. Set Ducts to None or In Finished Space to avoid this warning message.")
-    # end
-    # unless HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
-      # ducts.duct_location_zone = unit.living_zone
-      # ducts.duct_location_name = unit.living_zone.name.to_s
-      # ducts.has_ducts = false
-      # runner.registerWarning("Duct losses are currently neglected when simulating mini-split heat pumps. Set Ducts to None or In Finished Space to avoid this warning message.")
-    # end    
+    end
     
     # Set has_uncond_ducts to False if ducts are in a conditioned space,
-    # otherwise True    
+    # otherwise True
     ducts.ducts_not_in_living = true
     if ducts.duct_location_name == unit.living_zone.name.to_s
       ducts.ducts_not_in_living = false
