@@ -333,7 +333,7 @@ end
 def generate_example_osw_of_all_measures_in_order()
 
   require 'openstudio'
-  require_relative 'resources/helper_methods'
+  require_relative 'resources/meta_measure'
 
   puts "Updating example OSW..."
   
