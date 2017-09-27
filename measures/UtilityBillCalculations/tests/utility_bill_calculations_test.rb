@@ -12,19 +12,30 @@ class UtilityBillCalculationsTest < MiniTest::Test
     args_hash["run_dir"] = "."
     args_hash["tariff_directory"] = "./tests/tariffs"
     args_hash["tariff_file_name"] = "result.txt"
-    result = _test_error_or_NA(nil, args_hash, __method__)
+    result = _test_error_or_NA("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw")
     assert(result.errors.size == 1)
     assert_equal("Fail", result.value.valueName)
     assert_includes(result.errors.map{ |x| x.logMessage }, "'#{File.expand_path(File.join(File.dirname(__FILE__), "..", args_hash["tariff_directory"], args_hash["tariff_file_name"]))}' does not exist or is not a JSON file.")
   end
   
-  def test_error_no_api_key_or_tariff_file_name
+  def test_tmy_no_api_key_or_tariff_file_name
     args_hash = {}
     args_hash["run_dir"] = "."
+    args_hash["tariff_directory"] = "./resources/tariffs"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 44)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 43, 1)
+  end
+  
+  def test_amy_no_api_key_or_tariff_file_name
+    args_hash = {}
+    args_hash["run_dir"] = "."
+    args_hash["tariff_directory"] = "./resources/tariffs"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 47, 1)
   end  
   
   def test_tariff_file_name_valid
@@ -35,8 +46,17 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 5)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 4, 1)
   end
+  
+  def test_state_rates
+    args_hash = {}
+    args_hash["run_dir"] = "."
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+  end  
   
   def test_override_state_rates
     args_hash = {}
@@ -50,56 +70,61 @@ class UtilityBillCalculationsTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, 4)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
 
   private
 
-  def model_in_path_default
-    return "#{File.dirname(__FILE__)}/SFD_2000sqft_2story_SL_UA_Denver.osm"
+  def model_in_path_default(osm_file_or_model)
+    return "#{File.dirname(__FILE__)}/#{osm_file_or_model}"
   end
 
-  def epw_path_default
+  def epw_path_default(epw_name)
     # make sure we have a weather data location
     epw = nil
-    epw = OpenStudio::Path.new("#{File.dirname(__FILE__)}/USA_CO_Denver_Intl_AP_725650_TMY3.epw")
+    epw = OpenStudio::Path.new("#{File.dirname(__FILE__)}/#{epw_name}")
     assert(File.exist?(epw.to_s))
     return epw.to_s
-  end  
+  end
   
   def run_dir(test_name)
     # always generate test output in specially named 'output' directory so result files are not made part of the measure
     return "#{File.dirname(__FILE__)}/output/#{test_name}/run"
   end
   
+  def tests_dir(test_name)
+    return "#{File.dirname(__FILE__)}/output/#{test_name}/tests"
+  end  
+  
   def resources_dir(test_name)
     return "#{run_dir(test_name)}/UtilityBillCalculations/resources"
   end
 
-  def model_out_path(test_name)
-    return "#{run_dir(test_name)}/SFD_2000sqft_2story_SL_UA_Denver.osm"
+  def model_out_path(osm_file_or_model, test_name)
+    return "#{run_dir(test_name)}/#{osm_file_or_model}"
   end
-
-  def timeseries_path(test_name)
-    return "#{run_dir(test_name)}/enduse_timeseries.csv"
+  
+  def sql_path(test_name)
+    return "#{run_dir(test_name)}/run/eplusout.sql"
   end
   
   # create test files if they do not exist when the test first runs
-  def setup_test(test_name, idf_output_requests, model_in_path=model_in_path_default, epw_path=epw_path_default)
+  def setup_test(osm_file_or_model, test_name, idf_output_requests, epw_path, model_in_path)
 
     if !File.exist?(run_dir(test_name))
       FileUtils.mkdir_p(run_dir(test_name))
     end
     assert(File.exist?(run_dir(test_name)))
 
-    if File.exist?(timeseries_path(test_name))
-      FileUtils.rm(timeseries_path(test_name))
+    if !File.exist?(tests_dir(test_name))
+      FileUtils.mkdir_p(tests_dir(test_name))
     end
-
+    assert(File.exist?(tests_dir(test_name)))
+    
     assert(File.exist?(model_in_path))
 
-    if File.exist?(model_out_path(test_name))
-      FileUtils.rm(model_out_path(test_name))
+    if File.exist?(model_out_path(osm_file_or_model, test_name))
+      FileUtils.rm(model_out_path(osm_file_or_model, test_name))
     end
 
     # convert output requests to OSM for testing, OS App and PAT will add these to the E+ Idf
@@ -113,12 +138,19 @@ class UtilityBillCalculationsTest < MiniTest::Test
     assert((not model.empty?))
     model = model.get
     model.addObjects(request_model.objects)
-    model.save(model_out_path(test_name), true)
+    model.save(model_out_path(osm_file_or_model, test_name), true)
+
+    osw_path = File.join(run_dir(test_name), "in.osw")
+    osw_path = File.absolute_path(osw_path)
+    
+    workflow = OpenStudio::WorkflowJSON.new
+    workflow.setSeedFile(File.absolute_path(model_out_path(osm_file_or_model, test_name)))
+    workflow.setWeatherFile(epw_path)
+    workflow.saveAs(osw_path)
 
     if !File.exist?("#{run_dir(test_name)}")
       FileUtils.mkdir_p("#{run_dir(test_name)}")
     end
-    FileUtils.cp("#{File.dirname(__FILE__)}/enduse_timeseries.csv", "#{run_dir(test_name)}")
     if !File.exist?("#{run_dir(test_name)}/UtilityBillCalculations/resources")
       FileUtils.mkdir_p("#{resources_dir(test_name)}")
     end
@@ -126,11 +158,18 @@ class UtilityBillCalculationsTest < MiniTest::Test
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/by_nsrdb.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/Natural gas.csv", "#{resources_dir(test_name)}")
     
+    cli_path = OpenStudio.getOpenStudioCLI
+    cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
+    puts cmd
+    system(cmd)
+    
+    FileUtils.cp(epw_path, "#{tests_dir(test_name)}")    
+    
     return model
     
   end
 
-  def _test_error_or_NA(osm_file_or_model, args_hash, test_name)
+  def _test_error_or_NA(osm_file_or_model, args_hash, test_name, epw_name)
     # create an instance of the measure
     measure = UtilityBillCalculations.new
 
@@ -154,17 +193,17 @@ class UtilityBillCalculationsTest < MiniTest::Test
 
     # get the energyplus output requests, this will be done automatically by OS App and PAT
     idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    assert(idf_output_requests.size == 0)
+    assert(idf_output_requests.size == measure.fuel_types.length*measure.end_uses.length)
 
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
-    setup_test(test_name, idf_output_requests)
+    setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
 
-    assert(File.exist?(model_out_path(test_name)))
+    assert(File.exist?(model_out_path(osm_file_or_model, test_name)))
 
     # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
-    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_out_path(test_name)))
-
-    assert(File.exist?(timeseries_path(test_name)))
+    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_out_path(osm_file_or_model, test_name)))
+    runner.setLastEpwFilePath(File.expand_path(epw_path_default(epw_name)))
+    runner.setLastEnergyPlusSqlFilePath(OpenStudio::Path.new(sql_path(test_name)))
 
     # temporarily change directory to the run directory and run the measure
     start_dir = Dir.pwd
@@ -174,6 +213,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
+      # show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
@@ -184,7 +224,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     
   end  
   
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
     measure = UtilityBillCalculations.new
 
@@ -216,17 +256,17 @@ class UtilityBillCalculationsTest < MiniTest::Test
 
     # get the energyplus output requests, this will be done automatically by OS App and PAT
     idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    assert(idf_output_requests.size == 0)
+    assert(idf_output_requests.size == measure.fuel_types.length*measure.end_uses.length)
 
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
-    model = setup_test(test_name, idf_output_requests)
+    model = setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
 
-    assert(File.exist?(model_out_path(test_name)))
+    assert(File.exist?(model_out_path(osm_file_or_model, test_name)))
 
     # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
-    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_out_path(test_name)))
-
-    assert(File.exist?(timeseries_path(test_name)))
+    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_out_path(osm_file_or_model, test_name)))
+    runner.setLastEpwFilePath(File.expand_path(epw_path_default(epw_name)))
+    runner.setLastEnergyPlusSqlFilePath(OpenStudio::Path.new(sql_path(test_name)))
 
     # temporarily change directory to the run directory and run the measure
     start_dir = Dir.pwd
@@ -236,40 +276,15 @@ class UtilityBillCalculationsTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
+      # show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
-
-    # show the output
-    # show_output(result)
-    
-    # make sure the report file exists
-    assert(File.exist?(timeseries_path(test_name)))
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
-    
-    # get the final objects in the model
-    final_objects = get_objects(model)
-    
-    # get new and deleted objects
-    obj_type_exclusions = []
-    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
-    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
-    
-    # check we have the expected number of new/deleted objects
-    check_num_objects(all_new_objects, expected_num_new_objects, "added")
-    check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
-
-    all_new_objects.each do |obj_type, new_objects|
-        new_objects.each do |new_object|
-            next if not new_object.respond_to?("to_#{obj_type}")
-            new_object = new_object.public_send("to_#{obj_type}").get
-      
-        end
-    end
     
     FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
     

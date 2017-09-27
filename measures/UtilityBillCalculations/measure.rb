@@ -23,6 +23,26 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     return "Calls SAM SDK."
   end 
   
+  def fuel_types
+    fuel_types = [  
+      'Electricity',
+      'Gas',
+      'FuelOil#1',
+      'Propane',
+      'ElectricityProduced'
+    ]
+    
+    return fuel_types
+  end
+  
+  def end_uses
+    end_uses = [
+      'Facility'
+    ]
+    
+    return end_uses
+  end
+  
   # define the arguments that the user will input
   def arguments()
     args = OpenStudio::Measure::OSArgumentVector.new
@@ -41,7 +61,6 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_directory", false)
     arg.setDisplayName("Tariff Directory")
     arg.setDescription("Absolute (or relative) directory to tariff files.")
-    arg.setDefaultValue("./resources/tariffs")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_file_name", false)
@@ -52,19 +71,19 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_fixed", false)
     arg.setDisplayName("Electricity Fixed Cost")
     arg.setUnits("$")
-    arg.setDescription("Total fixed cost of electricity.")
+    arg.setDescription("Annual fixed cost of electricity.")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_rate", false)
     arg.setDisplayName("Electricity Unit Cost")
     arg.setUnits("$/kWh")
-    arg.setDescription("Price per kWh for electricity.")
+    arg.setDescription("Price per kilowatt-hour for electricity.")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_fixed", false)
     arg.setDisplayName("Natural Gas Fixed Cost")
     arg.setUnits("$")
-    arg.setDescription("Total fixed cost of natural gas.")
+    arg.setDescription("Annual fixed cost of natural gas.")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_rate", false)
@@ -86,6 +105,27 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     args << arg
     
     return args
+  end
+  
+  # return a vector of IdfObject's to request EnergyPlus objects needed by the run method
+  def energyPlusOutputRequests(runner, user_arguments)
+    super(runner, user_arguments)
+    
+    result = OpenStudio::IdfObjectVector.new
+
+    # Request the output for each end use/fuel type combination
+    end_uses.each do |end_use|
+      fuel_types.each do |fuel_type|
+        variable_name = if end_use == 'Facility'
+                  "#{fuel_type}:#{end_use}"
+                else
+                  "#{end_use}:#{fuel_type}"
+                end
+        result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},Hourly;").get
+      end
+    end
+
+    return result
   end
   
   def outputs
@@ -141,58 +181,114 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     prop_rate.is_initialized ? prop_rate = prop_rate.get : prop_rate = nil
 
     if tariff_directory == "./resources/tariffs" and elec_fixed == 0 and elec_rate.nil?
-      unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
-      unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/tariffs"))
-    end
-
-    unless (Pathname.new tariff_directory).absolute?
-      tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
-    end
-    
-    unless tariff_file_name.nil?
-      tariff_file_name = File.join(tariff_directory, tariff_file_name)
-      unless File.exists?(tariff_file_name) and tariff_file_name.downcase.end_with? ".json"
-        runner.registerError("'#{tariff_file_name}' does not exist or is not a JSON file.")
-        return false
+      if !File.directory? "#{File.dirname(__FILE__)}/resources/tariffs"
+        unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+        unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/tariffs"))
       end
     end
 
-    if !File.exist?(tariff_directory)
-      FileUtils.mkdir_p(tariff_directory)
+    if not tariff_directory.nil?
+    
+      unless (Pathname.new tariff_directory).absolute?
+        tariff_directory = File.expand_path(File.join(File.dirname(__FILE__), tariff_directory))
+      end
+      
+      unless tariff_file_name.nil?
+        tariff_file_name = File.join(tariff_directory, tariff_file_name)
+        unless File.exists?(tariff_file_name) and tariff_file_name.downcase.end_with? ".json"
+          runner.registerError("'#{tariff_file_name}' does not exist or is not a JSON file.")
+          return false
+        end
+      end
+
+      if !File.exist?(tariff_directory)
+        FileUtils.mkdir_p(tariff_directory)
+      end
+      
     end
     
-    # load profile
-    timeseries_file = File.expand_path(File.join(run_dir, "enduse_timeseries.csv"))
-    unless File.exists?(timeseries_file)
-      runner.registerWarning("'#{timeseries_file}' does not exist.")
-      return true
-    end    
-    cols = CSV.read(timeseries_file).transpose
-    elec_load = nil
-    elec_generated = nil
-    gas_load = nil
-    oil_load = nil
-    prop_load = nil
-    cols.each do |col|
-      if col[0].include? "Electricity:Facility"
-        elec_load = col[1..-1]
-      elsif col[0].include? "PV:Electricity"
-        elec_generated = col[1..-1]
-      elsif col[0].include? "Gas:Facility"
-        gas_load = col[1..-1]
-      elsif col[0].include? "FuelOil#1:Facility"
-        oil_load = col[1..-1]
-      elsif col[0].include? "Propane:Facility"
-        prop_load = col[1..-1]
+    # get the last model and sql file
+    model = runner.lastOpenStudioModel
+    if model.empty?
+      runner.registerError("Cannot find last model.")
+      return false
+    end
+    model = model.get
+    
+    sql = runner.lastEnergyPlusSqlFile
+    if sql.empty?
+      runner.registerError("Cannot find last sql file.")
+      return false
+    end
+    sql = sql.get
+    model.setSqlFile(sql)
+    
+    # Get the weather file run period (as opposed to design day run period)
+    ann_env_pd = nil
+    sql.availableEnvPeriods.each do |env_pd|
+      env_type = sql.environmentType(env_pd)
+      if env_type.is_initialized
+        if env_type.get == OpenStudio::EnvironmentType.new("WeatherRunPeriod")
+          ann_env_pd = env_pd
+        end
       end
     end
     
-    if elec_generated.nil?
-      elec_generated = Array.new(elec_load.length, 0)
+    timeseries = {}
+    end_uses.each do |end_use|
+      fuel_types.each do |fuel_type|
+      
+        var_name = "#{fuel_type}:#{end_use}"
+
+        y_timeseries = sql.timeSeries(ann_env_pd, "Hourly", var_name, '')
+        if y_timeseries.empty?
+          runner.registerWarning("No data found for Hourly #{var_name}.")
+          next
+        else
+          y_timeseries = y_timeseries.get
+        end
+        y_vals = y_timeseries.values
+                    
+        values = []
+        y_timeseries.dateTimes.each_with_index do |date_time, i|
+          values << y_vals[i]
+        end
+
+        next if values.all? {|x| x.abs < 0.000000001}
+                    
+        # Unit conversion
+        old_units = y_timeseries.units
+        new_units = case old_units
+                    when "J"
+                      if var_name.include?('Electricity')
+                        "kWh"
+                      else
+                        "kBtu"
+                      end
+                    when "m3"
+                      old_units = "m^3"
+                      "gal"
+                    else
+                      old_units
+                    end
+                    
+        values.each do |value|
+          if timeseries.keys.include? var_name
+            timeseries[var_name] << OpenStudio.convert(value, old_units, new_units).get
+          else
+            timeseries[var_name] = [OpenStudio.convert(value, old_units, new_units).get]
+          end
+        end
+        
+      end
+    end
+
+    if timeseries["ElectricityProduced:Facility"].nil?
+      timeseries["ElectricityProduced:Facility"] = Array.new(timeseries["Electricity:Facility"].length, 0)
     end
     
     cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
-    weather_file = runner.lastOpenStudioModel.get.getSite.weatherFile.get
+    weather_file = model.getSite.weatherFile.get
     
     # tariffs
     tariffs = []
@@ -218,7 +314,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         end
       end
       
-    elsif elec_fixed == 0 and elec_rate.nil?
+    elsif not tariff_directory.nil?
     
       closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to resstock epw
       runner.registerInfo("Nearest ResStock usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
@@ -293,86 +389,110 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         
       end
     end
-    
-    if not elec_fixed == 0 or not elec_rate.nil?
-      tariffs = []
-    end
-    
+
     grid_cells = []
     electricity_bills = []
     tariffs.each do |tariff|
     
-      begin
+      utility_bills = []
     
-        # utilityrate3
-        p_data = SscApi.create_data_object
-        SscApi.set_number(p_data, 'analysis_period', 1)
-        SscApi.set_array(p_data, 'degradation', [0])
-        SscApi.set_array(p_data, 'gen', elec_generated) # kW
-        SscApi.set_array(p_data, 'load', elec_load) # kW
-        SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
-        SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
-        SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
+      if timeseries["Electricity:Facility"].length > 8760 # SAM can't accommodate this length
+
         unless tariff[:fixedmonthlycharge].nil?
-          SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[:fixedmonthlycharge]) # $
+          elec_fixed = 12.0 * tariff[:fixedmonthlycharge] # $
         end
-        unless tariff[:demandratestructure].nil?
-          SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[:demandweekdayschedule]))
-          SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[:demandweekendschedule]))
-          SscApi.set_number(p_data, 'ur_dc_enable', 1)
-          tariff[:demandratestructure].each_with_index do |period, i|
-            period.each_with_index do |tier, j|
-              unless tier[:adj].nil?
-                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate] + tier[:adj])
-              else
-                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate])
-              end
-              unless tier[:max].nil?
-                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", tier[:max])
-              else
-                SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", 1000000000.0)
-              end
-            end
-          end
-        end
-        SscApi.set_number(p_data, 'ur_ec_enable', 1)
-        SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[:energyweekdayschedule]))
-        SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[:energyweekendschedule]))
         tariff[:energyratestructure].each_with_index do |period, i|
           period.each_with_index do |tier, j|
             unless tier[:adj].nil?
-              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate] + tier[:adj])
+              elec_rate = tier[:rate] + tier[:adj]
             else
-              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate])
+              elec_rate = tier[:rate]
             end
-            unless tier[:sell].nil?
-              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_sr", tier[:sell])
-            end
-            unless tier[:max].nil?
-              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", tier[:max])
-            else
-              SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", 1000000000.0)
-            end        
           end
         end
-        
-        p_mod = SscApi.create_module("utilityrate3")
-        SscApi.execute_module(p_mod, p_data)
-        
-        demand_charges_fixed = SscApi.get_array(p_data, 'charge_w_sys_dc_fixed')[1]
-        demand_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_dc_tou')[1]
-        energy_charges_flat = SscApi.get_array(p_data, 'charge_w_sys_ec_flat')[1]
-        energy_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_ec')[1]
+        total_val = 0
+        timeseries["Electricity:Facility"].each_with_index do |val, i|
+          total_val += timeseries["ElectricityProduced:Facility"][i] - timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
+        end      
+        utility_bills = [total_val * elec_rate + elec_fixed]
 
-        utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')
+      else    
+    
+        begin
+      
+          # utilityrate3
+          p_data = SscApi.create_data_object
+          SscApi.set_number(p_data, 'analysis_period', 1)
+          SscApi.set_array(p_data, 'degradation', [0])
+          SscApi.set_array(p_data, 'gen', timeseries["ElectricityProduced:Facility"]) # kW
+          SscApi.set_array(p_data, 'load', timeseries["Electricity:Facility"]) # kW
+          SscApi.set_number(p_data, 'system_use_lifetime_output', 0) # TODO: what should this be?
+          SscApi.set_number(p_data, 'inflation_rate', 0) # TODO: assume what?
+          SscApi.set_number(p_data, 'ur_flat_buy_rate', 0) # TODO: how to get this from list of energyratestructure rates?
+          unless tariff[:fixedmonthlycharge].nil?
+            SscApi.set_number(p_data, 'ur_monthly_fixed_charge', tariff[:fixedmonthlycharge]) # $
+          end
+          unless tariff[:demandratestructure].nil?
+            SscApi.set_matrix(p_data, 'ur_dc_sched_weekday', Matrix.rows(tariff[:demandweekdayschedule]))
+            SscApi.set_matrix(p_data, 'ur_dc_sched_weekend', Matrix.rows(tariff[:demandweekendschedule]))
+            SscApi.set_number(p_data, 'ur_dc_enable', 1)
+            tariff[:demandratestructure].each_with_index do |period, i|
+              period.each_with_index do |tier, j|
+                unless tier[:adj].nil?
+                  SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate] + tier[:adj])
+                else
+                  SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_dc", tier[:rate])
+                end
+                unless tier[:max].nil?
+                  SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", tier[:max])
+                else
+                  SscApi.set_number(p_data, "ur_dc_p#{i+1}_t#{j+1}_ub", 1000000000.0)
+                end
+              end
+            end
+          end
+          SscApi.set_number(p_data, 'ur_ec_enable', 1)
+          SscApi.set_matrix(p_data, 'ur_ec_sched_weekday', Matrix.rows(tariff[:energyweekdayschedule]))
+          SscApi.set_matrix(p_data, 'ur_ec_sched_weekend', Matrix.rows(tariff[:energyweekendschedule]))
+          tariff[:energyratestructure].each_with_index do |period, i|
+            period.each_with_index do |tier, j|
+              unless tier[:adj].nil?
+                SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate] + tier[:adj])
+              else
+                SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_br", tier[:rate])
+              end
+              unless tier[:sell].nil?
+                SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_sr", tier[:sell])
+              end
+              unless tier[:max].nil?
+                SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", tier[:max])
+              else
+                SscApi.set_number(p_data, "ur_ec_p#{i+1}_t#{j+1}_ub", 1000000000.0)
+              end        
+            end
+          end
+          
+          p_mod = SscApi.create_module("utilityrate3")
+          SscApi.execute_module(p_mod, p_data)
+          
+          demand_charges_fixed = SscApi.get_array(p_data, 'charge_w_sys_dc_fixed')[1]
+          demand_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_dc_tou')[1]
+          energy_charges_flat = SscApi.get_array(p_data, 'charge_w_sys_ec_flat')[1]
+          energy_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_ec')[1]
+
+          utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')          
+          
+        rescue => error
         
+          runner.registerWarning("#{error.backtrace}.")
+          
+        end
+        
+      end
+      
+      unless utility_bills.empty?
         grid_cells << utility_ids[tariff[:eiaid].to_s] * ";"
         electricity_bills << "#{tariff[:label].to_s}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
-        
-      rescue => error
-      
-        runner.registerWarning("#{error.backtrace}.")
-        
       end
       
     end
@@ -382,10 +502,13 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       runner.registerValue("total_electricity", electricity_bills.join("|"))
       runner.registerInfo("Registering electricity bills.")
     end
+
+    timeseries["Electricity:Facility"].each_with_index do |val, i|
+      timeseries["Electricity:Facility"][i] -= timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
+    end
     
     fuels = ["Electricity", "Natural gas", "Oil", "Propane"]
     fuels.each do |fuel|
-      rate = nil
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{fuel}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
       cols[0].each_with_index do |rate_state, i|
         weather_file_state = weather_file.stateProvinceRegion
@@ -393,34 +516,30 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
           weather_file_state = state_name_to_code[weather_file_state]
         end
         next unless rate_state == weather_file_state
-        if fuel == "Electricity" and not elec_load.nil? and electricity_bills.empty?
-          if elec_rate.nil?
+        if fuel == "Electricity" and not timeseries["Electricity:Facility"].nil? and electricity_bills.empty?
+          rate = elec_rate
+          if rate.nil?
             rate = cols[1][i]
-          else
-            rate = elec_rate
           end
-          report_output(runner, "total_#{fuel.downcase}", elec_load, "kWh", "kWh", rate, fuel, elec_fixed)
-        elsif fuel == "Natural gas" and not gas_load.nil?
+          report_output(runner, "total_#{fuel.downcase}", timeseries["Electricity:Facility"], "kWh", "kWh", rate, fuel, elec_fixed)
+        elsif fuel == "Natural gas" and not timeseries["Gas:Facility"].nil?
+          rate = ng_rate
           if ng_rate.nil?
             rate = cols[1][i]
-          else
-            rate = ng_rate
           end
-          report_output(runner, "total_#{fuel.downcase}", gas_load, "kBtu", "therm", rate, fuel, ng_fixed)
-        elsif fuel == "Oil" and not oil_load.nil?
+          report_output(runner, "total_#{fuel.downcase}", timeseries["Gas:Facility"], "kBtu", "therm", rate, fuel, ng_fixed)
+        elsif fuel == "Oil" and not timeseries["FuelOil#1:Facility"].nil?
+          rate = oil_rate
           if oil_rate.nil?
             rate = cols[1][i]
-          else
-            rate = oil_rate
           end
-          report_output(runner, "total_#{fuel.downcase}", oil_load, "kBtu", "gal", rate, fuel)
-        elsif fuel == "Propane" and not prop_load.nil?
+          report_output(runner, "total_#{fuel.downcase}", timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate, fuel)
+        elsif fuel == "Propane" and not timeseries["Propane:Facility"].nil?
+          rate = prop_rate
           if prop_rate.nil?
             rate = cols[1][i]
-          else
-            rate = prop_rate
           end
-          report_output(runner, "total_#{fuel.downcase}", prop_load, "kBtu", "gal", rate, fuel)
+          report_output(runner, "total_#{fuel.downcase}", timeseries["Propane:Facility"], "kBtu", "gal", rate, fuel)
         end
         break
       end
@@ -473,7 +592,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
   def report_output(runner, name, vals, os_units, desired_units, rate, fuel, fixed=0)
     total_val = 0.0
     vals.each do |val|
-        total_val += val.to_f
+      total_val += val.to_f
     end
     unless desired_units == "gal"
       runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f + fixed.to_f).round(2))
