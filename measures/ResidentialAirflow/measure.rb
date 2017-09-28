@@ -905,11 +905,6 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         runner.registerError("Unable to identify the living zone for #{building_unit.name}.")
         return false
       end
-
-      if not HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? and ducts.DuctLocation != "none" and ducts.DuctLocation != Constants.Auto and ( ducts.DuctReturnLeakageFractionOfTotal != 0 or ducts.DuctAHReturnLeakageFractionOfTotal != 0 or ducts.DuctReturnSurfaceAreaMultiplier != 0 )
-        runner.registerError("All ducted MSHPs should be modeled with only supply ducting due to OpenStudio limitations. Please ensure that all arguments related to the return ducting are set to 0 in the airflow measure.")
-        return false
-      end
       
       # Remove existing airflow
       
@@ -1603,7 +1598,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         other_equip.setName(other_equip_def.name.to_s)
         other_equip.setFuelType("None")
         other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ra_duct_space)
+        if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
+          other_equip.setSpace(unit.living_zone.spaces[0])
+        else
+          other_equip.setSpace(ra_duct_space)
+        end
         return_duct_conduction_to_plenum_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_duct_conduction_to_plenum_actuator.setName("#{other_equip.name} act")
       
@@ -1618,7 +1617,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         return_duct_conduction_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_duct_conduction_to_air_handler_actuator.setName("#{other_equip.name} act")
         
-        # Supply duct sensible lkage impact on the air handler zone.
+        # Supply duct sensible leakage impact on the air handler zone.
         other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
         other_equip_def.setName(supply_sensible_lkage_to_air_handler + " equip")
         other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
@@ -1629,7 +1628,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         supply_sensible_lkage_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         supply_sensible_lkage_to_air_handler_actuator.setName("#{other_equip.name} act")
         
-        # Supply duct latent lkage impact on the air handler zone.
+        # Supply duct latent leakage impact on the air handler zone.
         other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
         other_equip_def.setName(supply_latent_lkage_to_air_handler + " equip")
         other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
@@ -1640,25 +1639,33 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         supply_latent_lkage_to_air_handler_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         supply_latent_lkage_to_air_handler_actuator.setName("#{other_equip.name} act")
       
-        # Return duct sensible lkage impact on the return plenum
+        # Return duct sensible leakage impact on the return plenum
         other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
         other_equip_def.setName(return_sensible_lkage + " equip")
         other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
         other_equip.setName(other_equip_def.name.to_s)
         other_equip.setFuelType("None")
         other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ra_duct_space)
+        if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
+          other_equip.setSpace(unit.living_zone.spaces[0])        
+        else
+          other_equip.setSpace(ra_duct_space)
+        end
         return_sensible_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_sensible_lkage_actuator.setName("#{other_equip.name} act")
         
-        # Return duct latent lkage impact on the return plenum
+        # Return duct latent leakage impact on the return plenum
         other_equip_def = OpenStudio::Model::OtherEquipmentDefinition.new(model)
         other_equip_def.setName(return_latent_lkage + " equip")
         other_equip = OpenStudio::Model::OtherEquipment.new(other_equip_def)
         other_equip.setName(other_equip_def.name.to_s)
         other_equip.setFuelType("None")
         other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        other_equip.setSpace(ra_duct_space)
+        if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
+          other_equip.setSpace(unit.living_zone.spaces[0])        
+        else
+          other_equip.setSpace(ra_duct_space)
+        end
         return_latent_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_latent_lkage_actuator.setName("#{other_equip.name} act")
       
