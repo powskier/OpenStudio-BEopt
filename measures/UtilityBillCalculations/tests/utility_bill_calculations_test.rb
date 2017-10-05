@@ -28,6 +28,17 @@ class UtilityBillCalculationsTest < MiniTest::Test
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 43, 1)
   end
   
+  def test_tmy_no_api_key_or_tariff_file_name_average_rates
+    args_hash = {}
+    args_hash["run_dir"] = "."
+    args_hash["tariff_directory"] = "./resources/tariffs"
+    args_hash["avg_rates"] = "true"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 43, 1)
+  end
+  
   def test_amy_no_api_key_or_tariff_file_name
     args_hash = {}
     args_hash["run_dir"] = "."
@@ -276,7 +287,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
-      # show_output(result)
+      show_output(result)
     ensure
       Dir.chdir(start_dir)
     end

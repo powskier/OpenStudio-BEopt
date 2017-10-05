@@ -104,6 +104,12 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     arg.setDescription("Price per gallon for propane.")
     args << arg
     
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("avg_rates", true)
+    arg.setDisplayName("Average Residential Rates")
+    arg.setDescription("Average across residential rates in a given EIA ID.")
+    arg.setDefaultValue(false)
+    args << arg
+
     return args
   end
   
@@ -130,12 +136,11 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
   
   def outputs
     result = OpenStudio::Measure::OSOutputVector.new
-    result << OpenStudio::Measure::OSOutput.makeStringOutput("grid_cells")
-    result << OpenStudio::Measure::OSOutput.makeStringOutput("total_electricity")
+    result << OpenStudio::Measure::OSOutput.makeStringOutput("electricity")
     buildstock_outputs = [
-                          "total_natural_gas",
-                          "total_propane",
-                          "total_oil"
+                          "natural_gas",
+                          "propane",
+                          "fuel_oil"
                          ]    
     buildstock_outputs.each do |output|
         result << OpenStudio::Measure::OSOutput.makeDoubleOutput(output)
@@ -179,6 +184,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     oil_rate.is_initialized ? oil_rate = oil_rate.get : oil_rate = nil
     prop_rate = runner.getOptionalStringArgumentValue("prop_rate", user_arguments)
     prop_rate.is_initialized ? prop_rate = prop_rate.get : prop_rate = nil
+    avg_rates = runner.getBoolArgumentValue("avg_rates", user_arguments)
 
     if tariff_directory == "./resources/tariffs" and elec_fixed == 0 and elec_rate.nil?
       if !File.directory? "#{File.dirname(__FILE__)}/resources/tariffs"
@@ -336,16 +342,14 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
       cols.each do |col|
-        unless col[0].nil?
-          next unless col[0].include? "eiaid"
-          utility_ids.keys.each do |utility_id|
-            utility_ixs = col.each_index.select{|i| col[i] == utility_id}
-            utility_ixs.each do |utility_ix|
-              if rate_ids.keys.include? utility_id
-                rate_ids[utility_id] << cols[3][utility_ix]
-              else
-                rate_ids[utility_id] = [cols[3][utility_ix]]
-              end
+        next unless col[0].include? "eiaid"
+        utility_ids.keys.each do |utility_id|
+          utility_ixs = col.each_index.select{|i| col[i] == utility_id}
+          utility_ixs.each do |utility_ix|
+            if rate_ids.keys.include? utility_id
+              rate_ids[utility_id] << cols[3][utility_ix]
+            else
+              rate_ids[utility_id] = [cols[3][utility_ix]]
             end
           end
         end
@@ -390,7 +394,6 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    grid_cells = []
     electricity_bills = []
     tariffs.each do |tariff|
     
@@ -491,16 +494,34 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
       
       unless utility_bills.empty?
-        grid_cells << utility_ids[tariff[:eiaid].to_s] * ";"
-        electricity_bills << "#{tariff[:label].to_s}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
+        electricity_bills << "#{tariff[:eiaid]}_#{tariff[:label]}=#{(utility_bills.inject(0){ |sum, x| sum + x }).round(2)}"
       end
       
     end
 
     unless electricity_bills.empty?
-      runner.registerValue("grid_cells", grid_cells.join("|"))
-      runner.registerValue("total_electricity", electricity_bills.join("|"))
       runner.registerInfo("Registering electricity bills.")
+      if not avg_rates
+        runner.registerValue("electricity", electricity_bills.join("|"))
+      else
+        eiaids = {}
+        electricity_bills.each do |electricity_bill|
+          eiaid = electricity_bill.split("_")[0]
+          cost = electricity_bill.split("=")[1].to_f
+          if not eiaids.keys.include? eiaid
+            eiaids[eiaid] = [cost]
+          else
+            eiaids[eiaid] << cost
+          end
+        end
+        bills = []
+        eiaids.each do |eiaid, costs|
+          average = costs.inject(0){ |sum, x| sum + x } / costs.size
+          stdev = Math.sqrt(costs.inject(0){ |var, x| var += (x - average) ** 2 } / (costs.size - 1))
+          bills << "#{eiaid}:c=#{costs.length};m=#{average};s=#{stdev}"
+        end
+        runner.registerValue("electricity", bills.join("|"))
+      end
     end
 
     timeseries["Electricity:Facility"].each_with_index do |val, i|
@@ -521,25 +542,25 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
           if rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, "total_#{fuel.downcase}", timeseries["Electricity:Facility"], "kWh", "kWh", rate, fuel, elec_fixed)
+          report_output(runner, fuel.downcase, timeseries["Electricity:Facility"], "kWh", "kWh", rate, fuel, elec_fixed)
         elsif fuel == "Natural gas" and not timeseries["Gas:Facility"].nil?
           rate = ng_rate
           if ng_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, "total_#{fuel.downcase}", timeseries["Gas:Facility"], "kBtu", "therm", rate, fuel, ng_fixed)
+          report_output(runner, fuel.downcase, timeseries["Gas:Facility"], "kBtu", "therm", rate, fuel, ng_fixed)
         elsif fuel == "Oil" and not timeseries["FuelOil#1:Facility"].nil?
           rate = oil_rate
           if oil_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, "total_#{fuel.downcase}", timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate, fuel)
+          report_output(runner, fuel.downcase, timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate, fuel)
         elsif fuel == "Propane" and not timeseries["Propane:Facility"].nil?
           rate = prop_rate
           if prop_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, "total_#{fuel.downcase}", timeseries["Propane:Facility"], "kBtu", "gal", rate, fuel)
+          report_output(runner, fuel.downcase, timeseries["Propane:Facility"], "kBtu", "gal", rate, fuel)
         end
         break
       end
