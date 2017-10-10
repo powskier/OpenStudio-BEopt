@@ -225,7 +225,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
             elsif month == 3
               day = 31
             elsif month == 4
-              day = 28
+              day = 30
             elsif month == 5
               day = 31
             elsif month == 6
