@@ -51,6 +51,15 @@ class SetResidentialEPWFileTest < MiniTest::Test
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)      
   end
   
+  def test_custom_run_period
+    args_hash = {}
+    args_hash["run_start_date"] = "December 31" # single day run
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"SiteGroundTemperatureDeep"=>1, "RunPeriodControlDaylightSavingTime"=>1, "SiteGroundTemperatureBuildingSurface"=>1, "SiteWaterMainsTemperature"=>1, "WeatherFile"=>1, "ClimateZones"=>1, "Site"=>1, "YearDescription"=>1, "RunPeriod"=>1}
+    expected_values = {"StartDate"=>"2009-Apr-07", "EndDate"=>"2009-Oct-26", "Year"=>""}
+    _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)   
+  end  
+  
   private
   
   def _test_error_or_NA(osm_file_or_model, args_hash)
