@@ -16,15 +16,6 @@ class TimeseriesCSVExportTest < MiniTest::Test
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 101, measure.fuel_types.length*measure.end_uses.length)
   end
   
-  def test_tmy_and_no_output_vars_one_month
-    measure = TimeseriesCSVExport.new
-    args_hash = {}
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_OneDay.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 101, measure.fuel_types.length*measure.end_uses.length)
-  end
-  
   def test_leap_year_and_output_vars
     measure = TimeseriesCSVExport.new
     args_hash = {}
