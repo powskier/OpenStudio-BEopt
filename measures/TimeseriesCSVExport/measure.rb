@@ -245,7 +245,11 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
       js_date_times = []
       y_timeseries.dateTimes.each_with_index do |date_time, i|
-        js_date_times << epw_timestamps[i]
+        if reporting_frequency == "Hourly"
+          js_date_times << epw_timestamps[i]
+        else
+          js_date_times << i+1
+        end
       end
       
       # Store the timeseries data to hash for later

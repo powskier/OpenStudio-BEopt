@@ -50,16 +50,6 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     arg.setDefaultValue("October 26")
     args << arg
     
-    arg = OpenStudio::Measure::OSArgument.makeStringArgument("run_start_date", true)
-    arg.setDisplayName("Simulation Start Date")
-    arg.setDefaultValue("January 1")
-    args << arg
-    
-    arg = OpenStudio::Measure::OSArgument.makeStringArgument("run_end_date", true)
-    arg.setDisplayName("Simulation End Date")
-    arg.setDefaultValue("December 31")
-    args << arg
-    
     return args
   end
 
@@ -76,9 +66,7 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     weather_directory = runner.getStringArgumentValue("weather_directory", user_arguments)
     weather_file_name = runner.getStringArgumentValue("weather_file_name", user_arguments)
     dst_start_date = runner.getStringArgumentValue("dst_start_date", user_arguments)
-    dst_end_date = runner.getStringArgumentValue("dst_end_date", user_arguments)
-    run_start_date = runner.getStringArgumentValue("run_start_date", user_arguments)
-    run_end_date = runner.getStringArgumentValue("run_end_date", user_arguments)    
+    dst_end_date = runner.getStringArgumentValue("dst_end_date", user_arguments)   
     
     # ----------------
     # Set weather file
@@ -157,21 +145,6 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     swmt.setAnnualAverageOutdoorAirTemperature avgOAT
     swmt.setMaximumDifferenceInMonthlyAverageOutdoorAirTemperatures maxDiffOAT
     runner.registerInfo("Setting mains water temperature profile with an average temperature of #{weather.data.MainsAvgTemp.round(1)} F.")
-
-    # ----------------
-    # Set simulation time
-    # ----------------
-    run_start_date_month = OpenStudio::monthOfYear(run_start_date.split[0])
-    run_start_date_day = run_start_date.split[1].to_i
-    run_end_date_month = OpenStudio::monthOfYear(run_end_date.split[0])
-    run_end_date_day = run_end_date.split[1].to_i
-    if not ( run_start_date_month.value == 1 and run_start_date_day == 1 and run_end_date_month.value == 12 and run_end_date_day == 31 )
-      run_period = model.getRunPeriod 
-      run_period.setBeginMonth(run_start_date_month.value)
-      run_period.setBeginDayOfMonth(run_start_date_day)
-      run_period.setEndMonth(run_end_date_month.value)
-      run_period.setEndDayOfMonth(run_end_date_day)
-    end
     
     # ----------------
     # Set daylight saving time
