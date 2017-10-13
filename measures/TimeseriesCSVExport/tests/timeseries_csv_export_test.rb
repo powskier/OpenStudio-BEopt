@@ -6,15 +6,15 @@ require_relative '../measure.rb'
 require 'fileutils'
 
 class TimeseriesCSVExportTest < MiniTest::Test
-  
+
   def test_tmy_and_no_output_vars
     measure = TimeseriesCSVExport.new
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 100, measure.fuel_types.length*measure.end_uses.length)
-  end  
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 101, measure.fuel_types.length*measure.end_uses.length)
+  end
   
   def test_leap_year_and_output_vars
     measure = TimeseriesCSVExport.new
@@ -23,9 +23,9 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", measure.fuel_types.length*measure.end_uses.length+7, 100, measure.fuel_types.length*measure.end_uses.length+measure.output_vars.length)
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", measure.fuel_types.length*measure.end_uses.length+7, 101, measure.fuel_types.length*measure.end_uses.length+measure.output_vars.length)
   end
-
+  
   private
 
   def model_in_path_default(osm_file_or_model)
