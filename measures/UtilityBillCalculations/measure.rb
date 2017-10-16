@@ -500,7 +500,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     end
 
     unless electricity_bills.empty?
-      runner.registerInfo("Registering electricity bills.")
+      runner.registerInfo("Registering electricity bills, calculated based on rate(s) in the URDB.")
       if not avg_rates
         runner.registerValue("electricity", electricity_bills.join("|"))
       else
@@ -539,28 +539,28 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         next unless rate_state == weather_file_state
         if fuel == "Electricity" and not timeseries["Electricity:Facility"].nil? and electricity_bills.empty?
           rate = elec_rate
-          if rate.nil?
+          if elec_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, fuel.downcase, timeseries["Electricity:Facility"], "kWh", "kWh", rate, fuel, elec_fixed)
+          report_output(runner, fuel.downcase, timeseries["Electricity:Facility"], "kWh", "kWh", rate, elec_fixed)
         elsif fuel == "Natural gas" and not timeseries["Gas:Facility"].nil?
           rate = ng_rate
           if ng_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, fuel.downcase, timeseries["Gas:Facility"], "kBtu", "therm", rate, fuel, ng_fixed)
+          report_output(runner, fuel.downcase, timeseries["Gas:Facility"], "kBtu", "therm", rate, ng_fixed)
         elsif fuel == "Oil" and not timeseries["FuelOil#1:Facility"].nil?
           rate = oil_rate
           if oil_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, fuel.downcase, timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate, fuel)
+          report_output(runner, fuel.downcase, timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate)
         elsif fuel == "Propane" and not timeseries["Propane:Facility"].nil?
           rate = prop_rate
           if prop_rate.nil?
             rate = cols[1][i]
           end
-          report_output(runner, fuel.downcase, timeseries["Propane:Facility"], "kBtu", "gal", rate, fuel)
+          report_output(runner, fuel.downcase, timeseries["Propane:Facility"], "kBtu", "gal", rate)
         end
         break
       end
@@ -596,21 +596,15 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
   end
   
   def state_name_to_code
-    return {"Alabama"=>"AL", "Alaska"=>"AK", "Arizona"=>"AZ", "Arkansas"=>"AR","California"=>"CA",
-            "Colorado"=>"CO", "Connecticut"=>"CT", "Delaware"=>"DE", "District of Columbia"=>"DC",
-            "Florida"=>"FL", "Georgia"=>"GA", "Hawaii"=>"HI", "Idaho"=>"ID", "Illinois"=>"IL",
-            "Indiana"=>"IN", "Iowa"=>"IA","Kansas"=>"KS", "Kentucky"=>"KY", "Louisiana"=>"LA",
-            "Maine"=>"ME","Maryland"=>"MD", "Massachusetts"=>"MA", "Michigan"=>"MI", "Minnesota"=>"MN",
-            "Mississippi"=>"MS", "Missouri"=>"MO", "Montana"=>"MT","Nebraska"=>"NE", "Nevada"=>"NV",
-            "New Hampshire"=>"NH", "NewJersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY",
-            "North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
-            "Oregon"=>"OR", "Pennsylvania"=>"PA", "Puerto Rico"=>"PR", "Rhode Island"=>"RI",
-            "South Carolina"=>"SC", "South Dakota"=>"SD", "Tennessee"=>"TN", "Texas"=>"TX",
-            "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV",
-            "Wisconsin"=>"WI", "Wyoming"=>"WY"}
+    return {"Alabama"=>"AL", "Alaska"=>"AK", "Arizona"=>"AZ", "Arkansas"=>"AR","California"=>"CA","Colorado"=>"CO", "Connecticut"=>"CT", "Delaware"=>"DE", "District of Columbia"=>"DC",
+            "Florida"=>"FL", "Georgia"=>"GA", "Hawaii"=>"HI", "Idaho"=>"ID", "Illinois"=>"IL","Indiana"=>"IN", "Iowa"=>"IA","Kansas"=>"KS", "Kentucky"=>"KY", "Louisiana"=>"LA",
+            "Maine"=>"ME","Maryland"=>"MD", "Massachusetts"=>"MA", "Michigan"=>"MI", "Minnesota"=>"MN","Mississippi"=>"MS", "Missouri"=>"MO", "Montana"=>"MT","Nebraska"=>"NE", "Nevada"=>"NV",
+            "New Hampshire"=>"NH", "NewJersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY","North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
+            "Oregon"=>"OR", "Pennsylvania"=>"PA", "Puerto Rico"=>"PR", "Rhode Island"=>"RI","South Carolina"=>"SC", "South Dakota"=>"SD", "Tennessee"=>"TN", "Texas"=>"TX",
+            "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV","Wisconsin"=>"WI", "Wyoming"=>"WY"}
   end
   
-  def report_output(runner, name, vals, os_units, desired_units, rate, fuel, fixed=0)
+  def report_output(runner, name, vals, os_units, desired_units, rate, fixed=0)
     total_val = 0.0
     vals.each do |val|
       total_val += val.to_f
@@ -619,12 +613,12 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f + fixed.to_f).round(2))
     else
       if name.include? "oil"
-        runner.registerValue(name, (total_val * 1000.0 / 139000 * rate.to_f + fixed.to_f).round(2))
+        runner.registerValue("fuel_oil", (total_val * 1000.0 / 139000 * rate.to_f + fixed.to_f).round(2))
       elsif name.include? "propane"
         runner.registerValue(name, (total_val * 1000.0 / 91600 * rate.to_f + fixed.to_f).round(2))
       end
     end
-    runner.registerInfo("Registering #{fuel.downcase} utility bills.")
+    runner.registerInfo("Registering #{name} utility bills, calculated based on the average state rate.")
   end
   
   def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)    
