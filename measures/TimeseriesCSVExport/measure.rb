@@ -3,6 +3,7 @@
 
 require 'erb'
 require 'csv'
+require "#{File.dirname(__FILE__)}/resources/weather"
 
 #start the measure
 class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
@@ -26,10 +27,11 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     fuel_types = [  
       'Electricity',
       'Gas',
-      'AdditionalFuel',
       'DistrictCooling',
       'DistrictHeating',
-      'Water'
+      'Water',
+      'FuelOil#1',
+      'Propane'
     ]
     
     return fuel_types
@@ -55,7 +57,17 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     ]
     
     return end_uses
-  end  
+  end
+  
+  def output_vars
+    output_vars = [
+      'Zone Mean Air Temperature',
+      'Zone Mean Air Humidity Ratio',
+      'Fan Runtime Fraction'
+    ]
+    
+    return output_vars
+  end
   
   # define the arguments that the user will input
   def arguments()
@@ -69,12 +81,18 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     reporting_frequency_chs << "Daily"
     reporting_frequency_chs << "Monthly"
     reporting_frequency_chs << "Runperiod"
-    reporting_frequency = OpenStudio::Measure::OSArgument::makeChoiceArgument('reporting_frequency', reporting_frequency_chs, true)
-    reporting_frequency.setDisplayName("Reporting Frequency")
-    reporting_frequency.setDefaultValue("Hourly")
-    args << reporting_frequency
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument('reporting_frequency', reporting_frequency_chs, true)
+    arg.setDisplayName("Reporting Frequency")
+    arg.setDefaultValue("Hourly")
+    args << arg
     
     # TODO: argument for subset of output meters
+    
+    #make an argument for including optional output variables
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("inc_output_variables", true)
+    arg.setDisplayName("Include Output Variables")
+    arg.setDefaultValue(false)
+    args << arg
     
     return args
   end 
@@ -86,6 +104,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     result = OpenStudio::IdfObjectVector.new
 
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency",user_arguments)
+    inc_output_variables = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
 
     # Request the output for each end use/fuel type combination
     end_uses.each do |end_use|
@@ -99,6 +118,13 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       end
     end
     
+    # Request the output for each variable
+    if inc_output_variables
+      output_vars.each do |output_var|
+        result << OpenStudio::IdfObject.load("Output:Variable,#{output_var},#{reporting_frequency};").get
+      end
+    end
+
     return result
   end
   
@@ -113,6 +139,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     
     # Assign the user inputs to variables
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency",user_arguments)
+    inc_output_variables = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
     
     # get the last model and sql file
     model = runner.lastOpenStudioModel
@@ -145,35 +172,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
       return false
     end
-    
-    # Method to translate from OpenStudio's time formatting
-    # to Javascript time formatting
-    # OpenStudio time
-    # 2009-May-14 00:10:00   Raw string
-    # Javascript time
-    # 2009/07/12 12:34:56
-    def to_JSTime(os_time)
-      js_time = os_time.to_s
-      # Replace the '-' with '/'
-      js_time = js_time.gsub('-','/')
-      # Replace month abbreviations with numbers
-      js_time = js_time.gsub('Jan','01')
-      js_time = js_time.gsub('Feb','02')
-      js_time = js_time.gsub('Mar','03')
-      js_time = js_time.gsub('Apr','04')
-      js_time = js_time.gsub('May','05')
-      js_time = js_time.gsub('Jun','06')
-      js_time = js_time.gsub('Jul','07')
-      js_time = js_time.gsub('Aug','08')
-      js_time = js_time.gsub('Sep','09')
-      js_time = js_time.gsub('Oct','10')
-      js_time = js_time.gsub('Nov','11')
-      js_time = js_time.gsub('Dec','12')
-      
-      return js_time
 
-    end     
-        
     # Create an array of arrays of variables
     variables_to_graph = []
     end_uses.each do |end_use|
@@ -187,15 +186,21 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         runner.registerInfo("Exporting #{variable_name}")
       end
     end
+    if inc_output_variables
+      output_vars.each do |output_var|
+        sql.availableKeyValues(ann_env_pd, reporting_frequency, output_var).each do |key_value|
+          variables_to_graph << [output_var, reporting_frequency, key_value]
+          runner.registerInfo("Exporting #{key_value} #{output_var}")
+        end
+      end
+    end
 
-    # Create a new series like this
-    # for each condition series we want to plot
-    # {"name" : "series 1",
-    # "color" : "purple",
-    # "data" :[{ "x": 20, "y": 0.015, "time": "2009/07/12 12:34:56"},
-            # { "x": 25, "y": 0.008, "time": "2009/07/12 12:34:56"},
-            # { "x": 30, "y": 0.005, "time": "2009/07/12 12:34:56"}]
-    # }
+    weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
+    if weather.error?
+      return false
+    end
+    epw_timestamps = weather.epw_timestamps
+
     all_series = []
     # Sort by fuel, putting the total (Facility) column at the end of the fuel.
     variables_to_graph.sort_by! do |i| 
@@ -226,12 +231,15 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         y_timeseries = y_timeseries.get
       end
       y_vals = y_timeseries.values
-            
-      # Convert time stamp format to be more readable
+
       js_date_times = []
-      y_timeseries.dateTimes.each do |date_time|
-        js_date_times << to_JSTime(date_time)
-      end    
+      y_timeseries.dateTimes.each_with_index do |date_time, i|
+        if reporting_frequency == "Hourly"
+          js_date_times << epw_timestamps[i]
+        else
+          js_date_times << i+1
+        end
+      end
       
       # Store the timeseries data to hash for later
       # export to the HTML file
@@ -267,11 +275,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         point["time"] = time_i
         data << point
       end
+      next if data.all? {|x| x["y"] == 0}
       series["data"] = data
-      all_series << series        
-        
-      # increment color selection
-      j += 1  
+      all_series << series
         
     end
         
@@ -283,7 +289,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       # Record the timestamps and units on the first pass only
       if k == 0
         time_col = ['Time']
-        #time_col << "#{reporting_frequency}"
         data.each do |entry|
           time_col << entry['time']
         end
@@ -292,13 +297,13 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       # Record the data
       col_name = "#{series['type']} #{series['name']} [#{series['units']}]"
       data_col = [col_name]
-      #data_col << units
       data.each do |entry|
-        data_col << entry['y']
+        data_col << entry['y'].round(2)
       end
       cols << data_col
     end
     rows = cols.transpose
+    rows = [rows[0]] + rows[1..-1].sort {|a, b| a[0] <=> b[0]} # get the rows into sequential order based on the timestamps
     
     # Write the rows out to CSV
     csv_path = File.expand_path("../enduse_timeseries.csv")
@@ -309,40 +314,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end    
     csv_path = File.absolute_path(csv_path)
     runner.registerFinalCondition("CSV file saved to <a href='file:///#{csv_path}'>enduse_timeseries.csv</a>.")
-
-    # # Convert all_series to JSON.
-    # # This JSON will be substituted
-    # # into the HTML file.
-    # require 'json'
-    # all_series = all_series.to_json
-    
-    # # read in template
-    # html_in_path = "#{File.dirname(__FILE__)}/resources/report.html.erb"
-    # if File.exist?(html_in_path)
-      # html_in_path = html_in_path
-    # else
-      # html_in_path = "#{File.dirname(__FILE__)}/report.html.erb"
-    # end
-    # html_in = ""
-    # File.open(html_in_path, 'r') do |file|
-      # html_in = file.read
-    # end
-
-    # # configure template with variable values
-    # renderer = ERB.new(html_in)
-    # html_out = renderer.result(binding)
-    
-    # # write html file
-    # html_out_path = "./report.html"
-    # File.open(html_out_path, 'w') do |file|
-      # file << html_out
-      # # make sure data is written to the disk one way or the other
-      # begin
-        # file.fsync
-      # rescue
-        # file.flush
-      # end
-    # end
     
     # close the sql file
     sql.close()

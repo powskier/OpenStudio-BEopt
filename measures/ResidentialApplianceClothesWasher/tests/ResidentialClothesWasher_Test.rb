@@ -423,8 +423,8 @@ class ResidentialClothesWasherTest < MiniTest::Test
             end
         end
     end
-    assert_in_epsilon(expected_values["Annual_kwh"], actual_values["Annual_kwh"], 0.01)
-    assert_in_epsilon(expected_values["HotWater_gpd"], actual_values["HotWater_gpd"], 0.01)
+    assert_in_epsilon(expected_values["Annual_kwh"], actual_values["Annual_kwh"], 0.05)
+    assert_in_epsilon(expected_values["HotWater_gpd"], actual_values["HotWater_gpd"], 0.05)
     if not expected_values["Space"].nil?
         assert_equal(1, actual_values["Space"].uniq.size)
         assert_equal(expected_values["Space"], actual_values["Space"][0])
