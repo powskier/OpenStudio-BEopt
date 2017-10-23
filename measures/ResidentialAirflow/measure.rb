@@ -1064,7 +1064,10 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       infil, building, unit = _processInfiltrationForUnit(infil, wind_speed, building, unit, has_hvac_flue, has_water_heater_flue, has_fireplace_chimney, runner)
       mech_vent = _processMechanicalVentilationForUnit(model, runner, infil, mech_vent, building, unit)
       nat_vent = _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit)   
-      ducts = _processDuctsForUnit(model, runner, ducts, building, unit)
+      ducts = _processDuctsForUnit(model, runner, ducts, building, unit, building_unit)
+      if ducts.nil?
+        return false
+      end
       
       schedules.BathExhaust = HourlyByMonthSchedule.new(model, runner, obj_name_infil + " bath exhaust schedule", [Array.new(6, 0.0) + [1.0] + Array.new(17, 0.0)] * 12, [Array.new(6, 0.0) + [1.0] + Array.new(17, 0.0)] * 12, normalize_values = false)
       schedules.ClothesDryerExhaust = HourlyByMonthSchedule.new(model, runner, obj_name_infil + " clothes dryer exhaust schedule", [Array.new(10, 0.0) + [1.0] + Array.new(13, 0.0)] * 12, [Array.new(10, 0.0) + [1.0] + Array.new(13, 0.0)] * 12, normalize_values = false)
@@ -2585,14 +2588,27 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
   end
   
-  def _processDuctsForUnit(model, runner, ducts, building, unit)
+  def _processDuctsForUnit(model, runner, ducts, building, unit, building_unit)
   
-    if ( ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? and HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? ) or ( ducts.DuctLocation ==  Constants.Auto and not HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? )
+    if not HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? # has mshp
+      miniSplitHPIsDucted = building_unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump) # get ducted or not
+      miniSplitHPIsDucted = miniSplitHPIsDucted.get
+      if ducts.DuctLocation != "none" and not miniSplitHPIsDucted # if not ducted but specified ducts, override
+        runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
+        ducts.DuctLocation = "none"
+      elsif ducts.DuctLocation == "none" and miniSplitHPIsDucted # if ducted but specified no ducts, error
+        runner.registerError("Ducted mini-split heat pump selected but no ducts were selected.")
+        return nil
+      end
+    end
+
+    no_ducted_equip = HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? && HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? && HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? && HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? && HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
+    if ducts.DuctLocation != "none" and no_ducted_equip
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
     end
     
-    ducts.duct_location_zone, ducts.duct_location_name = get_duct_location(runner, ducts.DuctLocation, building, unit)
+    ducts.duct_location_zone, ducts.duct_location_name = get_duct_location(ducts.DuctLocation, building, unit)
 
     ducts.has_ducts = true
     if ducts.duct_location_name == "none" or not ducts.DuctSystemEfficiency.nil?
@@ -2744,7 +2760,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   
   end
   
-  def get_duct_location(runner, duct_location, building, unit)
+  def get_duct_location(duct_location, building, unit)
     # FIXME: Need to improve this
     duct_location_zone = true
     duct_location_name = "none"

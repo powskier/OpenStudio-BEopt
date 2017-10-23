@@ -156,6 +156,13 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     miniSplitHPSupplyFanPower.setDescription("Fan power (in W) per delivered airflow rate (in cfm) of the fan.")
     miniSplitHPSupplyFanPower.setDefaultValue(0.07)
     args << miniSplitHPSupplyFanPower
+
+    #make a bool argument for whether the minisplit is ducted or ductless
+    miniSplitHPIsDucted = OpenStudio::Measure::OSArgument::makeBoolArgument("is_ducted", true)
+    miniSplitHPIsDucted.setDisplayName("Is Ducted")
+    miniSplitHPIsDucted.setDescription("Specified whether the mini-split heat pump is ducted or ductless.")
+    miniSplitHPIsDucted.setDefaultValue(false)
+    args << miniSplitHPIsDucted
     
     #make a string argument for minisplit cooling output capacity
     miniSplitCoolingOutputCapacity = OpenStudio::Measure::OSArgument::makeStringArgument("heat_pump_capacity", true)
@@ -209,6 +216,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
     miniSplitHPCapacityRetentionTemperature = runner.getDoubleArgumentValue("cap_retention_temp",user_arguments)
     miniSplitHPPanHeaterPowerPerUnit = runner.getDoubleArgumentValue("pan_heater_power",user_arguments)    
     miniSplitHPSupplyFanPower = runner.getDoubleArgumentValue("fan_power",user_arguments)
+    miniSplitHPIsDucted = runner.getBoolArgumentValue("is_ducted",user_arguments)
     miniSplitCoolingOutputCapacity = runner.getStringArgumentValue("heat_pump_capacity",user_arguments)
     unless miniSplitCoolingOutputCapacity == Constants.SizingAuto or miniSplitCoolingOutputCapacity == Constants.SizingAutoMaxLoad
       miniSplitCoolingOutputCapacity = OpenStudio::convert(miniSplitCoolingOutputCapacity.to_f,"ton","Btu/h").get
@@ -571,6 +579,9 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
         end # slave_zone
       
       end # control_zone
+      
+      # Store miniSplitHPIsDucted bool
+      unit.setFeature(Constants.DuctedInfoMiniSplitHeatPump, miniSplitHPIsDucted)
       
       # Store info for HVAC Sizing measure
       unit.setFeature(Constants.SizingInfoHVACCapacityRatioCooling, capacity_Ratio_Cooling.join(","))
