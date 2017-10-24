@@ -145,7 +145,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   class Unit
     def initialize
     end    
-    attr_accessor(:num_bedrooms, :num_bathrooms, :is_existing_home, :above_grade_exterior_wall_area, :above_grade_finished_floor_area, :finished_floor_area, :dryer_exhaust, :window_area, :living_zone, :living, :finished_basement_zone, :finished_basement)
+    attr_accessor(:num_bedrooms, :num_bathrooms, :is_existing_home, :above_grade_exterior_wall_area, :above_grade_finished_floor_area, :finished_floor_area, :dryer_exhaust, :window_area, :living_zone, :living, :finished_basement_zone, :finished_basement, :has_mini_split_heat_pump)
   end  
 
   class NaturalVentilation
@@ -1061,6 +1061,9 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         unit.dryer_exhaust = 0
       end
       
+      # Search for mini-split heat pump
+      unit.has_mini_split_heat_pump = HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
+      
       infil, building, unit = _processInfiltrationForUnit(infil, wind_speed, building, unit, has_hvac_flue, has_water_heater_flue, has_fireplace_chimney, runner)
       mech_vent = _processMechanicalVentilationForUnit(model, runner, infil, mech_vent, building, unit)
       nat_vent = _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit)   
@@ -1601,11 +1604,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         other_equip.setName(other_equip_def.name.to_s)
         other_equip.setFuelType("None")
         other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
-          other_equip.setSpace(unit.living_zone.spaces[0])
-        else
-          other_equip.setSpace(ra_duct_space)
-        end
+        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
         return_duct_conduction_to_plenum_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_duct_conduction_to_plenum_actuator.setName("#{other_equip.name} act")
       
@@ -1649,11 +1648,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         other_equip.setName(other_equip_def.name.to_s)
         other_equip.setFuelType("None")
         other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
-          other_equip.setSpace(unit.living_zone.spaces[0])        
-        else
-          other_equip.setSpace(ra_duct_space)
-        end
+        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
         return_sensible_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_sensible_lkage_actuator.setName("#{other_equip.name} act")
         
@@ -1664,11 +1659,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
         other_equip.setName(other_equip_def.name.to_s)
         other_equip.setFuelType("None")
         other_equip.setSchedule(model.alwaysOnDiscreteSchedule)
-        if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
-          other_equip.setSpace(unit.living_zone.spaces[0])        
-        else
-          other_equip.setSpace(ra_duct_space)
-        end
+        unit.has_mini_split_heat_pump ? other_equip.setSpace(unit.living_zone.spaces[0]) : other_equip.setSpace(ra_duct_space) # mini-split returns to the living space
         return_latent_lkage_actuator = OpenStudio::Model::EnergyManagementSystemActuator.new(other_equip, "OtherEquipment", "Power Level")
         return_latent_lkage_actuator.setName("#{other_equip.name} act")
       
@@ -2590,7 +2581,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   
   def _processDuctsForUnit(model, runner, ducts, building, unit, building_unit)
   
-    if not HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil? # has mshp
+    if unit.has_mini_split_heat_pump # has mshp
       miniSplitHPIsDucted = building_unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump) # get ducted or not
       miniSplitHPIsDucted = miniSplitHPIsDucted.get
       if ducts.DuctLocation != "none" and not miniSplitHPIsDucted # if not ducted but specified ducts, override
@@ -2602,7 +2593,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    no_ducted_equip = HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? && HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? && HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? && HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? && HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false).nil?
+    no_ducted_equip = HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? && HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? && HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? && HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil? && unit.has_mini_split_heat_pump.nil?
     if ducts.DuctLocation != "none" and no_ducted_equip
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
@@ -2617,19 +2608,19 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       ducts.has_ducts = false
     end
     
-    # Set has_uncond_ducts to False if ducts are in a conditioned space,
-    # otherwise True
+    # Set has_uncond_ducts to False if ducts are in a conditioned space, otherwise True
     ducts.ducts_not_in_living = true
     if ducts.duct_location_name == unit.living_zone.name.to_s
       ducts.ducts_not_in_living = false
     end
     
+    # Determine if forced air equipment
     ducts.has_forced_air_equipment = false
     model.getAirLoopHVACs.each do |air_loop|
       next unless air_loop.thermalZones.include? unit.living_zone
       ducts.has_forced_air_equipment = true
     end
-    if HVAC.has_mini_split_heat_pump(model, runner, unit.living_zone, false)
+    if unit.has_mini_split_heat_pump
       ducts.has_forced_air_equipment = true
     end
     
