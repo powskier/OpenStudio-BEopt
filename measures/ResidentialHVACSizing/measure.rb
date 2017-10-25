@@ -91,7 +91,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     end
     attr_accessor(:Has, :NotInLiving, :SupplySurfaceArea, :ReturnSurfaceArea, 
                   :SupplyLoss, :ReturnLoss, :SupplyRvalue, :ReturnRvalue,
-                  :Location, :LocationSpace, :LocationFrac)
+                  :Location, :LocationSpace, :LocationFrac, :DuctSystemEfficiency)
   end
   
   #define the name that a user will see, this method may be deprecated as
@@ -1501,10 +1501,14 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     unit_final.dse_Fregain = nil
     
     # Distribution system efficiency (DSE) calculations based on ASHRAE Standard 152
-    if ducts.Has and ducts.NotInLiving
+    if (ducts.Has and ducts.NotInLiving) or not ducts.DuctSystemEfficiency.nil?
         # dse_Fregain values comes from MJ8 pg 204 and Walker (1998) "Technical background for default 
         # values used for forced air systems in proposed ASHRAE Std. 152"
-        if Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace)
+        if not ducts.DuctSystemEfficiency.nil?
+            #Regain is already incorporated into the DSE
+            unit_final.dse_Fregain = 0.0
+        
+        elsif Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace)
 
             walls_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
             ceiling_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
@@ -1591,7 +1595,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     if ducts.Has and ducts.NotInLiving and hvac.HasForcedAirHeating
         dse_Tamb_heating = mj8.heat_design_temps[ducts.LocationSpace]
         unit_final.Heat_Load_Ducts = calc_heat_duct_load(ducts, mj8.acf, mj8.heat_setpoint, unit_final.dse_Fregain, heatingLoad, hvac.HtgSupplyAirTemp, dse_Tamb_heating)
-        if Geometry.space_is_finished(ducts.LocationSpace)
+        if not ducts.DuctSystemEfficiency.nil?
+            unit_final.Heat_Load = heatingLoad + unit_final.Heat_Load_Ducts
+        elsif Geometry.space_is_finished(ducts.LocationSpace)
             # Ducts in finished spaces shouldn't affect the total heating capacity
             unit_final.Heat_Load = heatingLoad
         else
@@ -1754,6 +1760,10 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
 
         # Limit the DE to a reasonable value to prevent negative values and huge equipment
         dse_DEcorr_dehumid = [dse_DEcorr_dehumid, 0.25].max
+        
+        if not ducts.DuctSystemEfficiency.nil?
+            dse_DEcorr_dehumid = ducts.DuctSystemEfficiency
+        end
         
         # Calculate the increase in sensible dehumidification load due to ducts
         unit_final.Dehumid_Load_Sens = unit_init.Dehumid_Load_Sens / dse_DEcorr_dehumid
@@ -2764,7 +2774,6 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     '''
     Calculate the Distribution System Efficiency using the method of ASHRAE Standard 152 (used for heating and cooling).
     '''
-    
     dse_Bs, dse_Br, dse_a_s, dse_a_r, dse_dTe, dse_dT = _calc_dse_init(ducts, acf, cfm_inter, load_Inter_Sens, dse_Tamb, dse_As, dse_Ar, t_setpoint)
     dse_DE = _calc_dse_DE_heating(dse_a_s, dse_Bs, dse_a_r, dse_Br, dse_dT, dse_dTe)
     dse_DEcorr = _calc_dse_DEcorr(ducts, dse_DE, dse_Fregain, dse_Br, dse_a_r)
@@ -2842,6 +2851,10 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     dse_DEcorr = [dse_DEcorr, 0.25].max
     dse_DEcorr = [dse_DEcorr, 1.00].min
     
+    if not ducts.DuctSystemEfficiency.nil?
+        dse_DEcorr = ducts.DuctSystemEfficiency
+    end
+    
     return dse_DEcorr
   end
   
@@ -2864,6 +2877,23 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     if (hvac.HasForcedAirHeating or hvac.HasForcedAirCooling) and not hvac.HasMiniSplitHeatPump
         ducts.Has = true
         ducts.NotInLiving = false # init
+        
+        ducts.DuctSystemEfficiency = get_unit_feature(runner, unit, Constants.SizingInfoDuctsDSE, 'double', false)
+        if not ducts.DuctSystemEfficiency.nil?
+            ducts.LocationFrac = 1.0
+            ducts.SupplyLoss = 0.0
+            ducts.ReturnLoss = 0.0
+            ducts.SupplyRvalue = 1.0
+            ducts.ReturnRvalue = 1.0
+            unit.spaces.each do |s|
+              next if not s.name.to_s.start_with? Constants.LivingSpace
+              ducts.LocationSpace = s
+            end
+            ducts.SupplySurfaceArea = 0.0
+            ducts.ReturnSurfaceArea = 0.0
+            ducts.NotInLiving = true
+            return ducts
+        end
         
         ducts.SupplySurfaceArea = get_unit_feature(runner, unit, Constants.SizingInfoDuctsSupplySurfaceArea, 'double')
         ducts.ReturnSurfaceArea = get_unit_feature(runner, unit, Constants.SizingInfoDuctsReturnSurfaceArea, 'double')
