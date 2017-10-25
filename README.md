@@ -56,8 +56,6 @@ Status: **Available**
 
 Most of these measures were written to be reusable for existing building retrofits. For example, while the dishwasher measure adds a dishwasher to a model without a dishwasher, the same measure will replace a dishwasher that already exists in an existing building model (rather than adding an additional dishwasher to the model). This could be used to evaluate an EnergyStar dishwasher replacement, for example.
 
-Note that some measures are dependent on others. For example, if the Clothes Washer measure were to be applied to the existing building model, such that the existing clothes washer is replaced, the Clothes Dryer measure would also need to be subsequently applied to the existing building model so that its energy use, as dependent on the clothes washer, is correct.
-
 While some of these measures may work on any user-created OpenStudio model, they have only been tested on, and are primarily intended to operate on, models created via one of the supported [Workflows](#workflows).
 
 ### Workflow: Create Model From Geometry
