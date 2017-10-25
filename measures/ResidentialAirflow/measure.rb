@@ -1516,6 +1516,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
           dse_space = dse_space.get
           dse_space.setName(Constants.DSESpace(building_unit.name.to_s))
           dse_space.setThermalZone(dse_zone)
+          dse_space.setBuildingUnit(building_unit)
           
           dse_space.surfaces.each do |surface|
             surface.setConstruction(adiabatic_const)

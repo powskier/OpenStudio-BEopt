@@ -207,7 +207,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         end
         
         # Set object values
-        if not setObjectValues(runner, model, unit, hvac, clg_equips, htg_equips, unit_final)
+        if not setObjectValues(runner, model, unit, hvac, ducts, clg_equips, htg_equips, unit_final)
             return false
         end
         
@@ -4086,7 +4086,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     return val.get
   end
   
-  def setObjectValues(runner, model, unit, hvac, clg_equips, htg_equips, unit_final)
+  def setObjectValues(runner, model, unit, hvac, ducts, clg_equips, htg_equips, unit_final)
     # Updates object properties in the model
     
     # Cooling coils
@@ -4249,16 +4249,26 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     control_and_slave_zones = HVAC.get_control_and_slave_zones(thermal_zones)
     
     # Air Terminals
+    dse = ducts.DuctSystemEfficiency
+    if dse.nil?
+        dse = 1.0
+    end
     control_and_slave_zones.each do |control_zone, slave_zones|
         next if not control_zone.airLoopHVACTerminal.is_initialized
         aterm = control_zone.airLoopHVACTerminal.get.to_AirTerminalSingleDuctUncontrolled.get
-        aterm.setMaximumAirFlowRate(OpenStudio.convert(unit_final.Fan_Airflow,"cfm","m^3/s").get * unit_final.Zone_FlowRatios[control_zone])
+        aterm.setMaximumAirFlowRate(OpenStudio.convert(unit_final.Fan_Airflow,"cfm","m^3/s").get * unit_final.Zone_FlowRatios[control_zone] * dse)
         
         slave_zones.each do |slave_zone|
             next if not slave_zone.airLoopHVACTerminal.is_initialized
             aterm = slave_zone.airLoopHVACTerminal.get.to_AirTerminalSingleDuctUncontrolled.get
-            aterm.setMaximumAirFlowRate(OpenStudio.convert(unit_final.Fan_Airflow,"cfm","m^3/s").get * unit_final.Zone_FlowRatios[slave_zone])
+            aterm.setMaximumAirFlowRate(OpenStudio.convert(unit_final.Fan_Airflow,"cfm","m^3/s").get * unit_final.Zone_FlowRatios[slave_zone] * dse)
         end
+    end
+    thermal_zones.each do |zone|
+        next if not zone.airLoopHVACTerminal.is_initialized
+        next if not zone.name.to_s.start_with?(Constants.DSEZone)
+        aterm = zone.airLoopHVACTerminal.get.to_AirTerminalSingleDuctUncontrolled.get
+        aterm.setMaximumAirFlowRate(OpenStudio.convert(unit_final.Fan_Airflow,"cfm","m^3/s").get * (1.0 - dse))
     end
     
     # Zone HVAC Window AC
