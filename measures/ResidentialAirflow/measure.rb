@@ -644,6 +644,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     ductSystemEfficiency = runner.getStringArgumentValue("duct_dse",user_arguments)
     unless ductSystemEfficiency == "NA"
       ductSystemEfficiency = ductSystemEfficiency.to_f
+      ductLocation = "none"
     else
       ductSystemEfficiency = nil
     end
@@ -1497,43 +1498,36 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       if not ducts.DuctSystemEfficiency.nil?
         
-        if not ducts.has_forced_air_equipment
-          runner.registerWarning("The building has no forced air equipment; the distribution system efficiency provided will be ignored.")
-          ducts.DuctSystemEfficiency = nil
-        else
+        dse_zone = OpenStudio::Model::ThermalZone.new(model)
+        dse_zone.setName(Constants.DSEZone(building_unit.name.to_s))
+        dse_zone.setVolume(0)
         
-          dse_zone = OpenStudio::Model::ThermalZone.new(model)
-          dse_zone.setName(Constants.DSEZone(building_unit.name.to_s))
-          dse_zone.setVolume(0)
-          
-          sw_point = OpenStudio::Point3d.new(30, 50, 0)
-          nw_point = OpenStudio::Point3d.new(30, 50.5, 0)
-          ne_point = OpenStudio::Point3d.new(30.5, 50.5, 0)
-          se_point = OpenStudio::Point3d.new(30.5, 50, 0)
-          dse_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
-          
-          dse_space = OpenStudio::Model::Space::fromFloorPrint(dse_polygon, 0.5, model)
-          dse_space = dse_space.get
-          dse_space.setName(Constants.DSESpace(building_unit.name.to_s))
-          dse_space.setThermalZone(dse_zone)
-          dse_space.setBuildingUnit(building_unit)
-          
-          dse_space.surfaces.each do |surface|
-            surface.setConstruction(adiabatic_const)
-            surface.setOutsideBoundaryCondition("Adiabatic")
-            surface.setSunExposure("NoSun")
-            surface.setWindExposure("NoWind")
-          end
-          
-          model.getAirLoopHVACs.each do |air_loop|
-            next unless air_loop.thermalZones.include? unit.living_zone # get the correct air loop for this unit
-            dse_diffuser = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
-            dse_diffuser.setName(obj_name_ducts + " dist system eff zone direct air")
-            air_loop.addBranchForZone(dse_zone, dse_diffuser.to_StraightComponent)
-          end
-          
+        sw_point = OpenStudio::Point3d.new(30, 50, 0)
+        nw_point = OpenStudio::Point3d.new(30, 50.5, 0)
+        ne_point = OpenStudio::Point3d.new(30.5, 50.5, 0)
+        se_point = OpenStudio::Point3d.new(30.5, 50, 0)
+        dse_polygon = Geometry.make_polygon(sw_point, nw_point, ne_point, se_point)
+        
+        dse_space = OpenStudio::Model::Space::fromFloorPrint(dse_polygon, 0.5, model)
+        dse_space = dse_space.get
+        dse_space.setName(Constants.DSESpace(building_unit.name.to_s))
+        dse_space.setThermalZone(dse_zone)
+        dse_space.setBuildingUnit(building_unit)
+        
+        dse_space.surfaces.each do |surface|
+          surface.setConstruction(adiabatic_const)
+          surface.setOutsideBoundaryCondition("Adiabatic")
+          surface.setSunExposure("NoSun")
+          surface.setWindExposure("NoWind")
         end
-      
+        
+        model.getAirLoopHVACs.each do |air_loop|
+          next unless air_loop.thermalZones.include? unit.living_zone # get the correct air loop for this unit
+          dse_diffuser = OpenStudio::Model::AirTerminalSingleDuctUncontrolled.new(model, model.alwaysOnDiscreteSchedule)
+          dse_diffuser.setName(obj_name_ducts + " dist system eff zone direct air")
+          air_loop.addBranchForZone(dse_zone, dse_diffuser.to_StraightComponent)
+        end
+          
       end            
     
       ra_duct_zone = OpenStudio::Model::ThermalZone.new(model)
@@ -2609,9 +2603,16 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   
   def _processDuctsForUnit(model, runner, ducts, building, unit)
   
-    if ducts.DuctLocation !=  "none" and HVAC.has_central_air_conditioner(model, runner, unit.living_zone, false, false).nil? and HVAC.has_furnace(model, runner, unit.living_zone, false, false).nil? and HVAC.has_air_source_heat_pump(model, runner, unit.living_zone, false).nil? and HVAC.has_gshp_vert_bore(model, runner, unit.living_zone, false).nil?
+    ducts.has_forced_air_equipment = false
+    model.getAirLoopHVACs.each do |air_loop|
+      next unless air_loop.thermalZones.include? unit.living_zone
+      ducts.has_forced_air_equipment = true
+    end
+    
+    if (ducts.DuctLocation != "none" or not ducts.DuctSystemEfficiency.nil?) and not ducts.has_forced_air_equipment
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
+      ducts.DuctSystemEfficiency = nil
     end        
     
     ducts.duct_location_zone, ducts.duct_location_name = get_duct_location(runner, ducts.DuctLocation, building, unit)
@@ -2635,12 +2636,6 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     ducts.ducts_not_in_living = true
     if ducts.duct_location_name == unit.living_zone.name.to_s
       ducts.ducts_not_in_living = false
-    end
-    
-    ducts.has_forced_air_equipment = false
-    model.getAirLoopHVACs.each do |air_loop|
-      next unless air_loop.thermalZones.include? unit.living_zone
-      ducts.has_forced_air_equipment = true
     end
     
     if not ducts.DuctSystemEfficiency.nil? and ducts.has_forced_air_equipment    
