@@ -111,10 +111,11 @@ The order in which these measures are called is important. For example, the Wind
 ||3. Hot Water Distribution|Hot Water Fixtures, Location|
 ||4. Solar Hot Water|Water Heater, Location|
 |5. HVAC|1. Central Air Source Heat Pump (or AC/Furnace, Boiler, MSHP, etc.)||
-||2. Heating Setpoint|HVAC Equipment, Location|
-||3. Cooling Setpoint|HVAC Equipment, Location|
-||4. Ceiling Fan|Cooling Setpoint, Beds/Baths|
-||5. Dehumidifier|HVAC Equipment|
+||2. Heating and Cooling Seasons||
+||3. Heating Setpoint|HVAC Equipment, Location|
+||4. Cooling Setpoint|HVAC Equipment, Location|
+||5. Ceiling Fan|Cooling Setpoint, Beds/Baths|
+||6. Dehumidifier|HVAC Equipment|
 |6. Major Appliances|1. Refrigerator||
 ||2. Clothes Washer|Water Heater, Location|
 ||3. Clothes Dryer - Electric (or Fuel)|Beds/Baths, Clothes Washer|

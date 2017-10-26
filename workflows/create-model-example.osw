@@ -1,5 +1,5 @@
 {
-   "created_at" : "20171025T164302Z",
+   "created_at" : "20171026T221726Z",
    "measure_paths" : [ "../measures" ],
    "seed_file" : "../seeds/EmptySeedModel.osm",
    "steps" : [
@@ -493,6 +493,19 @@
       },
       {
          "arguments" : {
+            "cooling_end_month" : "Dec",
+            "cooling_start_month" : "Jan",
+            "heating_end_month" : "Dec",
+            "heating_start_month" : "Jan",
+            "use_hsp_seasons" : "true"
+         },
+         "description" : "This measure sets the heating and cooling season schedules if they differ from the HSP seasons.",
+         "measure_dir_name" : "ResidentialHVACSeasons",
+         "modeler_description" : "This measure sets comma-separated strings, representing heating and cooling season schedules, on the BuildingUnit object when the user indicates not to use the HSP seasons.",
+         "name" : "ResidentialHVACSeasons"
+      },
+      {
+         "arguments" : {
             "htg_wkdy" : "71",
             "htg_wked" : "71"
          },
@@ -867,5 +880,5 @@
          "name" : "Set Residential HVAC Sizing"
       }
    ],
-   "updated_at" : "20171025T164304Z"
+   "updated_at" : "20171026T221729Z"
 }

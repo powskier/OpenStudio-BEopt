@@ -134,7 +134,24 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
         return false
     end
     
+    # Get building units
+    units = Geometry.get_building_units(model, runner)
+    if units.nil?
+        return false
+    end
+    building_unit = nil
+    units.each do |unit|
+      building_unit = unit
+      break
+    end
+    
     heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
+    if building_unit.getFeatureAsString(Constants.SeasonHeating).is_initialized
+      heating_season = building_unit.getFeatureAsString(Constants.SeasonHeating).get.split(",").map {|i| i.to_f}
+    end
+    if building_unit.getFeatureAsString(Constants.SeasonCooling).is_initialized
+      cooling_season = building_unit.getFeatureAsString(Constants.SeasonCooling).get.split(",").map {|i| i.to_f}
+    end
     if heating_season.nil? or cooling_season.nil?
         return false
     end
