@@ -10,9 +10,8 @@ class CreateResidentialEavesTest < MiniTest::Test
   def test_not_applicable_no_surfaces
     args_hash = {}
     result = _test_error(nil, args_hash)
-    assert(result.errors.size == 0)
-    assert_equal("NA", result.value.valueName)
-    assert_includes(result.info.map{ |x| x.logMessage }, "No surfaces found for adding eaves.")
+    assert(result.errors.size == 1)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "No building geometry has been defined.")
   end
     
   def test_not_applicable_depth_zero
@@ -222,6 +221,8 @@ class CreateResidentialEavesTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+    
+    #show_output(result)
       
     return result
     
