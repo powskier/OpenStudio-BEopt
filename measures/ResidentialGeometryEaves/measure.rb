@@ -87,6 +87,7 @@ class CreateResidentialEaves < OpenStudio::Measure::ModelMeasure
     end    
     
     units = Geometry.get_building_units(model, runner)
+    return false if units.nil?
     
     building_type = Geometry.get_building_type(model)
     roof_type = determine_roof_type(model.getSurfaces, units.length, building_type)
