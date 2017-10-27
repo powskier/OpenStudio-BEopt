@@ -27,6 +27,7 @@ class WeatherProcess
   def initialize(model, runner, measure_dir)
   
     @error = false
+    
     @model = model
     @runner = runner
     @measure_dir = measure_dir
@@ -35,47 +36,30 @@ class WeatherProcess
     @data = WeatherData.new
     @design = WeatherDesign.new
     
-    if model.weatherFile.is_initialized
-    
-      # OpenStudio measures
-      wf = model.weatherFile.get
-      # Sometimes path is available, sometimes just url. Should be improved in OS 2.0.
-      if wf.path.is_initialized
-        @epw_path = wf.path.get.to_s
-      else
-        @epw_path = wf.url.to_s.sub("file:///","").sub("file://","").sub("file:","")
-      end
-      if not File.exist? @epw_path # Handle relative paths for unit tests
-        epw_path2 = File.join(measure_dir, "resources", @epw_path)
-        if File.exist? epw_path2
-            @epw_path = epw_path2
-        end
-      end
-      
-      unit = get_weather_building_unit(model)
-    
-      cached = get_cached_weather(unit)
-      return if cached or @error
-      
-      process_epw(@epw_path)
-      return if @error
-      
-      cache_weather(unit)
-      
-    else
-    
-      runner.registerError("Model has not been assigned a weather file.")
+    @epw_path = WeatherProcess.get_epw_path(model, runner, measure_dir)
+    if @epw_path.nil?
       @error = true
-      
+      return
     end
     
+    unit = get_weather_building_unit(model)
+  
+    cached = get_cached_weather(unit)
+    return if cached or @error
+    
+    process_epw(@epw_path)
+    return if @error
+    
+    cache_weather(unit)
+      
   end
 
   def epw_path
     return @epw_path
   end
   
-  def self.epw_timestamps
+  def self.epw_timestamps(model, runner, measure_dir)
+    epw_path = get_epw_path(model, runner, measure_dir)
     epw_file = OpenStudio::EpwFile.new(epw_path)
     timestamps = []
     epw_file.data.each do |epw_data|
@@ -91,6 +75,29 @@ class WeatherProcess
   attr_accessor(:header, :data, :design)
   
   private
+  
+      def self.get_epw_path(model, runner, measure_dir)
+        if model.weatherFile.is_initialized
+        
+          wf = model.weatherFile.get
+          # Sometimes path is available, sometimes just url. Should be improved in OS 2.0.
+          if wf.path.is_initialized
+            epw_path = wf.path.get.to_s
+          else
+            epw_path = wf.url.to_s.sub("file:///","").sub("file://","").sub("file:","")
+          end
+          if not File.exist? epw_path # Handle relative paths for unit tests
+            epw_path2 = File.join(measure_dir, "resources", epw_path)
+            if File.exist? epw_path2
+                epw_path = epw_path2
+            end
+          end
+          return epw_path
+        end
+        
+        runner.registerError("Model has not been assigned a weather file.")
+        return nil
+      end
   
       def get_weather_building_unit(model)
         unit_name = "EPWWeatherInfo"
