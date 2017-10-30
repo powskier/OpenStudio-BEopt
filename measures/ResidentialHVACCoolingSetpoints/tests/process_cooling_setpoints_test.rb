@@ -117,6 +117,28 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
   end
   
+  def test_custom_cooling_season_all_year
+    args_hash = {}
+    args_hash["clg_use_hsp_seasons"] = "false"
+    args_hash["clg_start_month"] = "Jan"
+    args_hash["clg_end_month"] = "Dec"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
+    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+  end
+
+  def test_custom_cooling_season_loop_around_year
+    args_hash = {}
+    args_hash["clg_use_hsp_seasons"] = "false"
+    args_hash["clg_start_month"] = "Jul"
+    args_hash["clg_end_month"] = "Jun"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
+    expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}
+    _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_CentralAC_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+  end
+  
   private
   
   def _test_error(osm_file_or_model, args_hash)
@@ -218,9 +240,7 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
                     assert_in_epsilon(expected_values["heating_setpoint_sch_overlap_season"], OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get, 0.01)
                 end
             elsif obj_type == "ScheduleRule" and new_object.name.to_s.start_with? Constants.ObjectNameCoolingSetpoint and new_object.applyMonday
-                if new_object.startDate.get.monthOfYear.value == 1 # heating season
-                    assert OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get >= Constants.NoCoolingSetpoint
-                elsif new_object.startDate.get.monthOfYear.value == 7 # cooling season
+                if new_object.startDate.get.monthOfYear.value == 7 # cooling season
                     assert_in_epsilon(expected_values["cooling_setpoint_sch_cooling_season"], OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get, 0.01)
                 elsif new_object.startDate.get.monthOfYear.value == 10 # overlap season
                     assert_in_epsilon(expected_values["cooling_setpoint_sch_overlap_season"], OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get, 0.01)

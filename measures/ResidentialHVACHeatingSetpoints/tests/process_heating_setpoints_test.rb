@@ -35,7 +35,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>72, "heating_setpoint_sch_overlap_season"=>72, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
     _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
-  end    
+  end
   
   def test_furnace
     args_hash = {}
@@ -125,8 +125,28 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
     _test_measure("MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, num_units*5)
   end
   
-  private
+  def test_custom_heating_season_all_year
+    args_hash = {}
+    args_hash["htg_use_hsp_seasons"] = "false"
+    args_hash["htg_start_month"] = "Jan"
+    args_hash["htg_end_month"] = "Dec"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
+    expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
+    _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+  end
   
+  def test_custom_heating_season_loop_around_year
+    args_hash = {}
+    args_hash["htg_use_hsp_seasons"] = "false"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
+    expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
+    _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+  end
+  
+  private
+
   def _test_error(osm_file_or_model, args_hash)
     # create an instance of the measure
     measure = ProcessHeatingSetpoints.new
@@ -220,8 +240,6 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
             if obj_type == "ScheduleRule" and new_object.name.to_s.start_with? Constants.ObjectNameHeatingSetpoint and new_object.applyMonday
                 if new_object.startDate.get.monthOfYear.value == 1 # heating season
                     assert_in_epsilon(expected_values["heating_setpoint_sch_heating_season"], OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get, 0.01)
-                elsif new_object.startDate.get.monthOfYear.value == 7 # cooling season
-                    assert OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get <= Constants.NoHeatingSetpoint
                 elsif new_object.startDate.get.monthOfYear.value == 10 # overlap season
                     assert_in_epsilon(expected_values["heating_setpoint_sch_overlap_season"], OpenStudio::convert(new_object.daySchedule.values[0],"C","F").get, 0.01)
                 end

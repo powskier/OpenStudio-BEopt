@@ -1010,4 +1010,57 @@ class HVAC
         return heating_season, cooling_season
     end
     
+    # Determine the heating/cooling seasons from the setpoint schedules
+    def self.get_heating_and_cooling_seasons(model, weather, runner=nil)
+    
+      finished_zones = []
+      model.getThermalZones.each do |thermal_zone|
+        if Geometry.zone_is_finished(thermal_zone)
+          finished_zones << thermal_zone
+        end
+      end
+      
+      heating_season = Array.new(12, 0)
+      cooling_season = Array.new(12, 0)
+      finished_zones.each do |finished_zone|
+      
+        thermostatsetpointdualsetpoint = finished_zone.thermostatSetpointDualSetpoint
+        if thermostatsetpointdualsetpoint.is_initialized
+        
+          thermostatsetpointdualsetpoint = thermostatsetpointdualsetpoint.get
+          
+          thermostatsetpointdualsetpoint.heatingSetpointTemperatureSchedule.get.to_Schedule.get.to_ScheduleRuleset.get.scheduleRules.each do |rule|
+            
+            idx = rule.startDate.get.monthOfYear.value - 1
+            if rule.daySchedule.values[0] == Constants.NoHeatingSetpoint            
+              heating_season[idx] = 0
+            else            
+              heating_season[idx] = 1
+            end
+
+          end
+          
+          thermostatsetpointdualsetpoint.coolingSetpointTemperatureSchedule.get.to_Schedule.get.to_ScheduleRuleset.get.scheduleRules.each do |rule|
+            
+            idx = rule.startDate.get.monthOfYear.value - 1            
+            if rule.daySchedule.values[0] == Constants.NoCoolingSetpoint            
+              cooling_season[idx] = 0
+            else            
+              cooling_season[idx] = 1
+            end
+
+          end
+          
+        else # in case the setpoint measures haven't been applied yet
+        
+          heating_season, cooling_season = self.calc_heating_and_cooling_seasons(model, weather, runner)
+        
+        end
+          
+      end
+          
+      return heating_season, cooling_season
+      
+    end
+    
 end

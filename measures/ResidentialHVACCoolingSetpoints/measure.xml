@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>process_cooling_setpoints</name>
   <uid>2daa9d28-8891-4074-a1d1-bce3cb3d7ac6</uid>
-  <version_id>c6cae14d-dc75-4d6f-b5f8-32a8dfc1ec34</version_id>
-  <version_modified>20171027T191850Z</version_modified>
+  <version_id>5bfcfd37-7103-473e-8fc3-a959ff827a5b</version_id>
+  <version_modified>20171030T152708Z</version_modified>
   <xml_checksum>356BE47F</xml_checksum>
   <class_name>ProcessCoolingSetpoints</class_name>
   <display_name>Set Residential Cooling Setpoints and Schedules</display_name>
-  <description>This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>This measure creates residential cooling season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.</modeler_description>
+  <description>This measure creates the cooling season schedules and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>This measure creates residential cooling season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.</modeler_description>
   <arguments>
     <argument>
       <name>clg_wkdy</name>
@@ -29,6 +29,143 @@
       <required>false</required>
       <model_dependent>false</model_dependent>
       <default_value>76</default_value>
+    </argument>
+    <argument>
+      <name>clg_use_hsp_seasons</name>
+      <display_name>Use HSP Seasons</display_name>
+      <description>Whether to use schedule values based on information contained in the EPW file or not. User-defined cooling start/end months will be ignored if this option is selected.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>clg_start_month</name>
+      <display_name>Cooling Start Month</display_name>
+      <description>Start month of the cooling season.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Jun</default_value>
+      <choices>
+        <choice>
+          <value>Jan</value>
+          <display_name>Jan</display_name>
+        </choice>
+        <choice>
+          <value>Feb</value>
+          <display_name>Feb</display_name>
+        </choice>
+        <choice>
+          <value>Mar</value>
+          <display_name>Mar</display_name>
+        </choice>
+        <choice>
+          <value>Apr</value>
+          <display_name>Apr</display_name>
+        </choice>
+        <choice>
+          <value>May</value>
+          <display_name>May</display_name>
+        </choice>
+        <choice>
+          <value>Jun</value>
+          <display_name>Jun</display_name>
+        </choice>
+        <choice>
+          <value>Jul</value>
+          <display_name>Jul</display_name>
+        </choice>
+        <choice>
+          <value>Aug</value>
+          <display_name>Aug</display_name>
+        </choice>
+        <choice>
+          <value>Sep</value>
+          <display_name>Sep</display_name>
+        </choice>
+        <choice>
+          <value>Oct</value>
+          <display_name>Oct</display_name>
+        </choice>
+        <choice>
+          <value>Nov</value>
+          <display_name>Nov</display_name>
+        </choice>
+        <choice>
+          <value>Dec</value>
+          <display_name>Dec</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>clg_end_month</name>
+      <display_name>Cooling End Month</display_name>
+      <description>End month of the cooling season.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Sep</default_value>
+      <choices>
+        <choice>
+          <value>Jan</value>
+          <display_name>Jan</display_name>
+        </choice>
+        <choice>
+          <value>Feb</value>
+          <display_name>Feb</display_name>
+        </choice>
+        <choice>
+          <value>Mar</value>
+          <display_name>Mar</display_name>
+        </choice>
+        <choice>
+          <value>Apr</value>
+          <display_name>Apr</display_name>
+        </choice>
+        <choice>
+          <value>May</value>
+          <display_name>May</display_name>
+        </choice>
+        <choice>
+          <value>Jun</value>
+          <display_name>Jun</display_name>
+        </choice>
+        <choice>
+          <value>Jul</value>
+          <display_name>Jul</display_name>
+        </choice>
+        <choice>
+          <value>Aug</value>
+          <display_name>Aug</display_name>
+        </choice>
+        <choice>
+          <value>Sep</value>
+          <display_name>Sep</display_name>
+        </choice>
+        <choice>
+          <value>Oct</value>
+          <display_name>Oct</display_name>
+        </choice>
+        <choice>
+          <value>Nov</value>
+          <display_name>Nov</display_name>
+        </choice>
+        <choice>
+          <value>Dec</value>
+          <display_name>Dec</display_name>
+        </choice>
+      </choices>
     </argument>
   </arguments>
   <outputs/>
@@ -78,12 +215,6 @@
       <checksum>3C131B97</checksum>
     </file>
     <file>
-      <filename>process_cooling_setpoints_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>5B60FB0B</checksum>
-    </file>
-    <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -96,27 +227,10 @@
       <checksum>64BC6389</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.11.5</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>B63AF12C</checksum>
-    </file>
-    <file>
       <filename>schedules.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>7576B4B2</checksum>
-    </file>
-    <file>
-      <filename>hvac.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C9C319CF</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
@@ -195,6 +309,29 @@
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>52C7C723</checksum>
+    </file>
+    <file>
+      <filename>process_cooling_setpoints_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>FCED983B</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.11.5</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>48F64059</checksum>
+    </file>
+    <file>
+      <filename>hvac.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>B638B480</checksum>
     </file>
   </files>
 </measure>

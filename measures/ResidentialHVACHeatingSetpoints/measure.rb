@@ -23,11 +23,11 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure creates the heating season schedules based on weather data, and the heating setpoint schedules.#{Constants.WorkflowDescription}"
+    return "This measure creates the heating season schedules and the heating setpoint schedules.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description
-    return "This measure creates #{Constants.ObjectNameHeatingSeason} ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates #{Constants.ObjectNameHeatingSetpoint} ruleset objects. Schedule values are populated based on information input by the user as well as contained in the #{Constants.ObjectNameHeatingSeason}. The heating setpoint schedules are added to the living zone's thermostat."
+    return "This measure creates #{Constants.ObjectNameHeatingSeason} ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates #{Constants.ObjectNameHeatingSetpoint} ruleset objects. Schedule values are populated based on information input by the user as well as contained in the #{Constants.ObjectNameHeatingSeason}. The heating setpoint schedules are added to the living zone's thermostat."
   end     
   
   #define the arguments that the user will input
@@ -50,6 +50,40 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     htg_wked.setDefaultValue("71")
     args << htg_wked
 
+    #make a bool argument for using hsp seasons or not
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("htg_use_hsp_seasons", true)
+    arg.setDisplayName("Use HSP Seasons")
+    arg.setDescription("Whether to use schedule values based on information contained in the EPW file or not. User-defined heating start/end months will be ignored if this option is selected.")
+    arg.setDefaultValue(true)
+    args << arg
+    
+    #make a choice argument for months of the year
+    month_display_names = OpenStudio::StringVector.new
+    month_display_names << "Jan"
+    month_display_names << "Feb"
+    month_display_names << "Mar"
+    month_display_names << "Apr"
+    month_display_names << "May"
+    month_display_names << "Jun"
+    month_display_names << "Jul"
+    month_display_names << "Aug"
+    month_display_names << "Sep"
+    month_display_names << "Oct"
+    month_display_names << "Nov"
+    month_display_names << "Dec"
+    
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("htg_start_month", month_display_names, false)
+    arg.setDisplayName("Heating Start Month")
+    arg.setDescription("Start month of the heating season.")
+    arg.setDefaultValue("Oct")
+    args << arg
+
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("htg_end_month", month_display_names, false)
+    arg.setDisplayName("Heating End Month")
+    arg.setDescription("End month of the heating season.")
+    arg.setDefaultValue("Mar")
+    args << arg
+    
     return args
   end #end the arguments method
 
@@ -64,6 +98,9 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
 
     htg_wkdy = runner.getStringArgumentValue("htg_wkdy",user_arguments)
     htg_wked = runner.getStringArgumentValue("htg_wked",user_arguments)
+    htg_use_hsp_seasons = runner.getBoolArgumentValue("htg_use_hsp_seasons",user_arguments)
+    htg_start_month = runner.getOptionalStringArgumentValue("htg_start_month",user_arguments)
+    htg_end_month = runner.getOptionalStringArgumentValue("htg_end_month",user_arguments)    
     
     weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
     if weather.error?
@@ -82,9 +119,21 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     end
     
     # Get heating season
-    heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
-    if building_unit.getFeatureAsString(Constants.SeasonHeating).is_initialized
-      heating_season = building_unit.getFeatureAsString(Constants.SeasonHeating).get.split(",").map {|i| i.to_f}
+    if htg_use_hsp_seasons
+      heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
+    else
+      month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}
+      if htg_start_month.is_initialized
+        htg_start_month = month_map[htg_start_month.get]
+      end
+      if htg_end_month.is_initialized
+        htg_end_month = month_map[htg_end_month.get]
+      end
+      if htg_start_month <= htg_end_month
+        heating_season = Array.new(htg_start_month-1, 0) + Array.new(htg_end_month-htg_start_month+1, 1) + Array.new(12-htg_end_month, 0)
+      elsif htg_start_month > htg_end_month
+        heating_season = Array.new(htg_end_month, 1) + Array.new(htg_start_month-htg_end_month-1, 0) + Array.new(12-htg_start_month+1, 1)
+      end
     end
     if heating_season.nil?
       return false

@@ -145,13 +145,7 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
       break
     end
     
-    heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
-    if building_unit.getFeatureAsString(Constants.SeasonHeating).is_initialized
-      heating_season = building_unit.getFeatureAsString(Constants.SeasonHeating).get.split(",").map {|i| i.to_f}
-    end
-    if building_unit.getFeatureAsString(Constants.SeasonCooling).is_initialized
-      cooling_season = building_unit.getFeatureAsString(Constants.SeasonCooling).get.split(",").map {|i| i.to_f}
-    end
+    heating_season, cooling_season = HVAC.get_heating_and_cooling_seasons(model, weather, runner)
     if heating_season.nil? or cooling_season.nil?
         return false
     end

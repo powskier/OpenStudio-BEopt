@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>process_heating_setpoints</name>
   <uid>2b167665-f760-462d-8c9d-1d909da7b628</uid>
-  <version_id>1b737ada-40f7-4374-9da1-228fd43d893d</version_id>
-  <version_modified>20171027T191851Z</version_modified>
+  <version_id>dafc7e85-1d6e-4a53-a067-06b621782299</version_id>
+  <version_modified>20171030T152709Z</version_modified>
   <xml_checksum>2C877DEB</xml_checksum>
   <class_name>ProcessHeatingSetpoints</class_name>
   <display_name>Set Residential Heating Setpoints and Schedules</display_name>
-  <description>This measure creates the heating season schedules based on weather data, and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>This measure creates residential heating season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.</modeler_description>
+  <description>This measure creates the heating season schedules and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>This measure creates residential heating season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.</modeler_description>
   <arguments>
     <argument>
       <name>htg_wkdy</name>
@@ -29,6 +29,143 @@
       <required>false</required>
       <model_dependent>false</model_dependent>
       <default_value>71</default_value>
+    </argument>
+    <argument>
+      <name>htg_use_hsp_seasons</name>
+      <display_name>Use HSP Seasons</display_name>
+      <description>Whether to use schedule values based on information contained in the EPW file or not. User-defined heating start/end months will be ignored if this option is selected.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>htg_start_month</name>
+      <display_name>Heating Start Month</display_name>
+      <description>Start month of the heating season.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Oct</default_value>
+      <choices>
+        <choice>
+          <value>Jan</value>
+          <display_name>Jan</display_name>
+        </choice>
+        <choice>
+          <value>Feb</value>
+          <display_name>Feb</display_name>
+        </choice>
+        <choice>
+          <value>Mar</value>
+          <display_name>Mar</display_name>
+        </choice>
+        <choice>
+          <value>Apr</value>
+          <display_name>Apr</display_name>
+        </choice>
+        <choice>
+          <value>May</value>
+          <display_name>May</display_name>
+        </choice>
+        <choice>
+          <value>Jun</value>
+          <display_name>Jun</display_name>
+        </choice>
+        <choice>
+          <value>Jul</value>
+          <display_name>Jul</display_name>
+        </choice>
+        <choice>
+          <value>Aug</value>
+          <display_name>Aug</display_name>
+        </choice>
+        <choice>
+          <value>Sep</value>
+          <display_name>Sep</display_name>
+        </choice>
+        <choice>
+          <value>Oct</value>
+          <display_name>Oct</display_name>
+        </choice>
+        <choice>
+          <value>Nov</value>
+          <display_name>Nov</display_name>
+        </choice>
+        <choice>
+          <value>Dec</value>
+          <display_name>Dec</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>htg_end_month</name>
+      <display_name>Heating End Month</display_name>
+      <description>End month of the heating season.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Mar</default_value>
+      <choices>
+        <choice>
+          <value>Jan</value>
+          <display_name>Jan</display_name>
+        </choice>
+        <choice>
+          <value>Feb</value>
+          <display_name>Feb</display_name>
+        </choice>
+        <choice>
+          <value>Mar</value>
+          <display_name>Mar</display_name>
+        </choice>
+        <choice>
+          <value>Apr</value>
+          <display_name>Apr</display_name>
+        </choice>
+        <choice>
+          <value>May</value>
+          <display_name>May</display_name>
+        </choice>
+        <choice>
+          <value>Jun</value>
+          <display_name>Jun</display_name>
+        </choice>
+        <choice>
+          <value>Jul</value>
+          <display_name>Jul</display_name>
+        </choice>
+        <choice>
+          <value>Aug</value>
+          <display_name>Aug</display_name>
+        </choice>
+        <choice>
+          <value>Sep</value>
+          <display_name>Sep</display_name>
+        </choice>
+        <choice>
+          <value>Oct</value>
+          <display_name>Oct</display_name>
+        </choice>
+        <choice>
+          <value>Nov</value>
+          <display_name>Nov</display_name>
+        </choice>
+        <choice>
+          <value>Dec</value>
+          <display_name>Dec</display_name>
+        </choice>
+      </choices>
     </argument>
   </arguments>
   <outputs/>
@@ -68,12 +205,6 @@
       <checksum>3C131B97</checksum>
     </file>
     <file>
-      <filename>process_heating_setpoints_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>6AC8A55E</checksum>
-    </file>
-    <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -86,27 +217,10 @@
       <checksum>64BC6389</checksum>
     </file>
     <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.4.0</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>493865B1</checksum>
-    </file>
-    <file>
       <filename>schedules.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>7576B4B2</checksum>
-    </file>
-    <file>
-      <filename>hvac.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C9C319CF</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
@@ -191,6 +305,29 @@
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>52C7C723</checksum>
+    </file>
+    <file>
+      <filename>process_heating_setpoints_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>426B900D</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.4.0</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>1FB4E1DE</checksum>
+    </file>
+    <file>
+      <filename>hvac.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>B638B480</checksum>
     </file>
   </files>
 </measure>
