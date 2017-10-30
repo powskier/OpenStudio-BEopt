@@ -145,7 +145,7 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
       break
     end
     
-    heating_season, cooling_season = HVAC.get_heating_and_cooling_seasons(model, weather, runner)
+    heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
     if heating_season.nil? or cooling_season.nil?
         return false
     end

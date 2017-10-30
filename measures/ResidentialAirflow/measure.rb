@@ -1108,7 +1108,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       infil, building, unit = _processInfiltrationForUnit(infil, wind_speed, building, unit, has_hvac_flue, has_water_heater_flue, has_fireplace_chimney, runner)
       mech_vent = _processMechanicalVentilationForUnit(model, runner, infil, mech_vent, building, unit)
-      nat_vent = _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit, building_unit)
+      nat_vent = _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit)
       ducts = _processDuctsForUnit(model, runner, ducts, building, unit)
       
       schedules.BathExhaust = HourlyByMonthSchedule.new(model, runner, obj_name_infil + " bath exhaust schedule", [Array.new(6, 0.0) + [1.0] + Array.new(17, 0.0)] * 12, [Array.new(6, 0.0) + [1.0] + Array.new(17, 0.0)] * 12, normalize_values = false)
@@ -2451,7 +2451,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
 
   end
 
-  def _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit, building_unit)
+  def _processNaturalVentilationForUnit(model, runner, nat_vent, wind_speed, infil, building, unit)
     
     thermostatsetpointdualsetpoint = unit.living_zone.thermostatSetpointDualSetpoint
     
@@ -2511,7 +2511,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     nat_vent.ovlp_ssn_hourly_weekend_temp = nat_vent.ovlp_ssn_hourly_temp
       
     # Get heating and cooling seasons
-    heating_season, cooling_season = HVAC.get_heating_and_cooling_seasons(model, @weather, runner)
+    heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, @weather, runner)
     if heating_season.nil? or cooling_season.nil?
         return false
     end
