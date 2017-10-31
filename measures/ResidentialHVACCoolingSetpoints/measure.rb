@@ -35,7 +35,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args = OpenStudio::Measure::OSArgumentVector.new
   
     #Make a string argument for 24 weekday cooling set point values
-    clg_wkdy = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setpoint", false)
+    clg_wkdy = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setpoint", true)
     clg_wkdy.setDisplayName("Weekday Setpoint")
     clg_wkdy.setDescription("Specify a single cooling setpoint or a 24-hour comma-separated cooling schedule for the weekdays.")
     clg_wkdy.setUnits("degrees F")
@@ -43,7 +43,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args << clg_wkdy  
     
     #Make a string argument for 24 weekend cooling set point values
-    clg_wked = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setpoint", false)
+    clg_wked = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setpoint", true)
     clg_wked.setDisplayName("Weekend Setpoint")
     clg_wked.setDescription("Specify a single cooling setpoint or a 24-hour comma-separated cooling schedule for the weekend.")
     clg_wked.setUnits("degrees F")
