@@ -1,5 +1,5 @@
 {
-   "created_at" : "20171031T165130Z",
+   "created_at" : "20171030T141350Z",
    "measure_paths" : [ "../measures" ],
    "seed_file" : "../seeds/EmptySeedModel.osm",
    "steps" : [
@@ -493,28 +493,22 @@
       },
       {
          "arguments" : {
-            "htg_end_month" : "Mar",
-            "htg_start_month" : "Oct",
-            "htg_use_hsp_seasons" : "true",
             "htg_wkdy" : "71",
             "htg_wked" : "71"
          },
-         "description" : "This measure creates the heating season schedules and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
+         "description" : "This measure creates the heating season schedules based on weather data, and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialHVACHeatingSetpoints",
-         "modeler_description" : "This measure creates residential heating season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.",
+         "modeler_description" : "This measure creates residential heating season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.",
          "name" : "Set Residential Heating Setpoints and Schedules"
       },
       {
          "arguments" : {
-            "clg_end_month" : "Sep",
-            "clg_start_month" : "Jun",
-            "clg_use_hsp_seasons" : "true",
             "clg_wkdy" : "76",
             "clg_wked" : "76"
          },
-         "description" : "This measure creates the cooling season schedules and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
+         "description" : "This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialHVACCoolingSetpoints",
-         "modeler_description" : "This measure creates residential cooling season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.",
+         "modeler_description" : "This measure creates residential cooling season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.",
          "name" : "Set Residential Cooling Setpoints and Schedules"
       },
       {
@@ -874,5 +868,5 @@
          "name" : "Set Residential HVAC Sizing"
       }
    ],
-   "updated_at" : "20171031T165133Z"
+   "updated_at" : "20171030T141355Z"
 }
