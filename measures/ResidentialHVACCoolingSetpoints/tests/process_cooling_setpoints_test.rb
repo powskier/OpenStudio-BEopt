@@ -120,8 +120,6 @@ class ProcessCoolingSetpointsTest < MiniTest::Test
   def test_custom_cooling_season_all_year
     args_hash = {}
     args_hash["clg_use_hsp_seasons"] = "false"
-    args_hash["clg_start_month"] = "Jan"
-    args_hash["clg_end_month"] = "Dec"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>-18000, "heating_setpoint_sch_overlap_season"=>-18000, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76}

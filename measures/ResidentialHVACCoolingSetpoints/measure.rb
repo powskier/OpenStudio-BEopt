@@ -50,11 +50,11 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     clg_wked.setDefaultValue("76")
     args << clg_wked    
     
-    #make a bool argument for using hsp seasons or not
-    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("clg_use_hsp_seasons", true)
-    arg.setDisplayName("Use HSP Seasons")
-    arg.setDescription("Whether to use schedule values based on information contained in the EPW file or not. User-defined cooling start/end months will be ignored if this option is selected.")
-    arg.setDefaultValue(true)
+    #make a bool argument for using hsp season or not
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
+    arg.setDisplayName("Use Auto Season")
+    arg.setDescription("Specifies whether to automatically define the cooling season based on the weather file.")
+    arg.setDefaultValue(false)
     args << arg
     
     #make a choice argument for months of the year
@@ -75,13 +75,13 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("clg_start_month", month_display_names, false)
     arg.setDisplayName("Cooling Start Month")
     arg.setDescription("Start month of the cooling season.")
-    arg.setDefaultValue("Jun")
+    arg.setDefaultValue("Jan")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("clg_end_month", month_display_names, false)
     arg.setDisplayName("Cooling End Month")
     arg.setDescription("End month of the cooling season.")
-    arg.setDefaultValue("Sep")
+    arg.setDefaultValue("Dec")
     args << arg
     
     return args
@@ -98,7 +98,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     
     clg_wkdy = runner.getStringArgumentValue("clg_wkdy",user_arguments)
     clg_wked = runner.getStringArgumentValue("clg_wked",user_arguments)
-    clg_use_hsp_seasons = runner.getBoolArgumentValue("clg_use_hsp_seasons",user_arguments)
+    use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
     clg_start_month = runner.getOptionalStringArgumentValue("clg_start_month",user_arguments)
     clg_end_month = runner.getOptionalStringArgumentValue("clg_end_month",user_arguments)    
     
@@ -112,14 +112,9 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     if units.nil?
         return false
     end
-    building_unit = nil
-    units.each do |unit|
-      building_unit = unit
-      break
-    end
     
     # Get cooling season
-    if clg_use_hsp_seasons
+    if use_auto_season
       heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
     else
       month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}

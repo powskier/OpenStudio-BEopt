@@ -139,11 +139,6 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
     if units.nil?
         return false
     end
-    building_unit = nil
-    units.each do |unit|
-      building_unit = unit
-      break
-    end
     
     heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
     if heating_season.nil? or cooling_season.nil?

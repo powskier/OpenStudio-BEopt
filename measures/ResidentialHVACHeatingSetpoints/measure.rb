@@ -50,11 +50,11 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     htg_wked.setDefaultValue("71")
     args << htg_wked
 
-    #make a bool argument for using hsp seasons or not
-    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("htg_use_hsp_seasons", true)
-    arg.setDisplayName("Use HSP Seasons")
-    arg.setDescription("Whether to use schedule values based on information contained in the EPW file or not. User-defined heating start/end months will be ignored if this option is selected.")
-    arg.setDefaultValue(true)
+    #make a bool argument for using hsp season or not
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
+    arg.setDisplayName("Use Auto Season")
+    arg.setDescription("Specifies whether to automatically define the heating season based on the weather file.")
+    arg.setDefaultValue(false)
     args << arg
     
     #make a choice argument for months of the year
@@ -75,13 +75,13 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("htg_start_month", month_display_names, false)
     arg.setDisplayName("Heating Start Month")
     arg.setDescription("Start month of the heating season.")
-    arg.setDefaultValue("Oct")
+    arg.setDefaultValue("Jan")
     args << arg
 
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("htg_end_month", month_display_names, false)
     arg.setDisplayName("Heating End Month")
     arg.setDescription("End month of the heating season.")
-    arg.setDefaultValue("Mar")
+    arg.setDefaultValue("Dec")
     args << arg
     
     return args
@@ -98,7 +98,7 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
 
     htg_wkdy = runner.getStringArgumentValue("htg_wkdy",user_arguments)
     htg_wked = runner.getStringArgumentValue("htg_wked",user_arguments)
-    htg_use_hsp_seasons = runner.getBoolArgumentValue("htg_use_hsp_seasons",user_arguments)
+    use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
     htg_start_month = runner.getOptionalStringArgumentValue("htg_start_month",user_arguments)
     htg_end_month = runner.getOptionalStringArgumentValue("htg_end_month",user_arguments)    
     
@@ -112,14 +112,9 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     if units.nil?
         return false
     end
-    building_unit = nil
-    units.each do |unit|
-      building_unit = unit
-      break
-    end
     
     # Get heating season
-    if htg_use_hsp_seasons
+    if use_auto_season
       heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
     else
       month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}

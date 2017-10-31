@@ -128,8 +128,6 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
   def test_custom_heating_season_all_year
     args_hash = {}
     args_hash["htg_use_hsp_seasons"] = "false"
-    args_hash["htg_start_month"] = "Jan"
-    args_hash["htg_end_month"] = "Dec"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
@@ -139,6 +137,8 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
   def test_custom_heating_season_loop_around_year
     args_hash = {}
     args_hash["htg_use_hsp_seasons"] = "false"
+    args_hash["htg_start_month"] = "Oct"
+    args_hash["htg_end_month"] = "Mar"    
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
