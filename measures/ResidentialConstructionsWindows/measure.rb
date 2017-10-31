@@ -134,12 +134,6 @@ class ProcessConstructionsWindows < OpenStudio::Measure::ModelMeasure
         return false
     end
     
-    # Get building units
-    units = Geometry.get_building_units(model, runner)
-    if units.nil?
-        return false
-    end
-    
     heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
     if heating_season.nil? or cooling_season.nil?
         return false

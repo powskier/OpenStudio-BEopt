@@ -35,7 +35,7 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     args = OpenStudio::Measure::OSArgumentVector.new
 
    #Make a string argument for 24 weekday heating set point values
-    htg_wkdy = OpenStudio::Measure::OSArgument::makeStringArgument("htg_wkdy", false)
+    htg_wkdy = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setpoint", false)
     htg_wkdy.setDisplayName("Weekday Setpoint")
     htg_wkdy.setDescription("Specify a single heating setpoint or a 24-hour comma-separated heating schedule for the weekdays.")
     htg_wkdy.setUnits("degrees F")
@@ -43,7 +43,7 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     args << htg_wkdy
 
     #Make a string argument for 24 weekend heating set point values
-    htg_wked = OpenStudio::Measure::OSArgument::makeStringArgument("htg_wked", false)
+    htg_wked = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setpoint", false)
     htg_wked.setDisplayName("Weekend Setpoint")
     htg_wked.setDescription("Specify a single heating setpoint or a 24-hour comma-separated heating schedule for the weekend.")
     htg_wked.setUnits("degrees F")
@@ -52,8 +52,8 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
 
     #make a bool argument for using hsp season or not
     arg = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
-    arg.setDisplayName("Use Auto Season")
-    arg.setDescription("Specifies whether to automatically define the heating season based on the weather file.")
+    arg.setDisplayName("Use Auto Heating Season")
+    arg.setDescription("Specifies whether to automatically define the heating season based on the weather file. User-defined heating season start/end months will be ignored if this is selected")
     arg.setDefaultValue(false)
     args << arg
     
@@ -72,14 +72,14 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
     month_display_names << "Nov"
     month_display_names << "Dec"
     
-    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("htg_start_month", month_display_names, false)
-    arg.setDisplayName("Heating Start Month")
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("season_start_month", month_display_names, false)
+    arg.setDisplayName("Heating Season Start Month")
     arg.setDescription("Start month of the heating season.")
     arg.setDefaultValue("Jan")
     args << arg
 
-    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("htg_end_month", month_display_names, false)
-    arg.setDisplayName("Heating End Month")
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("season_end_month", month_display_names, false)
+    arg.setDisplayName("Heating Season End Month")
     arg.setDescription("End month of the heating season.")
     arg.setDefaultValue("Dec")
     args << arg
@@ -96,23 +96,17 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
       return false
     end
 
-    htg_wkdy = runner.getStringArgumentValue("htg_wkdy",user_arguments)
-    htg_wked = runner.getStringArgumentValue("htg_wked",user_arguments)
+    htg_wkdy = runner.getStringArgumentValue("weekday_setpoint",user_arguments)
+    htg_wked = runner.getStringArgumentValue("weekend_setpoint",user_arguments)
     use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
-    htg_start_month = runner.getOptionalStringArgumentValue("htg_start_month",user_arguments)
-    htg_end_month = runner.getOptionalStringArgumentValue("htg_end_month",user_arguments)    
+    htg_start_month = runner.getOptionalStringArgumentValue("season_start_month",user_arguments)
+    htg_end_month = runner.getOptionalStringArgumentValue("season_end_month",user_arguments)    
     
     weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
     if weather.error?
       return false
     end
 
-    # Get building units
-    units = Geometry.get_building_units(model, runner)
-    if units.nil?
-        return false
-    end
-    
     # Get heating season
     if use_auto_season
       heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)

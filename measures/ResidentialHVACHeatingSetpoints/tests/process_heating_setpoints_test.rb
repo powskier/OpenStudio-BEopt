@@ -15,7 +15,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
 
   def test_argument_error_not_24_values
     args_hash = {}
-    args_hash["htg_wkdy"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
+    args_hash["weekday_setpoint"] = "71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71"
     result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm", args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "A comma-separated string of 24 numbers must be entered for the weekday schedule.")    
   end
@@ -30,7 +30,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
   
   def test_wkdy_wked_are_different
     args_hash = {}
-    args_hash["htg_wkdy"] = "72"
+    args_hash["weekday_setpoint"] = "72"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>48, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>72, "heating_setpoint_sch_overlap_season"=>72, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
@@ -99,8 +99,8 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
   
   def test_cooling_setpoints_exist_and_h_more_than_c
     args_hash = {}
-    args_hash["htg_wkdy"] = "77"
-    args_hash["htg_wked"] = "77"
+    args_hash["weekday_setpoint"] = "77"
+    args_hash["weekend_setpoint"] = "77"
     expected_num_del_objects = {"ScheduleRule"=>24, "ScheduleRuleset"=>2}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3}
     expected_values = {"heating_setpoint_sch_heating_season"=>77, "heating_setpoint_sch_overlap_season"=>76.5, "cooling_setpoint_sch_cooling_season"=>76, "cooling_setpoint_sch_overlap_season"=>76.5}
@@ -127,7 +127,7 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
   
   def test_custom_heating_season_all_year
     args_hash = {}
-    args_hash["htg_use_hsp_seasons"] = "false"
+    args_hash["use_auto_seasons"] = "false"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
@@ -136,9 +136,9 @@ class ProcessHeatingSetpointsTest < MiniTest::Test
   
   def test_custom_heating_season_loop_around_year
     args_hash = {}
-    args_hash["htg_use_hsp_seasons"] = "false"
-    args_hash["htg_start_month"] = "Oct"
-    args_hash["htg_end_month"] = "Mar"    
+    args_hash["use_auto_seasons"] = "false"
+    args_hash["season_start_month"] = "Oct"
+    args_hash["season_end_month"] = "Mar"    
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleRule"=>36, "ScheduleRuleset"=>3, "ThermostatSetpointDualSetpoint"=>1}
     expected_values = {"heating_setpoint_sch_heating_season"=>71, "heating_setpoint_sch_overlap_season"=>71, "cooling_setpoint_sch_cooling_season"=>18000, "cooling_setpoint_sch_overlap_season"=>18000}
