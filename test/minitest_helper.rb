@@ -62,7 +62,13 @@ def get_objects(model)
     # Returns a list with [ObjectTypeString, ModelObject] items
     objects = []
     model.modelObjects.each do |obj|
-        objects << [get_model_object_type(obj), obj]
+        obj_type = get_model_object_type(obj)
+        if obj_type == "BuildingUnit"
+          # Skip units with no spaces (i.e., the weather "unit")
+          building_unit = obj.public_send("to_#{obj_type}").get
+          next if building_unit.spaces.size == 0
+        end
+        objects << [obj_type, obj]
     end
     return objects
 end
