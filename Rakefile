@@ -514,3 +514,64 @@ def get_osms_listed_in_test(testrb)
     osms = str.scan(/\w+\.osm/)
     return osms.uniq
 end
+
+desc 'update urdb tariffs in utility bill measure'
+task :update_tariffs do
+  require 'csv'
+  require 'net/https'
+  require 'openstudio'
+  
+  api_key = nil
+  STDOUT.puts "Enter API Key:"
+  api_key = STDIN.gets.strip
+  return if api_key.nil?
+  
+  tariffs_file = "./resources/tariffs.zip"
+  unzip_file = OpenStudio::UnzipFile.new(tariffs_file)
+  unzip_file.extractAllFiles(OpenStudio::toPath("./resources/tariffs"))
+  if !File.exists?("./resources/tariffs")
+    FileUtils.mkdir_p("./resources/tariffs")
+  end
+
+  uri = URI('https://api.openei.org/utility_rates?')
+  rows = CSV.read("./resources/utilities.csv", {:encoding=>'ISO-8859-1'})
+  rows.each_with_index do |row, i|
+    next if i == 0
+    utility_id = row[1]
+    getpage = row[3]
+    tariff_file_name = "./resources/tariffs/#{utility_id}_#{getpage}.json"
+    next if File.exists?(tariff_file_name) # only add new file(s), don't update existing file(s)
+    params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
+    uri.query = URI.encode_www_form(params)
+    request = Net::HTTP::Get.new(uri.request_uri)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    response = http.request(request)
+    response = JSON.parse(response.body, :symbolize_names=>true)
+    if response.keys.include? :error
+      puts "#{utility_id}_#{getpage}: #{response[:error][:message]}."
+      break
+    else
+      # if File.exists?(tariff_file_name) # update file(s)
+        # old_tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)
+        # if not response == old_tariff
+          # File.open(tariff_file_name, "w") do |f|
+            # puts "#{i}... #{File.basename(tariff_file_name)}"
+            # f.write(response.to_json)
+          # end
+        # end
+      # else # add new file(s)
+        File.open(tariff_file_name, "w") do |f|
+          puts "#{i}... #{File.basename(tariff_file_name)}"
+          f.write(response.to_json)
+        end
+      # end
+    end
+  end
+  
+  zip_file = OpenStudio::ZipFile.new(tariffs_file, false)
+  zip_file.addDirectory("./resources/tariffs", OpenStudio::toPath("/"))
+  FileUtils.rm_rf("./resources/tariffs")
+
+end
