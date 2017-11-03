@@ -13,7 +13,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", measure.fuel_types.length*measure.end_uses.length, 98, measure.fuel_types.length*measure.end_uses.length)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 112, 98, 112)
   end
   
   def test_leap_year_and_output_vars
@@ -23,7 +23,17 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", measure.fuel_types.length*measure.end_uses.length+7, 98, measure.fuel_types.length*measure.end_uses.length+measure.output_vars.length)
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 119, 98, 115)
+  end
+  
+  def test_tmy_and_appl_types
+    measure = TimeseriesCSVExport.new
+    args_hash = {}
+    args_hash["inc_appliances"] = "true"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1256, 1250, 1256)
   end
   
   private
@@ -148,6 +158,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
 
     # get the energyplus output requests, this will be done automatically by OS App and PAT
     idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
+    puts idf_output_requests.size
     assert(idf_output_requests.size == num_output_requests)
 
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
@@ -168,7 +179,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
-      # show_output(result)
+      show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
@@ -178,6 +189,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
+    puts result.info.size, result.warnings.size
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
     
