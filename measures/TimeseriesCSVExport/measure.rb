@@ -75,12 +75,12 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       Constants.ObjectNameGasFireplace,
       Constants.ObjectNameGasGrill,
       Constants.ObjectNameGasLighting,
-      Constants.ObjectNameHotTubHeaterElectric,
-      Constants.ObjectNameHotTubHeaterGas,
+      Constants.ObjectNameHotTubHeater(Constants.FuelTypeElectric),
+      Constants.ObjectNameHotTubHeater(Constants.FuelTypeGas),
       Constants.ObjectNameHotTubPump,
       Constants.ObjectNameMiscPlugLoads,
-      Constants.ObjectNamePoolHeaterElectric,
-      Constants.ObjectNamePoolHeaterGas,
+      Constants.ObjectNamePoolHeater(Constants.FuelTypeElectric),
+      Constants.ObjectNamePoolHeater(Constants.FuelTypeGas),
       Constants.ObjectNamePoolPump,
       Constants.ObjectNameWellPump
     ]    
