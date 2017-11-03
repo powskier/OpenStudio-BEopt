@@ -69,7 +69,20 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       Constants.ObjectNameCookingRange(Constants.FuelTypePropane),
       Constants.ObjectNameCookingRange(Constants.FuelTypeOil),
       Constants.ObjectNameDishwasher,
-      Constants.ObjectNameRefrigerator
+      Constants.ObjectNameRefrigerator,
+      Constants.ObjectNameExtraRefrigerator,
+      Constants.ObjectNameFreezer,
+      Constants.ObjectNameGasFireplace,
+      Constants.ObjectNameGasGrill,
+      Constants.ObjectNameGasLighting,
+      Constants.ObjectNameHotTubHeaterElectric,
+      Constants.ObjectNameHotTubHeaterGas,
+      Constants.ObjectNameHotTubPump,
+      Constants.ObjectNameMiscPlugLoads,
+      Constants.ObjectNamePoolHeaterElectric,
+      Constants.ObjectNamePoolHeaterGas,
+      Constants.ObjectNamePoolPump,
+      Constants.ObjectNameWellPump
     ]    
     return appl_types
   end

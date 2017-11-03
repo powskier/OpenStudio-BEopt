@@ -33,7 +33,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1256, 1250, 1256)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 1360, 1353, 1360)
   end
   
   private
@@ -158,7 +158,6 @@ class TimeseriesCSVExportTest < MiniTest::Test
 
     # get the energyplus output requests, this will be done automatically by OS App and PAT
     idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    puts idf_output_requests.size
     assert(idf_output_requests.size == num_output_requests)
 
     # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
@@ -179,7 +178,7 @@ class TimeseriesCSVExportTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
-      show_output(result)
+      # show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
@@ -189,7 +188,6 @@ class TimeseriesCSVExportTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    puts result.info.size, result.warnings.size
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
     
