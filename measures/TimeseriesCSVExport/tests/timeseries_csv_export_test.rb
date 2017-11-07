@@ -29,11 +29,11 @@ class TimeseriesCSVExportTest < MiniTest::Test
   def test_tmy_and_appl_types
     measure = TimeseriesCSVExport.new
     args_hash = {}
-    args_hash["inc_appliances"] = "true"
+    args_hash["inc_end_use_subcategories"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 2608, 2601, 2608)
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_Appl.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 116, 552, 560)
   end
   
   private
@@ -156,20 +156,18 @@ class TimeseriesCSVExportTest < MiniTest::Test
       argument_map[arg.name] = temp_arg_var
     end
 
-    # get the energyplus output requests, this will be done automatically by OS App and PAT
-    idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    puts idf_output_requests.size
-    assert(idf_output_requests.size == num_output_requests)
-
-    # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
-    model = setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
-
-    assert(File.exist?(model_out_path(osm_file_or_model, test_name)))
-
     # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
     runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_out_path(osm_file_or_model, test_name)))
     runner.setLastEpwFilePath(File.expand_path(epw_path_default(epw_name)))
     runner.setLastEnergyPlusSqlFilePath(OpenStudio::Path.new(sql_path(test_name)))
+    
+    # get the energyplus output requests, this will be done automatically by OS App and PAT
+    idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
+    assert(idf_output_requests.size == num_output_requests)
+
+    # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
+    model = setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
+    assert(File.exist?(model_out_path(osm_file_or_model, test_name)))
 
     # temporarily change directory to the run directory and run the measure
     start_dir = Dir.pwd
@@ -189,7 +187,6 @@ class TimeseriesCSVExportTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    puts result.info.size, result.warnings.size
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
     

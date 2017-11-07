@@ -57,34 +57,15 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     return end_uses
   end
   
-  def appl_types
-    appl_types = [
-      Constants.ObjectNameClothesDryer(Constants.FuelTypeElectric),
-      Constants.ObjectNameClothesDryer(Constants.FuelTypeGas),
-      Constants.ObjectNameClothesDryer(Constants.FuelTypePropane),
-      Constants.ObjectNameClothesDryer(Constants.FuelTypeOil),
-      Constants.ObjectNameClothesWasher,
-      Constants.ObjectNameCookingRange(Constants.FuelTypeElectric),
-      Constants.ObjectNameCookingRange(Constants.FuelTypeGas),
-      Constants.ObjectNameCookingRange(Constants.FuelTypePropane),
-      Constants.ObjectNameCookingRange(Constants.FuelTypeOil),
-      Constants.ObjectNameDishwasher,
-      Constants.ObjectNameRefrigerator,
-      Constants.ObjectNameExtraRefrigerator,
-      Constants.ObjectNameFreezer,
-      Constants.ObjectNameGasFireplace,
-      Constants.ObjectNameGasGrill,
-      Constants.ObjectNameGasLighting,
-      Constants.ObjectNameHotTubHeater(Constants.FuelTypeElectric),
-      Constants.ObjectNameHotTubHeater(Constants.FuelTypeGas),
-      Constants.ObjectNameHotTubPump,
-      Constants.ObjectNameMiscPlugLoads,
-      Constants.ObjectNamePoolHeater(Constants.FuelTypeElectric),
-      Constants.ObjectNamePoolHeater(Constants.FuelTypeGas),
-      Constants.ObjectNamePoolPump,
-      Constants.ObjectNameWellPump
-    ]    
-    return appl_types
+  def end_use_subcategories(model)
+    end_use_subcategories = []
+    model.getElectricEquipments.each do |ee|
+      next if ee.endUseSubcategory.empty?
+      next if end_use_subcategories.include? ee.endUseSubcategory
+      end_use_subcategories << ee.endUseSubcategory
+    end
+    # TODO: add a gas one and test
+    return end_use_subcategories
   end
   
   # define the arguments that the user will input
@@ -104,9 +85,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     arg.setDefaultValue("Hourly")
     args << arg
     
-    #make an argument for including optional individual appliances
-    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("inc_appliances", true)
-    arg.setDisplayName("Include Individual Appliances")
+    #make an argument for including optional end use subcategories
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("inc_end_use_subcategories", true)
+    arg.setDisplayName("Include End Use Subcategories")
     arg.setDefaultValue(false)
     args << arg    
     
@@ -132,8 +113,8 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     result = OpenStudio::IdfObjectVector.new
 
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency",user_arguments)
-    inc_appliances = runner.getBoolArgumentValue("inc_appliances",user_arguments)
-    inc_output_vars = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
+    inc_end_use_subcategories = runner.getBoolArgumentValue("inc_end_use_subcategories",user_arguments)
+    inc_output_variables = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
     output_vars = runner.getStringArgumentValue("output_variables",user_arguments).split(",")
 
     # Request the output for each end use/fuel type combination
@@ -145,16 +126,30 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
                   "#{end_use}:#{fuel_type}"
                 end
         result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
-        next if end_use == 'Facility'
-        next unless inc_appliances
-        appl_types.each do |appl_type|
-          result << OpenStudio::IdfObject.load("Output:Meter,#{appl_type}:#{variable_name},#{reporting_frequency};").get
+      end
+    end
+    
+    # Request the output for each electric equipment object
+    if inc_end_use_subcategories
+      # get the last model and sql file
+      model = runner.lastOpenStudioModel
+      if model.empty?
+        runner.registerError("Cannot find last model.")
+        return false
+      end
+      model = model.get    
+      end_use_subcategories(model).each do |end_use_subcategory|
+        end_uses.each do |end_use|
+          fuel_types.each do |fuel_type|
+            variable_name = "#{end_use_subcategory}:#{end_use}:#{fuel_type}"
+            result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
+          end
         end
       end
     end
     
-    # Request the output for each variable
-    if inc_output_vars
+    # Request the output for each output variable
+    if inc_output_variables
       output_vars.each do |output_var|
         result << OpenStudio::IdfObject.load("Output:Variable,#{output_var.strip},#{reporting_frequency};").get
       end
@@ -174,8 +169,8 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     
     # Assign the user inputs to variables
     reporting_frequency = runner.getStringArgumentValue("reporting_frequency",user_arguments)
-    inc_appliances = runner.getBoolArgumentValue("inc_appliances",user_arguments)
-    inc_output_vars = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
+    inc_end_use_subcategories = runner.getBoolArgumentValue("inc_end_use_subcategories",user_arguments)
+    inc_output_variables = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
     output_vars = runner.getStringArgumentValue("output_variables",user_arguments).split(",")
     
     # get the last model and sql file
@@ -185,7 +180,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       return false
     end
     model = model.get
-
+    
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
       runner.registerError("Cannot find last sql file.")
@@ -221,15 +216,20 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
                         end
         variables_to_graph << [variable_name, reporting_frequency, '']
         runner.registerInfo("Exporting #{variable_name}")
-        next if end_use == 'Facility'
-        next unless inc_appliances
-        appl_types.each do |appl_type|
-          variables_to_graph << ["#{appl_type}:#{variable_name}", reporting_frequency, '']
-          runner.registerInfo("Exporting #{appl_type}:#{variable_name}")
-        end
       end
     end
-    if inc_output_vars
+    if inc_end_use_subcategories
+      end_use_subcategories(model).each do |end_use_subcategory|
+        end_uses.each do |end_use|
+          fuel_types.each do |fuel_type|
+            variable_name = "#{end_use_subcategory}:#{end_use}:#{fuel_type}"
+            variables_to_graph << [variable_name, reporting_frequency, '']
+          end
+        end
+        runner.registerInfo("Exporting #{end_use_subcategory}")
+      end
+    end    
+    if inc_output_variables
       output_vars.each do |output_var|
         sql.availableKeyValues(ann_env_pd, reporting_frequency, output_var.strip).each do |key_value|
           variables_to_graph << [output_var.strip, reporting_frequency, key_value]
@@ -342,7 +342,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       cols << data_col
     end
     rows = cols.transpose
-    rows = [rows[0]] + rows[1..-1].sort {|a, b| a[0] <=> b[0]} # get the rows into sequential order based on the timestamps
+    
+    # Get the rows into sequential order based on the timestamps    
+    rows = [rows[0]] + rows[1..-1].sort {|a, b| a[0] <=> b[0]}
     
     # Write the rows out to CSV
     csv_path = File.expand_path("../enduse_timeseries.csv")
