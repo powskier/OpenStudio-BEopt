@@ -59,12 +59,11 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
   
   def end_use_subcategories(model)
     end_use_subcategories = []
-    model.getElectricEquipments.each do |ee|
-      next if ee.endUseSubcategory.empty?
-      next if end_use_subcategories.include? ee.endUseSubcategory
-      end_use_subcategories << ee.endUseSubcategory
+    (model.getElectricEquipments + model.getOtherEquipments).each do |equip|
+      next if equip.endUseSubcategory.empty?
+      next if end_use_subcategories.include? equip.endUseSubcategory
+      end_use_subcategories << equip.endUseSubcategory
     end
-    # TODO: add a gas one and test
     return end_use_subcategories
   end
   
