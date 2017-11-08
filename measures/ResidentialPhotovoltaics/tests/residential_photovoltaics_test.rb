@@ -374,6 +374,7 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     expected_values = {"total_kwhs"=>2105}
     model = _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "TimeseriesCSVExport", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
+    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculations", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
   end
 =end
   

@@ -287,7 +287,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
       # run the measure
       measure.run(runner, argument_map)
       result = runner.result
-      show_output(result)
+      # show_output(result)
     ensure
       Dir.chdir(start_dir)
     end
