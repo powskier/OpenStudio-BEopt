@@ -56,13 +56,32 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     ]    
     return end_uses
   end
-  
+
   def end_use_subcategories(model)
     end_use_subcategories = []
-    (model.getElectricEquipments + model.getOtherEquipments).each do |equip|
+    model.getElectricEquipments.each do |equip|
       next if equip.endUseSubcategory.empty?
-      next if end_use_subcategories.include? equip.endUseSubcategory
-      end_use_subcategories << equip.endUseSubcategory
+      end_uses.each do |end_use|
+        next if end_use_subcategories.include? "#{equip.endUseSubcategory}:#{end_use}:Electricity"
+        end_use_subcategories << "#{equip.endUseSubcategory}:#{end_use}:Electricity"
+      end
+    end
+    model.getGasEquipments.each do |equip|
+      next if equip.endUseSubcategory.empty?
+      end_uses.each do |end_use|
+        next if end_use_subcategories.include? "#{equip.endUseSubcategory}:#{end_use}:Gas"
+        end_use_subcategories << "#{equip.endUseSubcategory}:#{end_use}:Gas"
+      end
+    end
+    model.getOtherEquipments.each do |equip|
+      next if equip.endUseSubcategory.empty?
+      next if equip.fuelType.empty? or equip.fuelType == "None"
+      end_uses.each do |end_use|
+        variable_name = "#{equip.endUseSubcategory}:#{end_use}:#{equip.fuelType}"
+        variable_name = variable_name.gsub("NaturalGas", "Gas").gsub("PropaneGas", "Propane")
+        next if end_use_subcategories.include? variable_name
+        end_use_subcategories << variable_name
+      end
     end
     return end_use_subcategories
   end
@@ -120,10 +139,10 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
         variable_name = if end_use == 'Facility'
-                  "#{fuel_type}:#{end_use}"
-                else
-                  "#{end_use}:#{fuel_type}"
-                end
+            "#{fuel_type}:#{end_use}"
+          else
+            "#{end_use}:#{fuel_type}"
+          end
         result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
       end
     end
@@ -136,14 +155,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         runner.registerError("Cannot find last model.")
         return false
       end
-      model = model.get    
-      end_use_subcategories(model).each do |end_use_subcategory|
-        end_uses.each do |end_use|
-          fuel_types.each do |fuel_type|
-            variable_name = "#{end_use_subcategory}:#{end_use}:#{fuel_type}"
-            result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
-          end
-        end
+      model = model.get
+      end_use_subcategories(model).each do |variable_name|
+        result << OpenStudio::IdfObject.load("Output:Meter,#{variable_name},#{reporting_frequency};").get
       end
     end
     
@@ -209,23 +223,18 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
         variable_name = if end_use == 'Facility'
-                          "#{fuel_type}:#{end_use}"
-                        else
-                          "#{end_use}:#{fuel_type}"
-                        end
+            "#{fuel_type}:#{end_use}"
+          else
+            "#{end_use}:#{fuel_type}"
+          end
         variables_to_graph << [variable_name, reporting_frequency, '']
         runner.registerInfo("Exporting #{variable_name}")
       end
     end
     if inc_end_use_subcategories
-      end_use_subcategories(model).each do |end_use_subcategory|
-        end_uses.each do |end_use|
-          fuel_types.each do |fuel_type|
-            variable_name = "#{end_use_subcategory}:#{end_use}:#{fuel_type}"
-            variables_to_graph << [variable_name, reporting_frequency, '']
-          end
-        end
-        runner.registerInfo("Exporting #{end_use_subcategory}")
+      end_use_subcategories(model).each do |variable_name|
+        variables_to_graph << [variable_name, reporting_frequency, '']
+        runner.registerInfo("Exporting #{variable_name}")
       end
     end    
     if inc_output_variables
