@@ -520,58 +520,84 @@ task :update_tariffs do
   require 'csv'
   require 'net/https'
   require 'openstudio'
-  
-  api_key = nil
+
+  tariffs_path = "./resources/tariffs"
+  result = get_tariff_json_files(tariffs_path)  
+  if result
+    zip_file = OpenStudio::ZipFile.new(tariffs_zip, false)
+    zip_file.addDirectory(tariffs_path, OpenStudio::toPath("/"))
+  end
+  FileUtils.rm_rf(tariffs_path)
+
+end
+
+def get_tariff_json_files(tariffs_path)
+
   STDOUT.puts "Enter API Key:"
   api_key = STDIN.gets.strip
-  return if api_key.nil?
-  
-  tariffs_file = "./resources/tariffs.zip"
-  unzip_file = OpenStudio::UnzipFile.new(tariffs_file)
-  unzip_file.extractAllFiles(OpenStudio::toPath("./resources/tariffs"))
-  if !File.exists?("./resources/tariffs")
-    FileUtils.mkdir_p("./resources/tariffs")
+  return false if api_key.empty?
+
+  tariffs_zip = "#{tariffs_path}.zip"
+  unzip_file = OpenStudio::UnzipFile.new(tariffs_zip)
+  if not File.exists?(tariffs_path)
+    puts "Extracting #{tariffs_zip} to #{tariffs_path} ..."
+    unzip_file.extractAllFiles(OpenStudio::toPath(tariffs_path))
+  end
+  if !File.exists?(tariffs_path)
+    FileUtils.mkdir_p(tariffs_path)
   end
 
-  uri = URI('https://api.openei.org/utility_rates?')
+  url = URI.parse("https://api.openei.org/utility_rates?")
+  http = Net::HTTP.new(url.host, url.port)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_NONE  
+
   rows = CSV.read("./resources/utilities.csv", {:encoding=>'ISO-8859-1'})
+  size = 0
+  progress = 0
   rows.each_with_index do |row, i|
+
+    size += 1
     next if i == 0
-    utility_id = row[1]
-    getpage = row[3]
-    tariff_file_name = "./resources/tariffs/#{utility_id}_#{getpage}.json"
-    next if File.exists?(tariff_file_name) # only add new file(s), don't update existing file(s)
-    params = {'version':3, 'format':'json', 'detail':'full', 'getpage':getpage, 'api_key':api_key}
-    uri.query = URI.encode_www_form(params)
-    request = Net::HTTP::Get.new(uri.request_uri)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    utility, eiaid, name, label = row
+    tariff_file_name = File.join(tariffs_path, "#{eiaid}_#{label}.json")
+    
+    # next if File.file?(tariff_file_name) # just add, don't update
+
+    params = { 'version' => 3, 'format' => 'json', 'detail' => 'full', 'getpage' => label, 'api_key' => api_key }
+    url.query = URI.encode_www_form(params)
+    request = Net::HTTP::Get.new(url.request_uri)
     response = http.request(request)
     response = JSON.parse(response.body, :symbolize_names=>true)
+
     if response.keys.include? :error
-      puts "#{utility_id}_#{getpage}: #{response[:error][:message]}."
-      break
-    else
-      # if File.exists?(tariff_file_name) # update file(s)
-        # old_tariff = JSON.parse(File.read(tariff_file_name), :symbolize_names=>true)
-        # if not response == old_tariff
-          # File.open(tariff_file_name, "w") do |f|
-            # puts "#{i}... #{File.basename(tariff_file_name)}"
-            # f.write(response.to_json)
-          # end
-        # end
-      # else # add new file(s)
-        File.open(tariff_file_name, "w") do |f|
-          puts "#{i}... #{File.basename(tariff_file_name)}"
-          f.write(response.to_json)
-        end
-      # end
+      puts "#{eiaid}_#{label}: #{response[:error][:message]}."
+      if response[:error][:message].include? "exceeded your rate limit"
+        return false
+      end
+      next
     end
-  end
+
+    if not File.file?(tariff_file_name)
+      puts "Added #{tariff_file_name} to #{tariffs_path}."
+      File.open(tariff_file_name, "w") do |f|
+        f.write(response.to_json)
+      end
+    elsif not JSON.parse(File.read(tariff_file_name), :symbolize_names=>true) == response
+      puts "Updated #{tariff_file_name} to #{tariffs_path}."
+      File.open(tariff_file_name, "w") do |f|
+        f.write(response.to_json)
+      end
+    end
+    
+    new_progress = (size * 100) / rows.length
+    unless new_progress == progress
+      puts "Completed %3d%% ..." % [new_progress]
+    end
+    progress = new_progress
+
+  end    
   
-  zip_file = OpenStudio::ZipFile.new(tariffs_file, false)
-  zip_file.addDirectory("./resources/tariffs", OpenStudio::toPath("/"))
-  FileUtils.rm_rf("./resources/tariffs")
+  return true
 
 end
