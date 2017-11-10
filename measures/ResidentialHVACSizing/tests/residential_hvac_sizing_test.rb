@@ -2362,6 +2362,132 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_ElecBoiler_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
+  def test_equip_gas_boiler_autosize
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'DehumidLoad_Inf_Sens' => -1567,
+            'DehumidLoad_Inf_Lat' => -1161,
+            'DehumidLoad_Int_Sens' => 2303,
+            'DehumidLoad_Int_Lat' => 1065,
+            'Heat Windows' => 8623,
+            'Heat Doors' => 252,
+            'Heat Walls' => 12768,
+            'Heat Roofs' => 2242,
+            'Heat Floors' => 2049,
+            'Heat Infil' => 15650,
+            'Dehumid Windows' => -1053,
+            'Dehumid Doors' => -30,
+            'Dehumid Walls' => -1069,
+            'Dehumid Roofs' => -273,
+            'Dehumid Floors' => 9,
+            'Cool Windows' => 5778,
+            'Cool Doors' => 91,
+            'Cool Walls' => 1777,
+            'Cool Roofs' => 591,
+            'Cool Floors' => 230,
+            'Cool Infil Sens' => 1963,
+            'Cool Infil Lat' => -3226,
+            'Cool IntGains Sens' => 2912,
+            'Cool IntGains Lat' => 1062,
+            'Heat Load' => 41587,
+            'Cool Load Sens' => 13344,
+            'Cool Load Lat' => 0,
+            'Dehumid Load Sens' => -1682,
+            'Dehumid Load Lat' => -95,
+            'Heat Airflow' => 0,
+            'Cool Airflow' => 866,
+            'HeatingLoad' => 41587,
+            'HeatingDuctLoad' => 0,
+            'CoolingLoad_Lat' => 0,
+            'CoolingLoad_Sens' => 13344,
+            'CoolingLoad_Ducts_Lat' => 0,
+            'CoolingLoad_Ducts_Sens' => 0,
+            'DehumidLoad_Sens' => -1682,
+            'DehumidLoad_Ducts_Lat' => 0,
+            'Cool_Capacity' => 0,
+            'Cool_SensCap' => 0,
+            'Heat_Capacity' => 41587,
+            'SuppHeat_Capacity' => 0,
+            'Cool_AirFlowRate' => 0,
+            'Heat_AirFlowRate' => 0,
+            'Fan_AirFlowRate' => 0,
+            'Dehumid_WaterRemoval_Auto' => 0,
+            'Pump:VariableSpeed_Design Flow Rate {m3/s}' => 0.000262377620982,
+            'Boiler:HotWater_Nomimal Capacity {W}' => 12189.3551749,
+            'ZoneHVAC:Baseboard:Convective:Water_Living_U-Factor Times Area Value {W/K}' => 877.633572593,
+            'ZoneHVAC:Baseboard:Convective:Water_Living_Maximum Water Flow rate {m3/s}' => 0.000525093264264,
+            'ZoneHVAC:Baseboard:Convective:Water_Basement_U-Factor Times Area Value {W/K}' => 877.633572593,
+            'ZoneHVAC:Baseboard:Convective:Water_Basement_Maximum Water Flow rate {m3/s}' => 0.000525093264264,    
+                      }
+    _test_measure("SFD_HVACSizing_Equip_GasBoiler_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end  
+
+  def test_equip_gas_boiler_fixedsize
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'DehumidLoad_Inf_Sens' => -1567,
+            'DehumidLoad_Inf_Lat' => -1161,
+            'DehumidLoad_Int_Sens' => 2303,
+            'DehumidLoad_Int_Lat' => 1065,
+            'Heat Windows' => 8623,
+            'Heat Doors' => 252,
+            'Heat Walls' => 12768,
+            'Heat Roofs' => 2242,
+            'Heat Floors' => 2049,
+            'Heat Infil' => 15650,
+            'Dehumid Windows' => -1053,
+            'Dehumid Doors' => -30,
+            'Dehumid Walls' => -1069,
+            'Dehumid Roofs' => -273,
+            'Dehumid Floors' => 9,
+            'Cool Windows' => 5778,
+            'Cool Doors' => 91,
+            'Cool Walls' => 1777,
+            'Cool Roofs' => 591,
+            'Cool Floors' => 230,
+            'Cool Infil Sens' => 1963,
+            'Cool Infil Lat' => -3226,
+            'Cool IntGains Sens' => 2912,
+            'Cool IntGains Lat' => 1062,
+            'Heat Load' => 41587,
+            'Cool Load Sens' => 13344,
+            'Cool Load Lat' => 0,
+            'Dehumid Load Sens' => -1682,
+            'Dehumid Load Lat' => -95,
+            'Heat Airflow' => 0,
+            'Cool Airflow' => 866,
+            'HeatingLoad' => 100000,
+            'HeatingDuctLoad' => 0,
+            'CoolingLoad_Lat' => 0,
+            'CoolingLoad_Sens' => 13344,
+            'CoolingLoad_Ducts_Lat' => 0,
+            'CoolingLoad_Ducts_Sens' => 0,
+            'DehumidLoad_Sens' => -1682,
+            'DehumidLoad_Ducts_Lat' => 0,
+            'Cool_Capacity' => 0,
+            'Cool_SensCap' => 0,
+            'Heat_Capacity' => 100000,
+            'SuppHeat_Capacity' => 0,
+            'Cool_AirFlowRate' => 0,
+            'Heat_AirFlowRate' => 0,
+            'Fan_AirFlowRate' => 0,
+            'Dehumid_WaterRemoval_Auto' => 0,
+            'Pump:VariableSpeed_Design Flow Rate {m3/s}' => 0.00063090196,
+            'Boiler:HotWater_Nomimal Capacity {W}' => 29310.0,
+            'ZoneHVAC:Baseboard:Convective:Water_Living_U-Factor Times Area Value {W/K}' => 2110.32,
+            'ZoneHVAC:Baseboard:Convective:Water_Living_Maximum Water Flow rate {m3/s}' => 0.00126261671391,
+            'ZoneHVAC:Baseboard:Convective:Water_Basement_U-Factor Times Area Value {W/K}' => 2110.32,
+            'ZoneHVAC:Baseboard:Convective:Water_Basement_Maximum Water Flow rate {m3/s}' => 0.00126261671391,
+                      }
+    _test_measure("SFD_HVACSizing_Equip_GasBoiler_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end  
+  
   def test_equip_gas_furnace_autosize
     args_hash = {}
     args_hash["show_debug_info"] = true
