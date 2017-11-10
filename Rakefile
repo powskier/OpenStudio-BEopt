@@ -16,14 +16,6 @@ require 'json'
 # you must be an administrator or editor member of a group to
 # upload content to that group
 
-# Get latest installed version of openstudio.exe
-os_clis = Dir["C:/openstudio-*/bin/openstudio.exe"] + Dir["/usr/bin/openstudio"] + Dir["/usr/local/bin/openstudio"]
-if os_clis.size == 0
-    puts "ERROR: Could not find the openstudio binary. You may need to install the OpenStudio Command Line Interface."
-    exit
-end
-os_cli = os_clis[-1]
-
 namespace :measures do
   desc 'Generate measures to prepare for upload to BCL '
   task :generate do
@@ -154,6 +146,8 @@ namespace :test do
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
+    
+    os_cli = get_os_cli()
 
     osw_files.each do |osw|
 
@@ -317,6 +311,7 @@ task :update_measures do
   end
   
   # Update measure xmls
+  os_cli = get_os_cli()
   command = "\"#{os_cli}\" measure --update_all #{measures_dir} >> log"
   puts "Updating measure.xml files..."
   system(command)
@@ -600,4 +595,14 @@ def get_tariff_json_files(tariffs_path)
   
   return true
 
+end
+
+def get_os_cli
+  # Get latest installed version of openstudio.exe
+  os_clis = Dir["C:/openstudio-*/bin/openstudio.exe"] + Dir["/usr/bin/openstudio"] + Dir["/usr/local/bin/openstudio"]
+  if os_clis.size == 0
+      puts "ERROR: Could not find the openstudio binary. You may need to install the OpenStudio Command Line Interface."
+      exit
+  end
+  return os_clis[-1]
 end
