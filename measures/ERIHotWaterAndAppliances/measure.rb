@@ -291,15 +291,8 @@ class ERIHotWaterAndAppliances < OpenStudio::Measure::ModelMeasure
           plant_loop.addDemandBranchForComponent(water_use_connection)
           
           # Get water heater setpoint schedule
-          setpoint_sched = nil
-          plant_loop.supplyComponents.each do |wh|
-            if wh.to_WaterHeaterMixed.is_initialized
-              setpoint_sched = wh.to_WaterHeaterMixed.get.setpointTemperatureSchedule.get
-              break
-            end
-          end
+          setpoint_sched = Waterheater.get_water_heater_setpoint_schedule(model, plant_loop, runner)
           if setpoint_sched.nil?
-            runner.registerError("Could not find water heater setpoint schedule.")
             return false
           end
           
