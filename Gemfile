@@ -34,3 +34,5 @@ gem 'rest-client', '~> 2.0.1'
 
 gem 'parallel'
 gem 'rubyzip'
+
+gem 'ruby-prof'
