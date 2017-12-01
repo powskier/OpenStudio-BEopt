@@ -1,6 +1,7 @@
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
+# require 'ruby-prof'
 require 'erb'
 require 'csv'
 require "#{File.dirname(__FILE__)}/resources/weather"
@@ -170,7 +171,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
     return result
   end
-  
+
   # define what happens when the measure is run
   def run(runner, user_arguments)
     super(runner, user_arguments)
@@ -186,7 +187,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     inc_output_variables = runner.getBoolArgumentValue("inc_output_variables",user_arguments)
     output_vars = runner.getStringArgumentValue("output_variables",user_arguments).split(",")
     
-    # get the last model and sql file
+    # Get the last model
     model = runner.lastOpenStudioModel
     if model.empty?
       runner.registerError("Cannot find last model.")
@@ -194,6 +195,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end
     model = model.get
     
+    # Get the last sql file
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
       runner.registerError("Cannot find last sql file.")
@@ -212,10 +214,17 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         end
       end
     end
-
     if ann_env_pd == false
       runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
       return false
+    end
+
+    # Get the epw file
+    wf = model.weatherFile.get
+    epw_file = OpenStudio::EpwFile.new(wf.url.to_s.sub("file:///","").sub("file://","").sub("file:",""))
+    actual_timestamps = nil
+    if epw_file.startDateActualYear.is_initialized
+      actual_timestamps = WeatherProcess.epw_timestamps(model, runner, File.dirname(__FILE__))
     end
 
     # Create an array of arrays of variables
@@ -245,8 +254,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         end
       end
     end
-
-    epw_timestamps = WeatherProcess.epw_timestamps(model, runner, File.dirname(__FILE__))
 
     all_series = []
     # Sort by fuel, putting the total (Facility) column at the end of the fuel.
@@ -282,7 +289,11 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       js_date_times = []
       y_timeseries.dateTimes.each_with_index do |date_time, i|
         if reporting_frequency == "Hourly"
-          js_date_times << epw_timestamps[i]
+          if !actual_timestamps.nil?
+            js_date_times << actual_timestamps[i] # timestamps from the epw (AMY)
+          else
+            js_date_times << date_time # timestamps from the sqlfile (TMY)
+          end
         else
           js_date_times << i+1
         end
@@ -327,7 +338,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       all_series << series
         
     end
-        
+
     # Transform the data to CSV
     cols = []
     all_series.each_with_index do |series, k|
@@ -351,9 +362,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end
     rows = cols.transpose
     
-    # Get the rows into sequential order based on the timestamps    
-    rows = [rows[0]] + rows[1..-1].sort {|a, b| a[0] <=> b[0]}
-    
     # Write the rows out to CSV
     csv_path = File.expand_path("../enduse_timeseries.csv")
     CSV.open(csv_path, "wb") do |csv|
@@ -370,7 +378,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     return true
  
   end
-
+  
 end
 
 # register the measure to be used by the application
