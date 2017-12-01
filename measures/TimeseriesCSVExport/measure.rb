@@ -231,18 +231,18 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     variables_to_graph = []
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = if end_use == 'Facility'
+        variable_name = if end_use == "Facility"
             "#{fuel_type}:#{end_use}"
           else
             "#{end_use}:#{fuel_type}"
           end
-        variables_to_graph << [variable_name, reporting_frequency, '']
+        variables_to_graph << [variable_name, reporting_frequency, ""]
         runner.registerInfo("Exporting #{variable_name}")
       end
     end
     if inc_end_use_subcategories
       end_use_subcategories(model).each do |variable_name|
-        variables_to_graph << [variable_name, reporting_frequency, '']
+        variables_to_graph << [variable_name, reporting_frequency, ""]
         runner.registerInfo("Exporting #{variable_name}")
       end
     end    
@@ -255,21 +255,8 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    all_series = []
-    # Sort by fuel, putting the total (Facility) column at the end of the fuel.
-    variables_to_graph.sort_by! do |i| 
-      fuel_type = if i[0].include?('Facility')
-                    i[0].gsub(/:Facility/, '')
-                  else
-                    i[0].gsub(/.*:/, '')
-                  end
-      end_use = if i[0].include?('Facility')
-                  'ZZZ' # so it will be last
-                else
-                  i[0].gsub(/:.*/, '')
-                end
-      sort_key = "#{fuel_type}#{end_use}"
-    end
+    date_times = []
+    cols = []
     variables_to_graph.each_with_index do |var_to_graph, j|
     
       var_name = var_to_graph[0]
@@ -283,32 +270,13 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         next
       else
         y_timeseries = y_timeseries.get
+        values = y_timeseries.values
       end
-      y_vals = y_timeseries.values
 
-      js_date_times = []
-      y_timeseries.dateTimes.each_with_index do |date_time, i|
-        if reporting_frequency == "Hourly"
-          if !actual_timestamps.nil?
-            js_date_times << actual_timestamps[i] # timestamps from the epw (AMY)
-          else
-            js_date_times << date_time # timestamps from the sqlfile (TMY)
-          end
-        else
-          js_date_times << i+1
-        end
-      end
-      
-      # Store the timeseries data to hash for later
-      # export to the HTML file
-      series = {}
-      series["name"] = "#{kv}"
-      series["type"] = "#{var_name}"
-      # Unit conversion
-      old_units = y_timeseries.units
+      old_units = y_timeseries.units      
       new_units = case old_units
                   when "J"
-                    if var_name.include?('Electricity')
+                    if var_name.include?("Electricity")
                       "kWh"
                     else
                       "kBtu"
@@ -316,53 +284,45 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
                   when "m3"
                     old_units = "m^3"
                     "gal"
+                  when "C"
+                    "F"
                   else
                     old_units
                   end
-      series["units"] = new_units
-      data = []
-      for i in 0..(js_date_times.size - 1)
-        point = {}
-        val_i = y_vals[i]
-        # Unit conversion
-        unless new_units == old_units
-          val_i = OpenStudio.convert(val_i, old_units, new_units).get
+      unit_conv = OpenStudio.convert(1.0, old_units, new_units).get
+      
+      y_vals = ["#{var_name} #{kv} [#{new_units}]"]
+      y_timeseries.dateTimes.each_with_index do |date_time, i|
+        if date_times.empty?
+          date_times << "Time"
         end
-        time_i = js_date_times[i]
-        point["y"] = val_i
-        point["time"] = time_i
-        data << point
+        if cols.empty?
+          if reporting_frequency == "Hourly"
+            if !actual_timestamps.nil?
+              date_times << actual_timestamps[i] # timestamps from the epw (AMY)
+            else
+              date_times << date_time # timestamps from the sqlfile (TMY)
+            end
+          else
+            date_times << i+1
+          end
+        end
+        if not ["C"].include? old_units # these unit conversions are scalars
+          y_vals << values[i] * unit_conv
+        else # these aren't
+          y_vals << OpenStudio.convert(values[i], "C", "F").get
+        end
       end
-      next if data.all? {|x| x["y"].abs < 0.000000001}
-      series["data"] = data
-      all_series << series
-        
+
+      if cols.empty?
+        cols << date_times
+      end      
+      cols << y_vals
+
     end
 
-    # Transform the data to CSV
-    cols = []
-    all_series.each_with_index do |series, k|
-      data = series['data']
-      units = series['units']
-      # Record the timestamps and units on the first pass only
-      if k == 0
-        time_col = ['Time']
-        data.each do |entry|
-          time_col << entry['time']
-        end
-        cols << time_col
-      end
-      # Record the data
-      col_name = "#{series['type']} #{series['name']} [#{series['units']}]"
-      data_col = [col_name]
-      data.each do |entry|
-        data_col << entry['y'].round(2)
-      end
-      cols << data_col
-    end
+    # Write the rows out to csv
     rows = cols.transpose
-    
-    # Write the rows out to CSV
     csv_path = File.expand_path("../enduse_timeseries.csv")
     CSV.open(csv_path, "wb") do |csv|
       rows.each do |row|
@@ -371,7 +331,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end    
     csv_path = File.absolute_path(csv_path)
     runner.registerFinalCondition("CSV file saved to <a href='file:///#{csv_path}'>enduse_timeseries.csv</a>.")
-    
+
     # close the sql file
     sql.close()
     
