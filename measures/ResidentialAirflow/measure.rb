@@ -2623,7 +2623,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       ducts.has_ducts = false
     end      
     
-    unless HVAC.has_mshp(model, runner, unit.living_zone)
+    if HVAC.has_mshp(model, runner, unit.living_zone)
       ducts.duct_location_zone = unit.living_zone
       ducts.duct_location_name = unit.living_zone.name.to_s
       ducts.has_ducts = false

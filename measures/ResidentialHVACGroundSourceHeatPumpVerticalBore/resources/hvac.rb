@@ -537,11 +537,16 @@ class HVAC
     
     def self.has_central_ac(model, runner, thermal_zone)
       system, clg_coil, htg_coil, air_loop = self.get_unitary_system(model, runner, thermal_zone)
-      if system.nil? or clg_coil.nil? or not htg_coil.nil?
+      if system.nil? or clg_coil.nil?
         return false
       end
       if not (clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized)
         return false
+      end
+      if not htg_coil.nil?
+        if htg_coil.to_CoilHeatingDXSingleSpeed.is_initialized or htg_coil.to_CoilHeatingDXMultiSpeed.is_initialized
+          return false # ASHP
+        end
       end
       return true
     end
@@ -581,6 +586,11 @@ class HVAC
       end
       if not (htg_coil.to_CoilHeatingGas.is_initialized or htg_coil.to_CoilHeatingElectric.is_initialized)
         return false
+      end
+      if not clg_coil.nil?
+        if clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized
+          return false # ASHP
+        end
       end
       return true
     end
