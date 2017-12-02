@@ -114,8 +114,8 @@ class Waterheater
         return nil
     end
 
-    def self.deadband(tank_type)
-        if tank_type == Constants.WaterHeaterTypeTank
+    def self.deadband(wh_type)
+        if wh_type == Constants.WaterHeaterTypeTank
             return 2.0 # deg-C
         else
             return 0.0 # deg-C
@@ -406,7 +406,7 @@ class Waterheater
         #Create a new plant loop for the water heater
         loop = OpenStudio::Model::PlantLoop.new(model)
         loop.setName(name)
-        loop.sizingPlant.setDesignLoopExitTemperature(OpenStudio::convert(t_set,"F","C").get + self.deadband(tank_type)/2.0)
+        loop.sizingPlant.setDesignLoopExitTemperature(OpenStudio::convert(t_set,"F","C").get + self.deadband(wh_type)/2.0)
         loop.sizingPlant.setLoopDesignTemperatureDifference(OpenStudio::convert(10,"R","K").get)
         loop.setPlantLoopVolume(0.003) #~1 gal
         loop.setMaximumLoopFlowRate(0.01) # This size represents the physical limitations to flow due to losses in the piping system. For BEopt we assume that the pipes are always adequately sized
