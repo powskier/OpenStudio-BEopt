@@ -395,7 +395,9 @@ class HVAC
       if self.has_mshp(model, runner, thermal_zone)
         runner.registerInfo("Found mini split heat pump in #{thermal_zone.name}.")
         vrf = self.get_vrf(model, runner, thermal_zone)
-        cooling_equipment << vrf
+        vrf.terminals.each do |terminal|
+          cooling_equipment << terminal
+        end
       end
       if self.has_gshp(model, runner, thermal_zone)
         system, clg_coil, htg_coil, air_loop = self.get_unitary_system(model, runner, thermal_zone)
@@ -431,7 +433,9 @@ class HVAC
       if self.has_mshp(model, runner, thermal_zone)
         runner.registerInfo("Found mini split heat pump in #{thermal_zone.name}.")
         vrf = self.get_vrf(model, runner, thermal_zone)
-        heating_equipment << vrf
+        vrf.terminals.each do |terminal|
+          heating_equipment << terminal
+        end
       end
       if self.has_gshp(model, runner, thermal_zone)
         runner.registerInfo("Found ground source heat pump in #{thermal_zone.name}.")
@@ -586,11 +590,6 @@ class HVAC
       end
       if not (htg_coil.to_CoilHeatingGas.is_initialized or htg_coil.to_CoilHeatingElectric.is_initialized)
         return false
-      end
-      if not clg_coil.nil?
-        if clg_coil.to_CoilCoolingDXSingleSpeed.is_initialized or clg_coil.to_CoilCoolingDXMultiSpeed.is_initialized
-          return false # ASHP
-        end
       end
       return true
     end
