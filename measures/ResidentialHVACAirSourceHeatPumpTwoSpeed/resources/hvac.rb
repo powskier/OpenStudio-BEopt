@@ -288,28 +288,46 @@ class HVAC
     
     def self.calc_plr_coefficients_cooling(number_Speeds, coolingSEER, c_d=nil)
         if c_d.nil?
-            if number_Speeds == 1
-                c_d = self.calc_Cd_from_SEER_EER_SingleSpeed(coolingSEER)
-            elsif number_Speeds == 2
-                c_d = self.calc_Cd_from_SEER_EER_TwoSpeed()
-            elsif number_Speeds == 4
-                c_d = self.calc_Cd_from_SEER_EER_FourSpeed()
-            end
+          c_d = self.get_c_d_cooling(number_Speeds, coolingSEER)
         end
         return [(1.0 - c_d), c_d, 0.0] # Linear part load model
     end
     
     def self.calc_plr_coefficients_heating(number_Speeds, heatingHSPF, c_d=nil)
         if c_d.nil?
-            if number_Speeds == 1
-              c_d = self.calc_Cd_from_HSPF_COP_SingleSpeed(heatingHSPF)
-            elsif number_Speeds == 2
-              c_d = self.calc_Cd_from_HSPF_COP_TwoSpeed()
-            elsif number_Speeds == 4
-              c_d = self.calc_Cd_from_HSPF_COP_FourSpeed()
-            end
+          c_d = self.get_c_d_heating(number_Speeds, heatingHSPF)
         end
         return [(1 - c_d), c_d, 0] # Linear part load model
+    end
+    
+    def self.get_c_d_cooling(number_Speeds, coolingSEER)
+        # Degradation coefficient for cooling
+        if number_Speeds == 1
+          if coolingSEER < 13.0
+            return 0.20
+          else
+            return 0.07
+          end
+        elsif number_Speeds == 2
+          return 0.11
+        elsif number_Speeds == 4
+          return 0.25
+        end
+    end
+    
+    def self.get_c_d_heating(number_Speeds, heatingHSPF)
+        # Degradation coefficient for heating
+        if number_Speeds == 1
+          if heatingHSPF < 7.0
+            return 0.20
+          else
+            return 0.11
+          end
+        elsif number_Speeds == 2
+          return 0.11
+        elsif number_Speeds == 4
+          return 0.24
+        end
     end
     
     def self.get_boiler_curve(model, isCondensing)
@@ -324,44 +342,6 @@ class HVAC
         return OpenStudio::convert(static / fan_power,"cfm","m^3/s").get # Overall Efficiency of the Supply Fan, Motor and Drive
     end
 
-    def self.calc_Cd_from_SEER_EER_SingleSpeed(seer)
-      # Use hard-coded Cd values
-      if seer < 13.0
-        return 0.20
-      else
-        return 0.07
-      end
-    end
-
-    def self.calc_Cd_from_SEER_EER_TwoSpeed()
-      # Use hard-coded Cd values
-      return 0.11
-    end
-
-    def self.calc_Cd_from_SEER_EER_FourSpeed()
-      # Use hard-coded Cd values
-      return 0.25
-    end
-
-    def self.calc_Cd_from_HSPF_COP_SingleSpeed(hspf)
-      # Use hard-coded Cd values
-      if hspf < 7.0
-          return 0.20
-      else
-          return 0.11
-      end
-    end
-
-    def self.calc_Cd_from_HSPF_COP_TwoSpeed()
-      # Use hard-coded Cd values
-      return 0.11
-    end
-
-    def self.calc_Cd_from_HSPF_COP_FourSpeed()
-      # Use hard-coded Cd values
-      return 0.24
-    end  
-  
     def self.get_furnace_hir(furnaceInstalledAFUE)
       # Based on DOE2 Volume 5 Compliance Analysis manual.
       # This is not used until we have a better way of disaggregating AFUE
