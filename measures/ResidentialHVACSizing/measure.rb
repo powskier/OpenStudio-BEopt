@@ -3002,30 +3002,14 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         htg_equips << htg_equip
     end
     
-    if not HVAC.has_central_air_conditioner(model, runner, control_zone, false, false).nil?
-        hvac.HasCentralAirConditioner = true
-    end
-    if not HVAC.has_room_air_conditioner(model, runner, control_zone, false).nil?
-        hvac.HasRoomAirConditioner = true
-    end
-    if not HVAC.has_furnace(model, runner, control_zone, false, false).nil?
-        hvac.HasFurnace = true
-    end
-    if not HVAC.has_boiler(model, runner, control_zone, false).nil?
-        hvac.HasBoiler = true
-    end
-    if not HVAC.has_electric_baseboard(model, runner, control_zone, false).nil?
-        hvac.HasElecBaseboard = true
-    end
-    if not HVAC.has_air_source_heat_pump(model, runner, control_zone, false).nil?
-        hvac.HasAirSourceHeatPump = true
-    end
-    if not HVAC.has_mini_split_heat_pump(model, runner, control_zone, unit, false).nil?
-        hvac.HasMiniSplitHeatPump = true
-    end
-    if not HVAC.has_gshp_vert_bore(model, runner, control_zone, false).nil?
-        hvac.HasGroundSourceHeatPump = true
-    end
+    hvac.HasCentralAirConditioner = HVAC.has_central_ac(model, runner, control_zone)
+    hvac.HasRoomAirConditioner = HVAC.has_room_ac(model, runner, control_zone)
+    hvac.HasFurnace = HVAC.has_furnace(model, runner, control_zone)
+    hvac.HasBoiler = HVAC.has_boiler(model, runner, control_zone)
+    hvac.HasElecBaseboard = HVAC.has_electric_baseboard(model, runner, control_zone)
+    hvac.HasAirSourceHeatPump = HVAC.has_ashp(model, runner, control_zone)
+    hvac.HasMiniSplitHeatPump = HVAC.has_mshp(model, runner, control_zone)
+    hvac.HasGroundSourceHeatPump = HVAC.has_gshp(model, runner, control_zone)
     
     if hvac.HasAirSourceHeatPump or hvac.HasMiniSplitHeatPump
         hvac.HPSizedForMaxLoad = get_unit_feature(runner, unit, Constants.SizingInfoHPSizedForMaxLoad, 'boolean', true)
