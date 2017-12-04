@@ -26,34 +26,34 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
 
   def fuel_types
     fuel_types = [  
-      'Electricity',
-      'Gas',
-      'DistrictCooling',
-      'DistrictHeating',
-      'Water',
-      'FuelOil#1',
-      'Propane',
-      'ElectricityProduced'
+      "Electricity",
+      "Gas",
+      "DistrictCooling",
+      "DistrictHeating",
+      "Water",
+      "FuelOil#1",
+      "Propane",
+      "ElectricityProduced"
     ]    
     return fuel_types
   end
   
   def end_uses
     end_uses = [
-      'Heating',
-      'Cooling',
-      'InteriorLights',
-      'ExteriorLights',
-      'InteriorEquipment',
-      'ExteriorEquipment',
-      'Fans',
-      'Pumps',
-      'HeatRejection',
-      'Humidifier',
-      'HeatRecovery',
-      'WaterSystems',
-      'Refrigeration',
-      'Facility'
+      "Heating",
+      "Cooling",
+      "InteriorLights",
+      "ExteriorLights",
+      "InteriorEquipment",
+      "ExteriorEquipment",
+      "Fans",
+      "Pumps",
+      "HeatRejection",
+      "Humidifier",
+      "HeatRecovery",
+      "WaterSystems",
+      "Refrigeration",
+      "Facility"
     ]    
     return end_uses
   end
@@ -139,7 +139,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     # Request the output for each end use/fuel type combination
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = if end_use == 'Facility'
+        variable_name = if end_use == "Facility"
             "#{fuel_type}:#{end_use}"
           else
             "#{end_use}:#{fuel_type}"
@@ -219,14 +219,6 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       return false
     end
 
-    # Get the epw file
-    wf = model.weatherFile.get
-    epw_file = OpenStudio::EpwFile.new(wf.url.to_s.sub("file:///","").sub("file://","").sub("file:",""))
-    actual_timestamps = nil
-    if epw_file.startDateActualYear.is_initialized
-      actual_timestamps = WeatherProcess.epw_timestamps(model, runner, File.dirname(__FILE__))
-    end
-
     # Create an array of arrays of variables
     variables_to_graph = []
     end_uses.each do |end_use|
@@ -255,6 +247,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       end
     end
 
+    # Get the timestamps for actual year epw file
+    actual_timestamps = WeatherProcess.actual_timestamps(model, runner, File.dirname(__FILE__))
+    
     date_times = []
     cols = []
     variables_to_graph.each_with_index do |var_to_graph, j|
@@ -289,7 +284,14 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
                   else
                     old_units
                   end
-      unit_conv = OpenStudio.convert(1.0, old_units, new_units).get
+      unit_conv = nil
+      if ["J", "m^3"].include? old_units
+        unit_conv = OpenStudio.convert(1.0, old_units, new_units).get
+      elsif not (old_units == "C" and new_units == "F")
+        unless old_units.empty?
+          runner.registerInfo("Have not yet defined a conversion from #{old_units} to other units.")
+        end
+      end
       
       y_vals = ["#{var_name} #{kv} [#{new_units}]"]
       y_timeseries.dateTimes.each_with_index do |date_time, i|
@@ -298,20 +300,24 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         end
         if cols.empty?
           if reporting_frequency == "Hourly"
-            if !actual_timestamps.nil?
-              date_times << actual_timestamps[i] # timestamps from the epw (AMY)
+            if actual_timestamps.nil?
+              date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
             else
-              date_times << date_time # timestamps from the sqlfile (TMY)
+              date_times << actual_timestamps[i] # timestamps from the epw (AMY)
             end
           else
             date_times << i+1
           end
         end
-        if not ["C"].include? old_units # these unit conversions are scalars
-          y_vals << values[i] * unit_conv
-        else # these aren't
-          y_vals << OpenStudio.convert(values[i], "C", "F").get
+        y_val = values[i]
+        if unit_conv.nil? # these unit conversions are not scalars
+          if old_units == "C" and new_units == "F"
+            y_val = 1.8 * y_val + 32.0 # convert C to F
+          end
+        else # these are scalars
+          y_val *= unit_conv
         end
+        y_vals << y_val.round(3)
       end
 
       if cols.empty?
@@ -337,6 +343,23 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     
     return true
  
+  end
+  
+  def format_datetime(date_time)
+    date_time = date_time.gsub("-", "/")
+    date_time = date_time.gsub("Jan", "01")
+    date_time = date_time.gsub("Feb", "02")
+    date_time = date_time.gsub("Mar", "03")
+    date_time = date_time.gsub("Apr", "04")
+    date_time = date_time.gsub("May", "05")
+    date_time = date_time.gsub("Jun", "06")
+    date_time = date_time.gsub("Jul", "07")
+    date_time = date_time.gsub("Aug", "08")
+    date_time = date_time.gsub("Sep", "09")
+    date_time = date_time.gsub("Oct", "10")
+    date_time = date_time.gsub("Nov", "11")
+    date_time = date_time.gsub("Dec", "12")
+    return date_time
   end
   
 end
