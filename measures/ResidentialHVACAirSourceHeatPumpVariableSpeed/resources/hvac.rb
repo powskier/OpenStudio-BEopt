@@ -178,7 +178,7 @@ class HVAC
       return curve
     end
       
-    def self.calc_coil_stage_data_cooling(model, outputCapacity, number_Speeds, coolingEIR, shr_Rated_Gross, cOOL_CAP_FT_SPEC, cOOL_EIR_FT_SPEC, cOOL_CLOSS_FPLR_SPEC, cOOL_CAP_FFLOW_SPEC, cOOL_EIR_FFLOW_SPEC)
+    def self.calc_coil_stage_data_cooling(model, outputCapacity, number_Speeds, coolingEIR, shr_Rated_Gross, cOOL_CAP_FT_SPEC, cOOL_EIR_FT_SPEC, cOOL_CLOSS_FPLR_SPEC, cOOL_CAP_FFLOW_SPEC, cOOL_EIR_FFLOW_SPEC, distributionSystemEfficiency)
 
       const_biquadratic = self.create_curve_biquadratic_constant(model)
     
@@ -202,7 +202,7 @@ class HVAC
           stage_data.setGrossRatedTotalCoolingCapacity(OpenStudio::convert(outputCapacity,"Btu/h","W").get) # Used by HVACSizing measure
         end
         stage_data.setGrossRatedSensibleHeatRatio(shr_Rated_Gross[speed])
-        stage_data.setGrossRatedCoolingCOP(1.0 / coolingEIR[speed])
+        stage_data.setGrossRatedCoolingCOP(distributionSystemEfficiency / coolingEIR[speed])
         stage_data.setNominalTimeforCondensateRemovaltoBegin(1000)
         stage_data.setRatioofInitialMoistureEvaporationRateandSteadyStateLatentCapacity(1.5)
         stage_data.setMaximumCyclingRate(3)
@@ -213,7 +213,7 @@ class HVAC
       return clg_coil_stage_data
     end
       
-    def self.calc_coil_stage_data_heating(model, outputCapacity, number_Speeds, heatingEIR, hEAT_CAP_FT_SPEC, hEAT_EIR_FT_SPEC, hEAT_CLOSS_FPLR_SPEC, hEAT_CAP_FFLOW_SPEC, hEAT_EIR_FFLOW_SPEC)
+    def self.calc_coil_stage_data_heating(model, outputCapacity, number_Speeds, heatingEIR, hEAT_CAP_FT_SPEC, hEAT_EIR_FT_SPEC, hEAT_CLOSS_FPLR_SPEC, hEAT_CAP_FFLOW_SPEC, hEAT_EIR_FFLOW_SPEC, distributionSystemEfficiency)
     
       const_biquadratic = self.create_curve_biquadratic_constant(model)
     
@@ -237,7 +237,7 @@ class HVAC
         if outputCapacity != Constants.SizingAuto and outputCapacity != Constants.SizingAutoMaxLoad
           stage_data.setGrossRatedHeatingCapacity(OpenStudio::convert(outputCapacity,"Btu/h","W").get) # Used by HVACSizing measure
         end   
-        stage_data.setGrossRatedHeatingCOP(1.0 / heatingEIR[speed])
+        stage_data.setGrossRatedHeatingCOP(distributionSystemEfficiency / heatingEIR[speed])
         stage_data.setRatedWasteHeatFractionofPowerInput(0.2)
         htg_coil_stage_data[speed] = stage_data
       end
