@@ -15,12 +15,13 @@ class ProcessSingleSpeedCentralAirConditionerTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end  
   
-  def test_new_construction_fbsmt_seer_13
+  def test_new_construction_fbsmt_seer_13_80_dse
     args_hash = {}
     args_hash["capacity"] = "3.0"
+    args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
-    expected_values = {"COP"=>3.95, "NominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
+    expected_values = {"COP"=>3.95*0.8, "NominalCapacity"=>10550.55, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
   

@@ -17,12 +17,13 @@ class ProcessFurnaceElectricTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
   
-  def test_new_construction_fbsmt_afue_0_78
+  def test_new_construction_fbsmt_afue_0_78_80_dse
     args_hash = {}
     args_hash["capacity"] = "20"
+    args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingElectric"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
-    expected_values = {"Efficiency"=>1, "NominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
+    expected_values = {"Efficiency"=>1*dse, "NominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end  
   
