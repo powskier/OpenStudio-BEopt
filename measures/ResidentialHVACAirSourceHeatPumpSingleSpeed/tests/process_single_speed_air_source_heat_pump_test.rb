@@ -15,13 +15,14 @@ class ProcessSingleSpeedAirSourceHeatPumpTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)  
   end
   
-  def test_new_construction_fbsmt_seer_13_7pt7_hspf
+  def test_new_construction_fbsmt_seer_13_7pt7_hspf_80_dse
     args_hash = {}
     args_hash["heat_pump_capacity"] = "3.0"
     args_hash["supplemental_capacity"] = "20"
+    args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXSingleSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilHeatingElectric"=>1, "CoilHeatingDXSingleSpeed"=>1}
-    expected_values = {"CoolingCOP"=>4.07, "HeatingCOP"=>3.33, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
+    expected_values = {"CoolingCOP"=>4.07*0.8, "HeatingCOP"=>3.33*0.8, "CoolingNominalCapacity"=>10550.55, "HeatingNominalCapacity"=>10550.55, "SuppNominalCapacity"=>5861.42, "MaximumSupplyAirTemperature"=>76.66, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 6)    
   end
   
