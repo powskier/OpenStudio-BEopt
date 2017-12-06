@@ -153,7 +153,11 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
         elsif clg_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner
           clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
         elsif clg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-          clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
+          if clg_equip.coolingCoil.is_a? OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow
+            clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
+          else
+            clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil.get) # Optional coil as of 2.3.1
+          end
         else
           runner.registerError("Unexpected cooling system: '#{clg_equip.name}'.")
           return false

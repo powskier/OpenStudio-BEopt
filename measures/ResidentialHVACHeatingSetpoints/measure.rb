@@ -155,7 +155,11 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
             supp_htg_obj = HVAC.get_coil_from_hvac_component(htg_equip.supplementalHeatingCoil.get)
           end
         elsif htg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-          htg_obj = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil)
+          if htg_equip.heatingCoil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow 
+            htg_obj = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil)
+          else
+            htg_obj = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil.get) # Optional coil as of 2.3.1
+          end
         elsif htg_equip.to_ZoneHVACComponent.is_initialized
           htg_obj = htg_equip
         else
