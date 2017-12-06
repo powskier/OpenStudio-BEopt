@@ -462,7 +462,7 @@ class ResidentialHotWaterSolarTest < MiniTest::Test
     final_objects = get_objects(model)
     
     # get new and deleted objects
-    obj_type_exclusions = ["ConnectorMixer", "Node", "PipeAdiabatic", "ConnectorSplitter", "ScheduleDay", "ScheduleTypeLimits", "ScheduleConstant"]
+    obj_type_exclusions = ["ConnectorMixer", "Node", "PipeAdiabatic", "ConnectorSplitter", "ScheduleDay", "ScheduleTypeLimits", "ScheduleConstant", "AvailabilityManagerAssignmentList"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     
