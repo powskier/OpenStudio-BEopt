@@ -3004,9 +3004,15 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             hvac.HasForcedAirCooling = true
             clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil.get)
         elsif clg_equip.to_ZoneHVACComponent.is_initialized
-            clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
             if clg_equip.is_a?(OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow)
+                if clg_equip.coolingCoil.is_a? OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow
+                    clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
+                else
+                    clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil.get) # Optional coil as of 2.3.1
+                end
                 hvac.HasForcedAirCooling = true
+            else
+                clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
             end
         else
             runner.registerError("Unexpected cooling equipment: #{clg_equip.name}.")
@@ -3188,11 +3194,15 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             end
             
         elsif htg_equip.to_ZoneHVACComponent.is_initialized
-            if not htg_equip.is_a?(OpenStudio::Model::ZoneHVACBaseboardConvectiveElectric)
-                htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil)
-            end
             if htg_equip.is_a?(OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow)
+                if htg_equip.heatingCoil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow
+                    htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil)
+                else
+                    htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil.get) # Optional coil as of 2.3.1
+                end
                 hvac.HasForcedAirHeating = true
+            elsif not htg_equip.is_a?(OpenStudio::Model::ZoneHVACBaseboardConvectiveElectric)
+                htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil)
             end
             
         else
@@ -4050,8 +4060,16 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         clg_coil = nil
         if clg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem
             clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil.get)
-            
+          
+        elsif clg_equip.to_ZoneHVACTerminalUnitVariableRefrigerantFlow.is_initialized
+            if clg_equip.coolingCoil.is_a? OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow
+                clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
+            else
+                clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil.get) # Optional coil as of 2.3.1
+            end
+          
         elsif clg_equip.to_ZoneHVACComponent.is_initialized
+            
             clg_coil = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
             
         else
@@ -4110,6 +4128,13 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil.get)
             if htg_equip.supplementalHeatingCoil.is_initialized
                 supp_htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.supplementalHeatingCoil.get)
+            end
+            
+        elsif htg_equip.to_ZoneHVACTerminalUnitVariableRefrigerantFlow.is_initialized
+            if htg_equip.heatingCoil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow
+                htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil)
+            else
+                htg_coil = HVAC.get_coil_from_hvac_component(htg_equip.heatingCoil.get) # Optional coil as of 2.3.1
             end
             
         elsif htg_equip.to_ZoneHVACComponent.is_initialized
@@ -4265,10 +4290,18 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                 terminal.setOutdoorAirFlowRateWhenNoCoolingorHeatingisNeeded(0.0)
                 
                 # Coils
-                terminal.heatingCoil.setRatedTotalHeatingCapacity(htg_cap)
-                terminal.coolingCoil.setRatedTotalCoolingCapacity(clg_cap)
-                terminal.heatingCoil.setRatedAirFlowRate(htg_coil_airflow)
-                terminal.coolingCoil.setRatedAirFlowRate(clg_coil_airflow)
+                terminalHeatingCoil = terminal.heatingCoil
+                if not terminalHeatingCoil.is_a? OpenStudio::Model::CoilHeatingDXVariableRefrigerantFlow 
+                    terminalHeatingCoil = terminalHeatingCoil.get # Optional coil as of 2.3.1
+                end
+                terminalHeatingCoil.setRatedTotalHeatingCapacity(htg_cap)
+                terminalHeatingCoil.setRatedAirFlowRate(htg_coil_airflow)
+                terminalCoolingCoil = terminal.coolingCoil
+                if not terminalCoolingCoil.is_a? OpenStudio::Model::CoilCoolingDXVariableRefrigerantFlow 
+                    terminalCoolingCoil = terminalCoolingCoil.get # Optional coil as of 2.3.1
+                end
+                terminalCoolingCoil.setRatedTotalCoolingCapacity(clg_cap)
+                terminalCoolingCoil.setRatedAirFlowRate(clg_coil_airflow)
                 
                 # Fan
                 fanonoff = terminal.supplyAirFan.to_FanOnOff.get
