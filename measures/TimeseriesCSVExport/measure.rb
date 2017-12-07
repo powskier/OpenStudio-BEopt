@@ -1,7 +1,6 @@
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
-# require 'ruby-prof'
 require 'erb'
 require 'csv'
 require "#{File.dirname(__FILE__)}/resources/weather"
@@ -267,31 +266,9 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         y_timeseries = y_timeseries.get
         values = y_timeseries.values
       end
-
-      old_units = y_timeseries.units      
-      new_units = case old_units
-                  when "J"
-                    if var_name.include?("Electricity")
-                      "kWh"
-                    else
-                      "kBtu"
-                    end
-                  when "m3"
-                    old_units = "m^3"
-                    "gal"
-                  when "C"
-                    "F"
-                  else
-                    old_units
-                  end
-      unit_conv = nil
-      if ["J", "m^3"].include? old_units
-        unit_conv = OpenStudio.convert(1.0, old_units, new_units).get
-      elsif not (old_units == "C" and new_units == "F")
-        unless old_units.empty?
-          runner.registerInfo("Have not yet defined a conversion from #{old_units} to other units.")
-        end
-      end
+      
+      old_units = y_timeseries.units
+      new_units, unit_conv = UnitConversion.get_scalar_unit_conversion(var_name, old_units)
       
       y_vals = ["#{var_name} #{kv} [#{new_units}]"]
       y_timeseries.dateTimes.each_with_index do |date_time, i|
@@ -326,7 +303,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       cols << y_vals
 
     end
-
+    
     # Write the rows out to csv
     rows = cols.transpose
     csv_path = File.expand_path("../enduse_timeseries.csv")

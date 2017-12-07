@@ -10,7 +10,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_json_path_invalid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./tests/tariffs"
+    args_hash["tariff_directory"] = "./resources"
     args_hash["tariff_file_name"] = "result.txt"
     result = _test_error_or_NA("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw")
     assert(result.errors.size == 1)
@@ -21,7 +21,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_tmy_no_api_key_or_tariff_file_name
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources/tariffs"
+    args_hash["tariff_directory"] = "./resources"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
@@ -31,7 +31,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_tmy_no_api_key_or_tariff_file_name_average_rates
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources/tariffs"
+    args_hash["tariff_directory"] = "./resources"
     args_hash["avg_rates"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
@@ -42,7 +42,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_amy_no_api_key_or_tariff_file_name
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources/tariffs"
+    args_hash["tariff_directory"] = "./resources"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
@@ -52,7 +52,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
   def test_tariff_file_name_valid
     args_hash = {}
     args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./tests/tariffs"
+    args_hash["tariff_directory"] = "./resources"
     args_hash["tariff_file_name"] = "3138_539fc46eec4f024c27d8c6ed.json"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
@@ -168,6 +168,7 @@ class UtilityBillCalculationsTest < MiniTest::Test
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/utilities.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/by_nsrdb.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/Natural gas.csv", "#{resources_dir(test_name)}")
+    FileUtils.cp("#{File.dirname(__FILE__)}/../resources/unit_conversions.rb", "#{resources_dir(test_name)}")
     
     cli_path = OpenStudio.getOpenStudioCLI
     cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""

@@ -4,6 +4,7 @@
 require 'erb'
 require 'csv'
 require 'matrix'
+require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure
 class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
@@ -15,21 +16,21 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
   # human readable description
   def description
-    return "Calls SAM SDK."
+    return "Calls the SAM SDK for calculating utility bills."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calls SAM SDK."
+    return "Calls the utilityrate3 module in the SAM SDK."
   end 
   
   def fuel_types
     fuel_types = [  
-      'Electricity',
-      'Gas',
-      'FuelOil#1',
-      'Propane',
-      'ElectricityProduced'
+      "Electricity",
+      "Gas",
+      "FuelOil#1",
+      "Propane",
+      "ElectricityProduced"
     ]
     
     return fuel_types
@@ -37,7 +38,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
   
   def end_uses
     end_uses = [
-      'Facility'
+      "Facility"
     ]
     
     return end_uses
@@ -122,7 +123,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     # Request the output for each end use/fuel type combination
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = if end_use == 'Facility'
+        variable_name = if end_use == "Facility"
                   "#{fuel_type}:#{end_use}"
                 else
                   "#{end_use}:#{fuel_type}"
@@ -186,13 +187,6 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     prop_rate.is_initialized ? prop_rate = prop_rate.get : prop_rate = nil
     avg_rates = runner.getBoolArgumentValue("avg_rates", user_arguments)
 
-    if tariff_directory == "./resources/tariffs" and elec_fixed == 0 and elec_rate.nil?
-      if !File.directory? "#{File.dirname(__FILE__)}/resources/tariffs"
-        unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
-        unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/tariffs"))
-      end
-    end
-
     if not tariff_directory.nil?
     
       unless (Pathname.new tariff_directory).absolute?
@@ -210,7 +204,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       if !File.exist?(tariff_directory)
         FileUtils.mkdir_p(tariff_directory)
       end
-      
+
     end
     
     # get the last model and sql file
@@ -220,7 +214,8 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       return false
     end
     model = model.get
-    
+
+    # Get the last sql file
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
       runner.registerError("Cannot find last sql file.")
@@ -239,51 +234,41 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
         end
       end
     end
-    
+    if ann_env_pd == false
+      runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
+      return false
+    end
+
     timeseries = {}
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
       
         var_name = "#{fuel_type}:#{end_use}"
 
-        y_timeseries = sql.timeSeries(ann_env_pd, "Hourly", var_name, '')
+        # Get the y axis values
+        y_timeseries = sql.timeSeries(ann_env_pd, "Hourly", var_name, "")
         if y_timeseries.empty?
           runner.registerWarning("No data found for Hourly #{var_name}.")
           next
         else
           y_timeseries = y_timeseries.get
-        end
-        y_vals = y_timeseries.values
-                    
-        values = []
-        y_timeseries.dateTimes.each_with_index do |date_time, i|
-          values << y_vals[i]
+          values = y_timeseries.values
         end
 
-        next if values.all? {|x| x.abs < 0.000000001}
-                    
-        # Unit conversion
         old_units = y_timeseries.units
-        new_units = case old_units
-                    when "J"
-                      if var_name.include?('Electricity')
-                        "kWh"
-                      else
-                        "kBtu"
-                      end
-                    when "m3"
-                      old_units = "m^3"
-                      "gal"
-                    else
-                      old_units
-                    end
-                    
-        values.each do |value|
-          if timeseries.keys.include? var_name
-            timeseries[var_name] << OpenStudio.convert(value, old_units, new_units).get
-          else
-            timeseries[var_name] = [OpenStudio.convert(value, old_units, new_units).get]
+        new_units, unit_conv = UnitConversion.get_scalar_unit_conversion(var_name, old_units)
+
+        timeseries[var_name] = []
+        y_timeseries.dateTimes.each_with_index do |date_time, i|
+          y_val = values[i]
+          if unit_conv.nil? # these unit conversions are not scalars
+            if old_units == "C" and new_units == "F"
+              y_val = 1.8 * y_val + 32.0 # convert C to F
+            end
+          else # these are scalars
+            y_val *= unit_conv
           end
+          timeseries[var_name] << y_val.round(3)
         end
         
       end
@@ -527,7 +512,7 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
     timeseries["Electricity:Facility"].each_with_index do |val, i|
       timeseries["Electricity:Facility"][i] -= timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
     end
-    
+
     fuels = ["Electricity", "Natural gas", "Oil", "Propane"]
     fuels.each do |fuel|
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{fuel}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
@@ -566,8 +551,9 @@ class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
       end
     end
 
+    FileUtils.rm_rf("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1")
     FileUtils.rm_rf("#{File.dirname(__FILE__)}/resources/tariffs")
-    
+
     return true
  
   end
