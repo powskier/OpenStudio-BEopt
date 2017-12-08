@@ -191,9 +191,9 @@ class CreateResidentialOverhangsTest < MiniTest::Test
             if obj_type == "ShadingSurface"
                 l, w, h = Geometry.get_surface_dimensions(new_object)
                 if l < w
-                  assert_in_epsilon(expected_values["overhang_depth"], OpenStudio::convert(l,"m","ft").get, 0.01)
+                  assert_in_epsilon(expected_values["overhang_depth"], UnitConversions.convert(l,"m","ft"), 0.01)
                 else
-                  assert_in_epsilon(expected_values["overhang_depth"], OpenStudio::convert(w,"m","ft").get, 0.01)
+                  assert_in_epsilon(expected_values["overhang_depth"], UnitConversions.convert(w,"m","ft"), 0.01)
                 end
             end
         end

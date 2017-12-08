@@ -532,7 +532,7 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
                 next if not new_object.respond_to?("to_#{obj_type}")
                 new_object = new_object.public_send("to_#{obj_type}").get
                 if obj_type == "WaterHeaterStratified"
-                    actual_values_wh["TankVolume"] += OpenStudio.convert(new_object.tankVolume.get, "m^3", "gal").get
+                    actual_values_wh["TankVolume"] += UnitConversions.convert(new_object.tankVolume.get, "m^3", "gal")
                     actual_values_wh["Heater1Height"] += new_object.heater1Height
                     actual_values_wh["Heater2Height"] += new_object.heater2Height
                     actual_values_wh["TankU"] += new_object.uniformSkinLossCoefficientperUnitAreatoAmbientTemperature.to_f
@@ -544,8 +544,8 @@ class ResidentialHotWaterHeaterHeatPumpTest < MiniTest::Test
                         storage_tank = inlet_object.to_WaterHeaterStratified.get
                         setpoint_schedule_one = storage_tank.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get
                         setpoint_schedule_two = storage_tank.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get
-                        actual_values_storage["StorageTankSetpoint1"] += OpenStudio.convert(setpoint_schedule_one.value + 2.89,"C","F").get
-                        actual_values_storage["StorageTankSetpoint2"] += OpenStudio.convert(setpoint_schedule_two.value,"C","F").get
+                        actual_values_storage["StorageTankSetpoint1"] += UnitConversions.convert(setpoint_schedule_one.value + 2.89,"C","F")
+                        actual_values_storage["StorageTankSetpoint2"] += UnitConversions.convert(setpoint_schedule_two.value,"C","F")
                       end
                     end
                     num_new_whs += 1

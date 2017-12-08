@@ -176,15 +176,15 @@ class DoorAreaTest < MiniTest::Test
     new_corridor_door_area = 0
     new_objects.each do |door|
         if door.surface.get.outsideBoundaryCondition.downcase == "adiabatic"
-            new_corridor_door_area += OpenStudio.convert(door.grossArea, "m^2", "ft^2").get
+            new_corridor_door_area += UnitConversions.convert(door.grossArea, "m^2", "ft^2")
         else
-            new_exterior_door_area += OpenStudio.convert(door.grossArea, "m^2", "ft^2").get
+            new_exterior_door_area += UnitConversions.convert(door.grossArea, "m^2", "ft^2")
         end
     end
 
     del_door_area = 0
     del_objects.each do |door|
-        del_door_area += OpenStudio.convert(door.grossArea, "m^2", "ft^2").get
+        del_door_area += UnitConversions.convert(door.grossArea, "m^2", "ft^2")
     end
 
     assert_in_epsilon(expected_exterior_door_area_added, new_exterior_door_area, 0.01)

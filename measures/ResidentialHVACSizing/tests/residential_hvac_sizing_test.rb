@@ -4210,13 +4210,13 @@ class ProcessHVACSizingTest < MiniTest::Test
         
         str = ""
         if is_flowrate
-            os_val = OpenStudio.convert(os_val,"m^3/s","cfm").get
-            beopt_val = OpenStudio.convert(beopt_val,"m^3/s","cfm").get
+            os_val = UnitConversions.convert(os_val,"m^3/s","cfm")
+            beopt_val = UnitConversions.convert(beopt_val,"m^3/s","cfm")
             str = "#{beopt_key.gsub(flowrate_units,'').strip}: #{beopt_val.round(1)} (BEopt) vs. #{os_val.round(1)} (OS)"
             tolerance = airflow_tolerance
         elsif is_capacity
-            os_val = OpenStudio.convert(os_val,"W","Btu/h").get
-            beopt_val = OpenStudio.convert(beopt_val,"W","Btu/h").get
+            os_val = UnitConversions.convert(os_val,"W","Btu/hr")
+            beopt_val = UnitConversions.convert(beopt_val,"W","Btu/hr")
             str = "#{beopt_key.gsub(capacity_units,'').strip}: #{beopt_val.round(0)} (BEopt) vs. #{os_val.round(0)} (OS)"
             tolerance = load_total_tolerance
         elsif is_water_removal
@@ -4229,8 +4229,8 @@ class ProcessHVACSizingTest < MiniTest::Test
             str = "#{beopt_key.gsub(ua_units,'').strip}: #{beopt_val.round(0)} (BEopt) vs. #{os_val.round(0)} (OS)"
             tolerance = ua_tolerance
         elsif is_length
-            os_val = OpenStudio.convert(os_val,"m","ft").get
-            beopt_val = OpenStudio.convert(beopt_val,"m","ft").get
+            os_val = UnitConversions.convert(os_val,"m","ft")
+            beopt_val = UnitConversions.convert(beopt_val,"m","ft")
             str = "#{beopt_key.gsub(length_units,'').strip}: #{beopt_val.round(0)} (BEopt) vs. #{os_val.round(0)} (OS)"
             tolerance = length_tolerance
         elsif is_unitless

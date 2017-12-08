@@ -601,11 +601,11 @@ class ResidentialHotWaterHeaterTankFuelTest < MiniTest::Test
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "WaterHeaterMixed" or obj_type == "WaterHeaterStratified"
-                actual_values["TankVolume"] += OpenStudio.convert(new_object.tankVolume.get, "m^3", "gal").get
-                actual_values["InputCapacity"] += OpenStudio.convert(new_object.heaterMaximumCapacity.get, "W", "kW").get
+                actual_values["TankVolume"] += UnitConversions.convert(new_object.tankVolume.get, "m^3", "gal")
+                actual_values["InputCapacity"] += UnitConversions.convert(new_object.heaterMaximumCapacity.get, "W", "kW")
                 actual_values["ThermalEfficiency"] += new_object.heaterThermalEfficiency.get
-                actual_values["TankUA1"] += OpenStudio::convert(new_object.onCycleLossCoefficienttoAmbientTemperature.get, "W/K", "Btu/hr*R").get
-                actual_values["TankUA2"] += OpenStudio::convert(new_object.offCycleLossCoefficienttoAmbientTemperature.get, "W/K", "Btu/hr*R").get
+                actual_values["TankUA1"] += UnitConversions.convert(new_object.onCycleLossCoefficienttoAmbientTemperature.get,"W/K","Btu/(hr*F)")
+                actual_values["TankUA2"] += UnitConversions.convert(new_object.offCycleLossCoefficienttoAmbientTemperature.get,"W/K","Btu/(hr*F)")
                 actual_values["Setpoint"] += Waterheater.get_water_heater_setpoint(model, new_object.plantLoop.get, nil)
                 actual_values["OnCycle"] += new_object.onCycleParasiticFuelConsumptionRate
                 actual_values["OffCycle"] += new_object.offCycleParasiticFuelConsumptionRate
@@ -617,8 +617,8 @@ class ResidentialHotWaterHeaterTankFuelTest < MiniTest::Test
                     storage_tank = inlet_object.to_WaterHeaterStratified.get
                     setpoint_schedule_one = storage_tank.heater1SetpointTemperatureSchedule.to_ScheduleConstant.get
                     setpoint_schedule_two = storage_tank.heater2SetpointTemperatureSchedule.to_ScheduleConstant.get
-                    actual_values["StorageTankSetpoint1"] += OpenStudio.convert(setpoint_schedule_one.value - new_object.deadbandTemperatureDifference/2.0,"C","F").get
-                    actual_values["StorageTankSetpoint2"] += OpenStudio.convert(setpoint_schedule_two.value - new_object.deadbandTemperatureDifference/2.0,"C","F").get
+                    actual_values["StorageTankSetpoint1"] += UnitConversions.convert(setpoint_schedule_one.value - new_object.deadbandTemperatureDifference/2.0,"C","F")
+                    actual_values["StorageTankSetpoint2"] += UnitConversions.convert(setpoint_schedule_two.value - new_object.deadbandTemperatureDifference/2.0,"C","F")
                   end
                 end
             end
