@@ -294,13 +294,13 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
             if obj_type == "Space"
                 if new_object.name.to_s.start_with?(Constants.UnfinishedBasementFoundationType)
                     actual_values["UnfinishedBasementHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["UnfinishedBasementFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["UnfinishedBasementFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.CrawlFoundationType)
                     actual_values["CrawlspaceHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["CrawlspaceFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["CrawlspaceFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 end
                 if Geometry.space_is_finished(new_object)
-                    actual_values["FinishedFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["FinishedFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 end
                 new_spaces << new_object
             end

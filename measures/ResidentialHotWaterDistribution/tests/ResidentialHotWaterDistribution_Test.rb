@@ -551,10 +551,10 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "OtherEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
-                actual_values["InternalLoadAnnual_MBtu"] += OpenStudio.convert(full_load_hrs * new_object.otherEquipmentDefinition.designLevel.get * new_object.multiplier, "Wh", "MBtu").get
+                actual_values["InternalLoadAnnual_MBtu"] += UnitConversions.convert(full_load_hrs * new_object.otherEquipmentDefinition.designLevel.get * new_object.multiplier, "Wh", "MBtu")
             elsif obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
-                actual_values["RecircPumpAnnual_kWh"] += OpenStudio.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh").get
+                actual_values["RecircPumpAnnual_kWh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
                 actual_values["RecircPumpFractionLost"] += new_object.electricEquipmentDefinition.fractionLost
             end
         end
@@ -569,7 +569,7 @@ class ResidentialHotWaterDistributionTest < MiniTest::Test
         final_object = final_object.public_send("to_#{obj_type}").get
         if obj_type == "WaterUseEquipment"
             full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, final_object.flowRateFractionSchedule.get)
-            actual_hw_gpd = OpenStudio.convert(full_load_hrs * final_object.waterUseEquipmentDefinition.peakFlowRate * final_object.multiplier, "m^3/s", "gal/min").get * 60.0 / 365.0
+            actual_hw_gpd = UnitConversions.convert(full_load_hrs * final_object.waterUseEquipmentDefinition.peakFlowRate * final_object.multiplier, "m^3/s", "gal/min") * 60.0 / 365.0
             if final_object.name.to_s.start_with?(Constants.ObjectNameShower)
                 actual_values["ShowerDailyWater_gpd"] += actual_hw_gpd
             elsif final_object.name.to_s.start_with?(Constants.ObjectNameSink)

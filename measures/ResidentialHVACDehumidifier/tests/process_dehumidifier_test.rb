@@ -37,7 +37,7 @@ class ProcessDehumidifierTest < MiniTest::Test
     args_hash["water_removal_rate"] = "35"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleConstant"=>2, "ZoneHVACDehumidifierDX"=>1, "ZoneControlHumidistat"=>1}
-    expected_values = {"water_removal_rate"=>UnitConversion.pint2liter(args_hash["water_removal_rate"].to_f), "energy_factor"=>autosize, "air_flow_rate"=>autosize, "hvac_priority"=>1}
+    expected_values = {"water_removal_rate"=>UnitConversions.convert(args_hash["water_removal_rate"].to_f,"pint","L"), "energy_factor"=>autosize, "air_flow_rate"=>autosize, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
@@ -46,7 +46,7 @@ class ProcessDehumidifierTest < MiniTest::Test
     args_hash["water_removal_rate"] = "200"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleConstant"=>2, "ZoneHVACDehumidifierDX"=>1, "ZoneControlHumidistat"=>1}
-    expected_values = {"water_removal_rate"=>UnitConversion.pint2liter(args_hash["water_removal_rate"].to_f), "energy_factor"=>autosize, "air_flow_rate"=>autosize, "hvac_priority"=>1}
+    expected_values = {"water_removal_rate"=>UnitConversions.convert(args_hash["water_removal_rate"].to_f,"pint","L"), "energy_factor"=>autosize, "air_flow_rate"=>autosize, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   
@@ -55,7 +55,7 @@ class ProcessDehumidifierTest < MiniTest::Test
     args_hash["air_flow_rate"] = "88.0"
     expected_num_del_objects = {}
     expected_num_new_objects = {"ScheduleConstant"=>2, "ZoneHVACDehumidifierDX"=>1, "ZoneControlHumidistat"=>1}
-    expected_values = {"water_removal_rate"=>autosize, "energy_factor"=>autosize, "air_flow_rate"=>OpenStudio::convert(args_hash["air_flow_rate"].to_f,"cfm","m^3/s").get, "hvac_priority"=>1}
+    expected_values = {"water_removal_rate"=>autosize, "energy_factor"=>autosize, "air_flow_rate"=>UnitConversions.convert(args_hash["air_flow_rate"].to_f,"cfm","m^3/s"), "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
   end
   

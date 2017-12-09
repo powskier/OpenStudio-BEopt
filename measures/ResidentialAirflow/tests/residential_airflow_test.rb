@@ -555,7 +555,7 @@ class ResidentialAirflowTest < MiniTest::Test
               end
             elsif obj_type == "ThermalZone"
               if new_object.name.to_s == "#{Constants.ObjectNameDucts}|u 1 ret air zone"
-                  assert_in_epsilon(expected_values["ra_duct_volume"], OpenStudio.convert(new_object.volume.get,"m^3","ft^3").get, 0.01)
+                  assert_in_epsilon(expected_values["ra_duct_volume"], UnitConversions.convert(new_object.volume.get,"m^3","ft^3"), 0.01)
               end
             elsif obj_type == "ZoneHVACEnergyRecoveryVentilator"
                 model.getThermalZones.each do |thermal_zone|
