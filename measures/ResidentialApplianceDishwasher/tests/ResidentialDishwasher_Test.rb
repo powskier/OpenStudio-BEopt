@@ -369,8 +369,9 @@ class ResidentialDishwasherTest < MiniTest::Test
     
     # get new and deleted objects
     obj_type_exclusions = ["WaterUseConnections", "Node", "ScheduleTypeLimits"]
-    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
-    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
+    obj_name_exclusions = ["Always On Discrete"]
+    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions, obj_name_exclusions)
+    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions, obj_name_exclusions)
     
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
