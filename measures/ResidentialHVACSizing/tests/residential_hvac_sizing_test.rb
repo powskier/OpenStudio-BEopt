@@ -412,63 +412,6 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA_ASHP_DuctsInCS.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
 
-  def test_loads_2story_crawlspace_garage_finished_attic_ducts_in_finished_attic
-    args_hash = {}
-    args_hash["show_debug_info"] = true
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {
-            'DehumidLoad_Inf_Sens' => -1553,
-            'DehumidLoad_Inf_Lat' => -1150,
-            'DehumidLoad_Int_Sens' => 2232,
-            'DehumidLoad_Int_Lat' => 1064,
-            'Heat Windows' => 8623,
-            'Heat Doors' => 252,
-            'Heat Walls' => 9830,
-            'Heat Roofs' => 2242,
-            'Heat Floors' => 2015,
-            'Heat Infil' => 15557,
-            'Dehumid Windows' => -1053,
-            'Dehumid Doors' => -30,
-            'Dehumid Walls' => -1069,
-            'Dehumid Roofs' => -273,
-            'Dehumid Floors' => 1606,
-            'Cool Windows' => 5778,
-            'Cool Doors' => 91,
-            'Cool Walls' => 1777,
-            'Cool Roofs' => 591,
-            'Cool Floors' => -322,
-            'Cool Infil Sens' => 1911,
-            'Cool Infil Lat' => -3140,
-            'Cool IntGains Sens' => 2807,
-            'Cool IntGains Lat' => 1059,
-            'Heat Load' => 38521,
-            'Cool Load Sens' => 12634,
-            'Cool Load Lat' => 0,
-            'Dehumid Load Sens' => -143,
-            'Dehumid Load Lat' => -86,
-            'Heat Airflow' => 1215,
-            'Cool Airflow' => 820,
-            'HeatingLoad' => 38521,
-            'HeatingDuctLoad' => 0,
-            'CoolingLoad_Lat' => 0,
-            'CoolingLoad_Sens' => 12634,
-            'CoolingLoad_Ducts_Lat' => 0,
-            'CoolingLoad_Ducts_Sens' => 0,
-            'DehumidLoad_Sens' => -143,
-            'DehumidLoad_Ducts_Lat' => 0,
-            'Cool_Capacity' => 15184,
-            'Cool_SensCap' => 9778,
-            'Heat_Capacity' => 15184,
-            'SuppHeat_Capacity' => 38521,
-            'Cool_AirFlowRate' => 631,
-            'Heat_AirFlowRate' => 478,
-            'Fan_AirFlowRate' => 631,
-            'Dehumid_WaterRemoval_Auto' => 0,
-                      }
-    _test_measure("SFD_HVACSizing_Load_2story_CS_GRG_FA_ASHP_DuctsInFA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
-  end  
-
   def test_loads_2story_crawlspace_garage_finished_attic_ducts_in_living
     args_hash = {}
     args_hash["show_debug_info"] = true
