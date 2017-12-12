@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>process_vrf_minisplit</name>
   <uid>402b168f-ed99-46bb-b367-103937011e91</uid>
-  <version_id>860028cb-635d-465a-ad4e-42a01f925036</version_id>
-  <version_modified>20171209T140656Z</version_modified>
+  <version_id>70481091-32f7-43dd-9cf4-21a670b73830</version_id>
+  <version_modified>20171212T170037Z</version_modified>
   <xml_checksum>470FC630</xml_checksum>
   <class_name>ProcessVRFMinisplit</class_name>
   <display_name>Set Residential Mini-Split Heat Pump</display_name>
@@ -170,6 +170,25 @@
       <default_value>0.07</default_value>
     </argument>
     <argument>
+      <name>is_ducted</name>
+      <display_name>Is Ducted</display_name>
+      <description>Specified whether the mini-split heat pump is ducted or ductless.</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
       <name>heat_pump_capacity</name>
       <display_name>Heat Pump Capacity</display_name>
       <description>The output cooling capacity of the heat pump. If using 'autosize', the autosizing algorithm will use ACCA Manual S to set the heat pump capacity based on the cooling load, with up to 1.3x oversizing allowed for variable-speed equipment in colder climates when the heating load exceeds the cooling load. If using 'autosize for max load', the autosizing algorithm will override ACCA Manual S and use the maximum of the heating and cooling loads to set the heat pump capacity, based on the heating/cooling capacities under design conditions.</description>
@@ -250,39 +269,10 @@
       <checksum>E23378AA</checksum>
     </file>
     <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>260EF643</checksum>
-    </file>
-    <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>A9382DBC</checksum>
-    </file>
-    <file>
       <filename>psychrometrics.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>11E27E42</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.12.4</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>4D8B5E12</checksum>
-    </file>
-    <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>BE5BF810</checksum>
     </file>
     <file>
       <filename>unit_conversions.rb</filename>
@@ -291,22 +281,10 @@
       <checksum>31924A51</checksum>
     </file>
     <file>
-      <filename>MF_8units_1story_SL_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1261A2EF</checksum>
-    </file>
-    <file>
-      <filename>SFA_4units_1story_FB_UA_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>792B763B</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>20D6C415</checksum>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>BE5BF810</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_ASHP.osm</filename>
@@ -363,6 +341,18 @@
       <checksum>59EC3609</checksum>
     </file>
     <file>
+      <filename>MF_8units_1story_SL_Denver.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>1261A2EF</checksum>
+    </file>
+    <file>
+      <filename>SFA_4units_1story_FB_UA_Denver.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>792B763B</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -379,6 +369,12 @@
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>C605CBBE</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_UA_Denver.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>20D6C415</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_CentralAC2.osm</filename>
@@ -399,28 +395,51 @@
       <checksum>D39A3F22</checksum>
     </file>
     <file>
+      <filename>hvac.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>3A9A4850</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>A9382DBC</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_Furnace.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
       <checksum>1C8A86FA</checksum>
     </file>
     <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>022C15E2</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.12.4</identifier>
+        <min_compatible>2.0.4</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>2656945C</checksum>
+    </file>
+    <file>
       <filename>SFD_2000sqft_2story_FB_UA_Denver_MSHP.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>991549B8</checksum>
+      <checksum>34BD86B2</checksum>
     </file>
     <file>
       <filename>process_mini_split_heat_pump_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>1C179F6E</checksum>
-    </file>
-    <file>
-      <filename>hvac.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>3A9A4850</checksum>
+      <checksum>5C45137D</checksum>
     </file>
   </files>
 </measure>
