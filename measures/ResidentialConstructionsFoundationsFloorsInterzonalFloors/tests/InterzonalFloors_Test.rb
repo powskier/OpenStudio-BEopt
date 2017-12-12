@@ -77,12 +77,14 @@ class ProcessConstructionsFoundationsFloorsInterzonalFloorsTest < MiniTest::Test
   end
   
   def test_apply_to_specific_surface
+    model = get_model(File.dirname(__FILE__), osm_geo_int_floor)
+    surfaces = ProcessConstructionsFoundationsFloorsInterzonalFloors.new.get_interzonal_floor_surfaces(model)
     args_hash = {}
-    args_hash["surface"] = "Surface 15"
+    args_hash["surface"] = surfaces[0].name.to_s
     expected_num_del_objects = {}
     expected_num_new_objects = {"Material"=>1, "Construction"=>1}
     expected_values = {"LayerRValue"=>0.1397/0.0489547873864979, "LayerDensity"=>106.36479, "LayerSpecificHeat"=>1151.685130657429, "LayerIndex"=>0, "SurfacesWithConstructions"=>2}
-    _test_measure(osm_geo_int_floor, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+    _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
   private

@@ -16,14 +16,6 @@ require 'json'
 # you must be an administrator or editor member of a group to
 # upload content to that group
 
-# Get latest installed version of openstudio.exe
-os_clis = Dir["C:/openstudio-*/bin/openstudio.exe"] + Dir["/usr/bin/openstudio"] + Dir["/usr/local/bin/openstudio"]
-if os_clis.size == 0
-    puts "ERROR: Could not find the openstudio binary. You may need to install the OpenStudio Command Line Interface."
-    exit
-end
-os_cli = os_clis[-1]
-
 namespace :measures do
   desc 'Generate measures to prepare for upload to BCL '
   task :generate do
@@ -154,6 +146,8 @@ namespace :test do
     if File.exists?(File.expand_path("../log", __FILE__))
         FileUtils.rm(File.expand_path("../log", __FILE__))
     end
+    
+    os_cli = get_os_cli()
 
     osw_files.each do |osw|
 
@@ -317,6 +311,7 @@ task :update_measures do
   end
   
   # Update measure xmls
+  os_cli = get_os_cli()
   command = "\"#{os_cli}\" measure --update_all #{measures_dir} >> log"
   puts "Updating measure.xml files..."
   system(command)
@@ -513,4 +508,101 @@ def get_osms_listed_in_test(testrb)
     str = File.readlines(testrb).join("\n")
     osms = str.scan(/\w+\.osm/)
     return osms.uniq
+end
+
+desc 'update urdb tariffs in utility bill measure'
+task :update_tariffs do
+  require 'csv'
+  require 'net/https'
+  require 'openstudio'
+
+  tariffs_path = "./resources/tariffs"
+  result = get_tariff_json_files(tariffs_path)  
+  if result
+    zip_file = OpenStudio::ZipFile.new(tariffs_zip, false)
+    zip_file.addDirectory(tariffs_path, OpenStudio::toPath("/"))
+  end
+  FileUtils.rm_rf(tariffs_path)
+
+end
+
+def get_tariff_json_files(tariffs_path)
+
+  STDOUT.puts "Enter API Key:"
+  api_key = STDIN.gets.strip
+  return false if api_key.empty?
+
+  tariffs_zip = "#{tariffs_path}.zip"
+  unzip_file = OpenStudio::UnzipFile.new(tariffs_zip)
+  if not File.exists?(tariffs_path)
+    puts "Extracting #{tariffs_zip} to #{tariffs_path} ..."
+    unzip_file.extractAllFiles(OpenStudio::toPath(tariffs_path))
+  end
+  if !File.exists?(tariffs_path)
+    FileUtils.mkdir_p(tariffs_path)
+  end
+
+  url = URI.parse("https://api.openei.org/utility_rates?")
+  http = Net::HTTP.new(url.host, url.port)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_NONE  
+
+  rows = CSV.read("./resources/utilities.csv", {:encoding=>'ISO-8859-1'})
+  size = 0
+  progress = 0
+  rows.each_with_index do |row, i|
+
+    size += 1
+    next if i == 0
+    utility, eiaid, name, label = row
+    tariff_file_name = File.join(tariffs_path, "#{eiaid}_#{label}.json")
+    
+    # next if File.file?(tariff_file_name) # just add, don't update
+
+    params = { 'version' => 3, 'format' => 'json', 'detail' => 'full', 'getpage' => label, 'api_key' => api_key }
+    url.query = URI.encode_www_form(params)
+    request = Net::HTTP::Get.new(url.request_uri)
+    response = http.request(request)
+    response = JSON.parse(response.body, :symbolize_names=>true)
+
+    if response.keys.include? :error
+      puts "#{eiaid}_#{label}: #{response[:error][:message]}."
+      if response[:error][:message].include? "exceeded your rate limit"
+        return false
+      end
+      next
+    end
+
+    if not File.file?(tariff_file_name)
+      puts "Added #{tariff_file_name} to #{tariffs_path}."
+      File.open(tariff_file_name, "w") do |f|
+        f.write(response.to_json)
+      end
+    elsif not JSON.parse(File.read(tariff_file_name), :symbolize_names=>true) == response
+      puts "Updated #{tariff_file_name} to #{tariffs_path}."
+      File.open(tariff_file_name, "w") do |f|
+        f.write(response.to_json)
+      end
+    end
+    
+    new_progress = (size * 100) / rows.length
+    unless new_progress == progress
+      puts "Completed %3d%% ..." % [new_progress]
+    end
+    progress = new_progress
+
+  end    
+  
+  return true
+
+end
+
+def get_os_cli
+  # Get latest installed version of openstudio.exe
+  os_clis = Dir["C:/openstudio-*/bin/openstudio.exe"] + Dir["/usr/bin/openstudio"] + Dir["/usr/local/bin/openstudio"]
+  if os_clis.size == 0
+      puts "ERROR: Could not find the openstudio binary. You may need to install the OpenStudio Command Line Interface."
+      exit
+  end
+  return os_clis[-1]
 end

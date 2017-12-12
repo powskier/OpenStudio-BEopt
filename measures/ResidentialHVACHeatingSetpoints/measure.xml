@@ -2,33 +2,170 @@
   <schema_version>3.0</schema_version>
   <name>process_heating_setpoints</name>
   <uid>2b167665-f760-462d-8c9d-1d909da7b628</uid>
-  <version_id>a0e4d749-dd17-4681-9f3b-4e23a4caafbb</version_id>
-  <version_modified>20171023T133933Z</version_modified>
+  <version_id>c32f62d6-9fb2-44cc-a8a6-209841005203</version_id>
+  <version_modified>20171212T170037Z</version_modified>
   <xml_checksum>2C877DEB</xml_checksum>
   <class_name>ProcessHeatingSetpoints</class_name>
   <display_name>Set Residential Heating Setpoints and Schedules</display_name>
-  <description>This measure creates the heating season schedules based on weather data, and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
-  <modeler_description>This measure creates residential heating season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.</modeler_description>
+  <description>This measure creates the heating season schedules and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
+  <modeler_description>This measure creates residential heating season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.</modeler_description>
   <arguments>
     <argument>
-      <name>htg_wkdy</name>
+      <name>weekday_setpoint</name>
       <display_name>Weekday Setpoint</display_name>
       <description>Specify a single heating setpoint or a 24-hour comma-separated heating schedule for the weekdays.</description>
       <type>String</type>
       <units>degrees F</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>71</default_value>
     </argument>
     <argument>
-      <name>htg_wked</name>
+      <name>weekend_setpoint</name>
       <display_name>Weekend Setpoint</display_name>
       <description>Specify a single heating setpoint or a 24-hour comma-separated heating schedule for the weekend.</description>
       <type>String</type>
       <units>degrees F</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>71</default_value>
+    </argument>
+    <argument>
+      <name>use_auto_season</name>
+      <display_name>Use Auto Heating Season</display_name>
+      <description>Specifies whether to automatically define the heating season based on the weather file. User-defined heating season start/end months will be ignored if this is selected</description>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>season_start_month</name>
+      <display_name>Heating Season Start Month</display_name>
+      <description>Start month of the heating season.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Jan</default_value>
+      <choices>
+        <choice>
+          <value>Jan</value>
+          <display_name>Jan</display_name>
+        </choice>
+        <choice>
+          <value>Feb</value>
+          <display_name>Feb</display_name>
+        </choice>
+        <choice>
+          <value>Mar</value>
+          <display_name>Mar</display_name>
+        </choice>
+        <choice>
+          <value>Apr</value>
+          <display_name>Apr</display_name>
+        </choice>
+        <choice>
+          <value>May</value>
+          <display_name>May</display_name>
+        </choice>
+        <choice>
+          <value>Jun</value>
+          <display_name>Jun</display_name>
+        </choice>
+        <choice>
+          <value>Jul</value>
+          <display_name>Jul</display_name>
+        </choice>
+        <choice>
+          <value>Aug</value>
+          <display_name>Aug</display_name>
+        </choice>
+        <choice>
+          <value>Sep</value>
+          <display_name>Sep</display_name>
+        </choice>
+        <choice>
+          <value>Oct</value>
+          <display_name>Oct</display_name>
+        </choice>
+        <choice>
+          <value>Nov</value>
+          <display_name>Nov</display_name>
+        </choice>
+        <choice>
+          <value>Dec</value>
+          <display_name>Dec</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>season_end_month</name>
+      <display_name>Heating Season End Month</display_name>
+      <description>End month of the heating season.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Dec</default_value>
+      <choices>
+        <choice>
+          <value>Jan</value>
+          <display_name>Jan</display_name>
+        </choice>
+        <choice>
+          <value>Feb</value>
+          <display_name>Feb</display_name>
+        </choice>
+        <choice>
+          <value>Mar</value>
+          <display_name>Mar</display_name>
+        </choice>
+        <choice>
+          <value>Apr</value>
+          <display_name>Apr</display_name>
+        </choice>
+        <choice>
+          <value>May</value>
+          <display_name>May</display_name>
+        </choice>
+        <choice>
+          <value>Jun</value>
+          <display_name>Jun</display_name>
+        </choice>
+        <choice>
+          <value>Jul</value>
+          <display_name>Jul</display_name>
+        </choice>
+        <choice>
+          <value>Aug</value>
+          <display_name>Aug</display_name>
+        </choice>
+        <choice>
+          <value>Sep</value>
+          <display_name>Sep</display_name>
+        </choice>
+        <choice>
+          <value>Oct</value>
+          <display_name>Oct</display_name>
+        </choice>
+        <choice>
+          <value>Nov</value>
+          <display_name>Nov</display_name>
+        </choice>
+        <choice>
+          <value>Dec</value>
+          <display_name>Dec</display_name>
+        </choice>
+      </choices>
     </argument>
   </arguments>
   <outputs/>
@@ -65,25 +202,25 @@
       <filename>psychrometrics.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>3C131B97</checksum>
+      <checksum>11E27E42</checksum>
     </file>
     <file>
       <filename>process_heating_setpoints_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>6AC8A55E</checksum>
+      <checksum>64961A2F</checksum>
     </file>
     <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>6BA22437</checksum>
+      <checksum>31924A51</checksum>
     </file>
     <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
+      <checksum>BE5BF810</checksum>
     </file>
     <file>
       <version>
@@ -94,103 +231,103 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>493865B1</checksum>
+      <checksum>B1B70614</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>6CBBA75F</checksum>
+      <checksum>35D6CC6C</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ASHP_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>8041C596</checksum>
+      <checksum>60E6B1E2</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>C491FDF7</checksum>
+      <checksum>866EDD6A</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC_NoHtgSetpoint.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>E6B44FFB</checksum>
+      <checksum>54EF8782</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>63BD7E07</checksum>
+      <checksum>E3250127</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_GSHPVertBore_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>55EA8081</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP_NoSetpoints.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>D029357A</checksum>
+      <checksum>4F3A705A</checksum>
     </file>
     <file>
       <filename>MF_8units_1story_SL_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>E6AB5D82</checksum>
+      <checksum>FAF129D0</checksum>
     </file>
     <file>
       <filename>SFA_4units_1story_SL_UA_3Beds_2Baths_Denver_Furnace_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>CF274E47</checksum>
+      <checksum>9351A004</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Boiler_NoSetpoints.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>1E18E3F0</checksum>
+      <checksum>EF2B073A</checksum>
     </file>
     <file>
       <filename>SFD_2000sqft_2story_SL_UA.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>A6433770</checksum>
+      <checksum>2C25DA33</checksum>
     </file>
     <file>
       <filename>schedules.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>7576B4B2</checksum>
+      <checksum>35121F90</checksum>
     </file>
     <file>
       <filename>geometry.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>6A82C5DA</checksum>
+      <checksum>A9382DBC</checksum>
     </file>
     <file>
       <filename>weather.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>03F09690</checksum>
+      <checksum>836D6EBC</checksum>
     </file>
     <file>
       <filename>hvac.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>C9C319CF</checksum>
+      <checksum>3A9A4850</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>67FA663D</checksum>
+      <checksum>022C15E2</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_MSHP_NoSetpoints.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>3F52D8A6</checksum>
     </file>
   </files>
 </measure>

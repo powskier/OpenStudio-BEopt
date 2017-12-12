@@ -12,6 +12,7 @@ require "#{File.dirname(__FILE__)}/resources/weather"
 require "#{File.dirname(__FILE__)}/resources/geometry"
 require "#{File.dirname(__FILE__)}/resources/schedules"
 require "#{File.dirname(__FILE__)}/resources/hvac"
+require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure
 class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
@@ -23,11 +24,11 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
   end
   
   def description
-    return "This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules.#{Constants.WorkflowDescription}"
+    return "This measure creates the cooling season schedules and the cooling setpoint schedules.#{Constants.WorkflowDescription}"
   end
   
   def modeler_description
-    return "This measure creates #{Constants.ObjectNameCoolingSeason} ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates #{Constants.ObjectNameCoolingSetpoint} ruleset objects. Schedule values are populated based on information input by the user as well as contained in the #{Constants.ObjectNameCoolingSeason}. The cooling setpoint schedules are added to the living zone's thermostat."
+    return "This measure creates #{Constants.ObjectNameCoolingSeason} ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates #{Constants.ObjectNameCoolingSetpoint} ruleset objects. Schedule values are populated based on information input by the user as well as contained in the #{Constants.ObjectNameCoolingSeason}. The cooling setpoint schedules are added to the living zone's thermostat."
   end     
   
   #define the arguments that the user will input
@@ -35,7 +36,7 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args = OpenStudio::Measure::OSArgumentVector.new
   
     #Make a string argument for 24 weekday cooling set point values
-    clg_wkdy = OpenStudio::Measure::OSArgument::makeStringArgument("clg_wkdy", false)
+    clg_wkdy = OpenStudio::Measure::OSArgument::makeStringArgument("weekday_setpoint", true)
     clg_wkdy.setDisplayName("Weekday Setpoint")
     clg_wkdy.setDescription("Specify a single cooling setpoint or a 24-hour comma-separated cooling schedule for the weekdays.")
     clg_wkdy.setUnits("degrees F")
@@ -43,12 +44,46 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     args << clg_wkdy  
     
     #Make a string argument for 24 weekend cooling set point values
-    clg_wked = OpenStudio::Measure::OSArgument::makeStringArgument("clg_wked", false)
+    clg_wked = OpenStudio::Measure::OSArgument::makeStringArgument("weekend_setpoint", true)
     clg_wked.setDisplayName("Weekend Setpoint")
     clg_wked.setDescription("Specify a single cooling setpoint or a 24-hour comma-separated cooling schedule for the weekend.")
     clg_wked.setUnits("degrees F")
     clg_wked.setDefaultValue("76")
     args << clg_wked    
+    
+    #make a bool argument for using hsp season or not
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("use_auto_season", true)
+    arg.setDisplayName("Use Auto Cooling Season")
+    arg.setDescription("Specifies whether to automatically define the cooling season based on the weather file. User-defined cooling season start/end months will be ignored if this is selected.")
+    arg.setDefaultValue(false)
+    args << arg
+    
+    #make a choice argument for months of the year
+    month_display_names = OpenStudio::StringVector.new
+    month_display_names << "Jan"
+    month_display_names << "Feb"
+    month_display_names << "Mar"
+    month_display_names << "Apr"
+    month_display_names << "May"
+    month_display_names << "Jun"
+    month_display_names << "Jul"
+    month_display_names << "Aug"
+    month_display_names << "Sep"
+    month_display_names << "Oct"
+    month_display_names << "Nov"
+    month_display_names << "Dec"
+    
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("season_start_month", month_display_names, false)
+    arg.setDisplayName("Cooling Season Start Month")
+    arg.setDescription("Start month of the cooling season.")
+    arg.setDefaultValue("Jan")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("season_end_month", month_display_names, false)
+    arg.setDisplayName("Cooling Season End Month")
+    arg.setDescription("End month of the cooling season.")
+    arg.setDefaultValue("Dec")
+    args << arg
     
     return args
   end #end the arguments method
@@ -62,17 +97,36 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
       return false
     end
     
-    clg_wkdy = runner.getStringArgumentValue("clg_wkdy",user_arguments)
-    clg_wked = runner.getStringArgumentValue("clg_wked",user_arguments)
+    clg_wkdy = runner.getStringArgumentValue("weekday_setpoint",user_arguments)
+    clg_wked = runner.getStringArgumentValue("weekend_setpoint",user_arguments)
+    use_auto_season = runner.getBoolArgumentValue("use_auto_season",user_arguments)
+    clg_start_month = runner.getOptionalStringArgumentValue("season_start_month",user_arguments)
+    clg_end_month = runner.getOptionalStringArgumentValue("season_end_month",user_arguments)    
     
     weather = WeatherProcess.new(model, runner, File.dirname(__FILE__))
     if weather.error?
       return false
     end
-    
-    heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
+
+    # Get cooling season
+    if use_auto_season
+      heating_season, cooling_season = HVAC.calc_heating_and_cooling_seasons(model, weather, runner)
+    else
+      month_map = {"Jan"=>1, "Feb"=>2, "Mar"=>3, "Apr"=>4, "May"=>5, "Jun"=>6, "Jul"=>7, "Aug"=>8, "Sep"=>9, "Oct"=>10, "Nov"=>11, "Dec"=>12}
+      if clg_start_month.is_initialized
+        clg_start_month = month_map[clg_start_month.get]
+      end
+      if clg_end_month.is_initialized
+        clg_end_month = month_map[clg_end_month.get]
+      end
+      if clg_start_month <= clg_end_month
+        cooling_season = Array.new(clg_start_month-1, 0) + Array.new(clg_end_month-clg_start_month+1, 1) + Array.new(12-clg_end_month, 0)
+      elsif clg_start_month > clg_end_month
+        cooling_season = Array.new(clg_end_month, 1) + Array.new(clg_start_month-clg_end_month-1, 0) + Array.new(12-clg_start_month+1, 1)
+      end
+    end
     if cooling_season.nil?
-        return false
+      return false
     end
     
     # Remove existing cooling season schedule
@@ -87,34 +141,15 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
     end
 
     # assign the availability schedules to the equipment objects
-    has_clg_equip = false
     model.getThermalZones.each do |thermal_zone|
       cooling_equipment = HVAC.existing_cooling_equipment(model, runner, thermal_zone)
       cooling_equipment.each do |clg_equip|
-        has_clg_equip = true
-        clg_obj = nil
-        if clg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem
-          if clg_equip.coolingCoil.is_initialized
-            clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil.get)
-          end
-        elsif clg_equip.is_a? OpenStudio::Model::ZoneHVACPackagedTerminalAirConditioner
-          clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
-        elsif clg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-          clg_obj = HVAC.get_coil_from_hvac_component(clg_equip.coolingCoil)
-        else
-          runner.registerError("Unexpected cooling system: '#{clg_equip.name}'.")
-          return false
-        end
-        unless clg_obj.nil? or clg_obj.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
-          clg_obj.setAvailabilitySchedule(coolingseasonschedule.schedule)
-          runner.registerInfo("Added availability schedule to #{clg_obj.name}.")
+        clg_coil, htg_coil, supp_htg_coil = HVAC.get_coils_from_hvac_equip(clg_equip)
+        unless clg_coil.nil? or clg_coil.to_CoilCoolingWaterToAirHeatPumpEquationFit.is_initialized
+          clg_coil.setAvailabilitySchedule(coolingseasonschedule.schedule)
+          runner.registerInfo("Added availability schedule to #{clg_coil.name}.")
         end
       end
-    end
-    
-    unless has_clg_equip
-      runner.registerWarning("No cooling equipment found.")
-      return true
     end
     
     # Convert to 24-values if a single value entered
@@ -125,8 +160,8 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
       clg_wked = Array.new(24, clg_wked).join(", ")
     end
 
-    clg_wkdy = clg_wkdy.split(",").map {|i| OpenStudio::convert(i.to_f,"F","C").get}
-    clg_wked = clg_wked.split(",").map {|i| OpenStudio::convert(i.to_f,"F","C").get}  
+    clg_wkdy = clg_wkdy.split(",").map {|i| UnitConversions.convert(i.to_f,"F","C")}
+    clg_wked = clg_wked.split(",").map {|i| UnitConversions.convert(i.to_f,"F","C")}  
     
     finished_zones = []
     model.getThermalZones.each do |thermal_zone|

@@ -1,5 +1,5 @@
 {
-   "created_at" : "20171023T133942Z",
+   "created_at" : "20171212T170043Z",
    "measure_paths" : [ "../measures" ],
    "seed_file" : "../seeds/EmptySeedModel.osm",
    "steps" : [
@@ -470,6 +470,7 @@
             "cop_capacity_derate_5ton" : "1",
             "crankcase_capacity" : "0.02",
             "crankcase_max_temp" : "55",
+            "dse" : "NA",
             "eer" : "11.4",
             "eer_capacity_derate_1ton" : "1",
             "eer_capacity_derate_2ton" : "1",
@@ -493,22 +494,28 @@
       },
       {
          "arguments" : {
-            "htg_wkdy" : "71",
-            "htg_wked" : "71"
+            "season_end_month" : "Dec",
+            "season_start_month" : "Jan",
+            "use_auto_season" : "false",
+            "weekday_setpoint" : "71",
+            "weekend_setpoint" : "71"
          },
-         "description" : "This measure creates the heating season schedules based on weather data, and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
+         "description" : "This measure creates the heating season schedules and the heating setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialHVACHeatingSetpoints",
-         "modeler_description" : "This measure creates residential heating season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.",
+         "modeler_description" : "This measure creates residential heating season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential heating setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential heating season. The heating setpoint schedules are added to the living zone's thermostat.",
          "name" : "Set Residential Heating Setpoints and Schedules"
       },
       {
          "arguments" : {
-            "clg_wkdy" : "76",
-            "clg_wked" : "76"
+            "season_end_month" : "Dec",
+            "season_start_month" : "Jan",
+            "use_auto_season" : "false",
+            "weekday_setpoint" : "76",
+            "weekend_setpoint" : "76"
          },
-         "description" : "This measure creates the cooling season schedules based on weather data, and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
+         "description" : "This measure creates the cooling season schedules and the cooling setpoint schedules. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialHVACCoolingSetpoints",
-         "modeler_description" : "This measure creates residential cooling season ruleset objects. Schedule values are populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.",
+         "modeler_description" : "This measure creates residential cooling season ruleset objects. Schedule values are either user-defined or populated based on information contained in the EPW file. This measure also creates residential cooling setpoint ruleset objects. Schedule values are populated based on information input by the user as well as contained in the residential cooling season. The cooling setpoint schedules are added to the living zone's thermostat.",
          "name" : "Set Residential Cooling Setpoints and Schedules"
       },
       {
@@ -656,8 +663,8 @@
             "mult" : "1",
             "option_type" : "Multiplier",
             "sens_frac" : "0.93",
-            "weekday_sch" : "0.04, 0.037, 0.037, 0.036, 0.033, 0.036, 0.043, 0.047, 0.034, 0.023, 0.024, 0.025, 0.024, 0.028, 0.031, 0.032, 0.039, 0.053, 0.063, 0.067, 0.071, 0.069, 0.059, 0.05",
-            "weekend_sch" : "0.04, 0.037, 0.037, 0.036, 0.033, 0.036, 0.043, 0.047, 0.034, 0.023, 0.024, 0.025, 0.024, 0.028, 0.031, 0.032, 0.039, 0.053, 0.063, 0.067, 0.071, 0.069, 0.059, 0.05"
+            "weekday_sch" : "0.035, 0.033, 0.032, 0.031, 0.032, 0.033, 0.037, 0.042, 0.043, 0.043, 0.043, 0.044, 0.045, 0.045, 0.044, 0.046, 0.048, 0.052, 0.053, 0.05, 0.047, 0.045, 0.04, 0.036",
+            "weekend_sch" : "0.035, 0.033, 0.032, 0.031, 0.032, 0.033, 0.037, 0.042, 0.043, 0.043, 0.043, 0.044, 0.045, 0.045, 0.044, 0.046, 0.048, 0.052, 0.053, 0.05, 0.047, 0.045, 0.04, 0.036"
          },
          "description" : "Adds (or replaces) residential plug loads with the specified efficiency and schedule in all finished spaces. For multifamily buildings, the plug loads can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.",
          "measure_dir_name" : "ResidentialMiscPlugLoads",
@@ -814,12 +821,12 @@
             "duct_location" : "auto",
             "duct_location_frac" : "auto",
             "duct_num_returns" : "auto",
+            "duct_r" : "0",
             "duct_return_area_mult" : "1",
             "duct_return_frac" : "0.067",
             "duct_supply_area_mult" : "1",
             "duct_supply_frac" : "0.6",
             "duct_total_leakage" : "0.3",
-            "duct_unconditioned_r" : "0",
             "finished_basement_ach" : "0",
             "garage_ach50" : "7",
             "has_fireplace_chimney" : "false",
@@ -867,5 +874,5 @@
          "name" : "Set Residential HVAC Sizing"
       }
    ],
-   "updated_at" : "20171023T133945Z"
+   "updated_at" : "20171212T170045Z"
 }

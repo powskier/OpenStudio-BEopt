@@ -10,9 +10,8 @@ class CreateResidentialEavesTest < MiniTest::Test
   def test_not_applicable_no_surfaces
     args_hash = {}
     result = _test_error(nil, args_hash)
-    assert(result.errors.size == 0)
-    assert_equal("NA", result.value.valueName)
-    assert_includes(result.info.map{ |x| x.logMessage }, "No surfaces found for adding eaves.")
+    assert(result.errors.size == 1)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "No building geometry has been defined.")
   end
     
   def test_not_applicable_depth_zero
@@ -222,6 +221,8 @@ class CreateResidentialEavesTest < MiniTest::Test
     # run the measure
     measure.run(model, runner, argument_map)
     result = runner.result
+    
+    #show_output(result)
       
     return result
     
@@ -287,11 +288,11 @@ class CreateResidentialEavesTest < MiniTest::Test
             if obj_type == "ShadingSurface"
                 l, w, h = Geometry.get_surface_dimensions(new_object)
                 if l < w
-                  next if OpenStudio::convert(l,"m","ft").get > 5
-                  assert_in_epsilon(expected_values["eaves_depth"], OpenStudio::convert(l,"m","ft").get, 0.01)
+                  next if UnitConversions.convert(l,"m","ft") > 5
+                  assert_in_epsilon(expected_values["eaves_depth"], UnitConversions.convert(l,"m","ft"), 0.01)
                 else
-                  next if OpenStudio::convert(w,"m","ft").get > 5
-                  assert_in_epsilon(expected_values["eaves_depth"], OpenStudio::convert(w,"m","ft").get, 0.01)
+                  next if UnitConversions.convert(w,"m","ft") > 5
+                  assert_in_epsilon(expected_values["eaves_depth"], UnitConversions.convert(w,"m","ft"), 0.01)
                 end
             end
         end

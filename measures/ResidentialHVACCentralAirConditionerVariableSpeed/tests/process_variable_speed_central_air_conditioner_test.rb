@@ -15,12 +15,13 @@ class ProcessVariableSpeedCentralAirConditionerTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_SL_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end  
   
-  def test_new_construction_fbsmt_seer_24pt5
+  def test_new_construction_fbsmt_seer_24pt5_80_dse
     args_hash = {}
     args_hash["capacity"] = "3.0"
+    args_hash["dse"] = "0.8"
     expected_num_del_objects = {}
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilCoolingDXMultiSpeed"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilCoolingDXMultiSpeedStageData"=>4, "UnitarySystemPerformanceMultispeed"=>1}
-    expected_values = {"COP"=>[6.29, 5.97, 5.33, 4.67], "NominalCapacity"=>[OpenStudio::convert(3.0,"ton","W").get]*4, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
+    expected_values = {"COP"=>[6.29*0.8, 5.97*0.8, 5.33*0.8, 4.67*0.8], "NominalCapacity"=>[UnitConversions.convert(3.0,"ton","W")]*4, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
   end
   
@@ -256,7 +257,7 @@ class ProcessVariableSpeedCentralAirConditionerTest < MiniTest::Test
     final_objects = get_objects(model)
     
     # get new and deleted objects
-    obj_type_exclusions = ["CurveQuadratic", "CurveBiquadratic", "CurveCubic", "Node", "AirLoopHVACZoneMixer", "SizingSystem", "AirLoopHVACZoneSplitter", "ScheduleTypeLimits", "CurveExponent", "ScheduleConstant", "SizingPlant", "PipeAdiabatic", "ConnectorSplitter", "ModelObjectList", "ConnectorMixer"]
+    obj_type_exclusions = ["CurveQuadratic", "CurveBiquadratic", "CurveCubic", "Node", "AirLoopHVACZoneMixer", "SizingSystem", "AirLoopHVACZoneSplitter", "ScheduleTypeLimits", "CurveExponent", "ScheduleConstant", "SizingPlant", "PipeAdiabatic", "ConnectorSplitter", "ModelObjectList", "ConnectorMixer", "AvailabilityManagerAssignmentList"]
     all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
     all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
     

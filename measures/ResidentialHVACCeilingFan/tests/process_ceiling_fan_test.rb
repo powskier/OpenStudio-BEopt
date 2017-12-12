@@ -225,18 +225,18 @@ class ProcessCeilingFanTest < MiniTest::Test
                 if final_object.name.to_s.include?(Schedule.allday_name)
                     for i in 1..24
                         next if final_object.values[i-1] > 999
-                        assert_in_epsilon(expected_values["clg_wkday_setpoints"][i-1], OpenStudio::convert(final_object.values[i-1],"C","F").get)
-                        assert_in_epsilon(expected_values["clg_wked_setpoints"][i-1], OpenStudio::convert(final_object.values[i-1],"C","F").get)
+                        assert_in_epsilon(expected_values["clg_wkday_setpoints"][i-1], UnitConversions.convert(final_object.values[i-1],"C","F"))
+                        assert_in_epsilon(expected_values["clg_wked_setpoints"][i-1], UnitConversions.convert(final_object.values[i-1],"C","F"))
                     end
                 elsif final_object.name.to_s.include?(Schedule.weekday_name)
                     for i in 1..24
                         next if final_object.values[i-1] > 999
-                        assert_in_epsilon(expected_values["clg_wkday_setpoints"][i-1], OpenStudio::convert(final_object.values[i-1],"C","F").get)
+                        assert_in_epsilon(expected_values["clg_wkday_setpoints"][i-1], UnitConversions.convert(final_object.values[i-1],"C","F"))
                     end
                 elsif final_object.name.to_s.include?(Schedule.weekend_name)
                     for i in 1..24
                         next if final_object.values[i-1] > 999
-                        assert_in_epsilon(expected_values["clg_wked_setpoints"][i-1], OpenStudio::convert(final_object.values[i-1],"C","F").get)
+                        assert_in_epsilon(expected_values["clg_wked_setpoints"][i-1], UnitConversions.convert(final_object.values[i-1],"C","F"))
                     end
                 else
                     flunk("Unexpected schedule.")

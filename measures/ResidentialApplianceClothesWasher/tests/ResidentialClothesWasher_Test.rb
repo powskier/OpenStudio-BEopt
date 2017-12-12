@@ -27,6 +27,18 @@ class ResidentialClothesWasherTest < MiniTest::Test
     return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTankless.osm"
   end
 
+  def osm_geo_beds_loc_tankwh_cw_eleccd
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher_ElecClothesDryer.osm"
+  end
+  
+  def osm_geo_beds_loc_tankwh_cw_gascd
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher_GasClothesDryer.osm"
+  end
+  
+  def osm_geo_beds_loc_tankwh_cw_propanecd
+    return "SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher_PropaneClothesDryer.osm"
+  end
+  
   def test_new_construction_none
     # Using energy multiplier
     args_hash = {}
@@ -159,6 +171,42 @@ class ResidentialClothesWasherTest < MiniTest::Test
     expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1}
     expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
     _test_measure(model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
+  end
+    
+  def test_retrofit_replace_with_elec_dryer
+    args_hash = {}
+    args_hash["imef"] = (2.47 - 0.503) / 0.95
+    args_hash["rated_annual_energy"] = 123.0
+    args_hash["annual_cost"] = 9.0
+    args_hash["drum_volume"] = 3.68
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1}
+    expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
+    _test_measure(osm_geo_beds_loc_tankwh_cw_eleccd, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
+  end
+    
+  def test_retrofit_replace_with_gas_dryer
+    args_hash = {}
+    args_hash["imef"] = (2.47 - 0.503) / 0.95
+    args_hash["rated_annual_energy"] = 123.0
+    args_hash["annual_cost"] = 9.0
+    args_hash["drum_volume"] = 3.68
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
+    _test_measure(osm_geo_beds_loc_tankwh_cw_gascd, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
+  end
+    
+  def test_retrofit_replace_with_propane_dryer
+    args_hash = {}
+    args_hash["imef"] = (2.47 - 0.503) / 0.95
+    args_hash["rated_annual_energy"] = 123.0
+    args_hash["annual_cost"] = 9.0
+    args_hash["drum_volume"] = 3.68
+    expected_num_del_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>2, "ElectricEquipment"=>2, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleFixedInterval"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "OtherEquipmentDefinition"=>1, "OtherEquipment"=>1}
+    expected_values = {"Annual_kwh"=>34.9, "HotWater_gpd"=>2.27, "Space"=>args_hash["space"]}
+    _test_measure(osm_geo_beds_loc_tankwh_cw_propanecd, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 3)
   end
     
   def test_retrofit_remove
@@ -399,9 +447,10 @@ class ResidentialClothesWasherTest < MiniTest::Test
     final_objects = get_objects(model)
     
     # get new and deleted objects
-    obj_type_exclusions = ["WaterUseConnections", "Node", "ScheduleTypeLimits"]
-    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
-    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
+    obj_type_exclusions = ["WaterUseConnections", "Node", "ScheduleTypeLimits", "ScheduleRule", "ScheduleDay"]
+    obj_name_exclusions = ["Always On Discrete"]
+    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions, obj_name_exclusions)
+    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions, obj_name_exclusions)
     
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
@@ -412,13 +461,14 @@ class ResidentialClothesWasherTest < MiniTest::Test
         new_objects.each do |new_object|
             next if not new_object.respond_to?("to_#{obj_type}")
             new_object = new_object.public_send("to_#{obj_type}").get
+            next if not new_object.name.to_s.start_with? Constants.ObjectNameClothesWasher
             if obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
-                actual_values["Annual_kwh"] += OpenStudio.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh").get
+                actual_values["Annual_kwh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
                 actual_values["Space"] << new_object.space.get.name.to_s
             elsif obj_type == "WaterUseEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.flowRateFractionSchedule.get)
-                actual_values["HotWater_gpd"] += OpenStudio.convert(full_load_hrs * new_object.waterUseEquipmentDefinition.peakFlowRate * new_object.multiplier, "m^3/s", "gal/min").get * 60.0 / 365.0
+                actual_values["HotWater_gpd"] += UnitConversions.convert(full_load_hrs * new_object.waterUseEquipmentDefinition.peakFlowRate * new_object.multiplier, "m^3/s", "gal/min") * 60.0 / 365.0
                 actual_values["Space"] << new_object.space.get.name.to_s
             end
         end

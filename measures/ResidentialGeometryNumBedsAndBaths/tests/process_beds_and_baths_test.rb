@@ -186,7 +186,7 @@ class BedroomsAndBathroomsTest < MiniTest::Test
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
     check_num_objects(all_del_objects, expected_num_del_objects, "deleted")
 
-    model.getBuildingUnits.each do |unit|
+    Geometry.get_building_units(model, runner).each do |unit|
         nbeds, nbaths = Geometry.get_unit_beds_baths(model, unit, runner)
         assert_equal(expected_values["Beds"], nbeds)
         assert_equal(expected_values["Baths"], nbaths)

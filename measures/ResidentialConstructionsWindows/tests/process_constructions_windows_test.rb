@@ -183,7 +183,7 @@ class ProcessConstructionsWindowsTest < MiniTest::Test
             new_object = new_object.public_send("to_#{obj_type}").get
             if obj_type == "SimpleGlazing"
                 new_object = new_object.to_SimpleGlazing.get
-                actual_values["ufactor"] += OpenStudio::convert(new_object.uFactor,"W/m^2*K","Btu/ft^2*h*R").get
+                actual_values["ufactor"] += UnitConversions.convert(new_object.uFactor,"W/(m^2*K)","Btu/(hr*ft^2*F)")
                 actual_values["shgc"] += new_object.solarHeatGainCoefficient
             elsif obj_type == "Construction"
                 model.getSubSurfaces.each do |sub_surface|

@@ -1,6 +1,7 @@
 require "#{File.dirname(__FILE__)}/resources/schedules"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
+require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure
 class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
@@ -160,7 +161,7 @@ class ResidentialCookingRange < OpenStudio::Measure::ModelMeasure
             end
         end
         if objects_to_remove.size > 0
-            runner.registerInfo("Removed existing cooking range from space #{space.name.to_s}.")
+            runner.registerInfo("Removed existing cooking range from space '#{space.name.to_s}'.")
         end
         objects_to_remove.uniq.each do |object|
             begin

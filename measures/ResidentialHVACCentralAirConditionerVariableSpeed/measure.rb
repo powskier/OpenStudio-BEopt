@@ -227,6 +227,13 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
     acCoolingOutputCapacity.setDefaultValue(Constants.SizingAuto)
     args << acCoolingOutputCapacity    
     
+    #make a string argument for distribution system efficiency
+    dist_system_eff = OpenStudio::Measure::OSArgument::makeStringArgument("dse", true)
+    dist_system_eff.setDisplayName("Distribution System Efficiency")
+    dist_system_eff.setDescription("Defines the energy losses associated with the delivery of energy from the equipment to the source of the load.")
+    dist_system_eff.setDefaultValue("NA")
+    args << dist_system_eff  
+    
     return args
   end #end the arguments method
 
@@ -256,8 +263,14 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
     acEERCapacityDerateFactor = [acEERCapacityDerateFactor1ton, acEERCapacityDerateFactor2ton, acEERCapacityDerateFactor3ton, acEERCapacityDerateFactor4ton, acEERCapacityDerateFactor5ton]
     acOutputCapacity = runner.getStringArgumentValue("capacity",user_arguments)
     unless acOutputCapacity == Constants.SizingAuto
-      acOutputCapacity = OpenStudio::convert(acOutputCapacity.to_f,"ton","Btu/h").get
+      acOutputCapacity = UnitConversions.convert(acOutputCapacity.to_f,"ton","Btu/hr")
     end 
+    dse = runner.getStringArgumentValue("dse",user_arguments)
+    if dse.to_f > 0
+      dse = dse.to_f
+    else
+      dse = 1.0
+    end
     
     number_Speeds = 4
     
@@ -275,7 +288,7 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
     cOOL_CAP_FFLOW_SPEC = [[1, 0, 0]] * number_Speeds
     cOOL_EIR_FFLOW_SPEC = [[1, 0, 0]] * number_Speeds
     
-    static = UnitConversion.inH2O2Pa(0.5) # Pascal
+    static = UnitConversions.convert(0.5,"inH2O","Pa") # Pascal
 
     # Cooling Coil
     acRatedAirFlowRate = 315.8 # cfm
@@ -304,7 +317,7 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
 
         # _processCurvesDXCooling
         
-        clg_coil_stage_data = HVAC.calc_coil_stage_data_cooling(model, acOutputCapacity, number_Speeds, coolingEIR, sHR_Rated_Gross, cOOL_CAP_FT_SPEC, cOOL_EIR_FT_SPEC, cOOL_CLOSS_FPLR_SPEC, cOOL_CAP_FFLOW_SPEC, cOOL_EIR_FFLOW_SPEC)
+        clg_coil_stage_data = HVAC.calc_coil_stage_data_cooling(model, acOutputCapacity, number_Speeds, coolingEIR, sHR_Rated_Gross, cOOL_CAP_FT_SPEC, cOOL_EIR_FT_SPEC, cOOL_CLOSS_FPLR_SPEC, cOOL_CAP_FFLOW_SPEC, cOOL_EIR_FFLOW_SPEC, dse)
 
         # _processSystemCoolingCoil
         
@@ -313,8 +326,8 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
         clg_coil.setCondenserType("AirCooled")
         clg_coil.setApplyPartLoadFractiontoSpeedsGreaterthan1(false)
         clg_coil.setApplyLatentDegradationtoSpeedsGreaterthan1(false)
-        clg_coil.setCrankcaseHeaterCapacity(OpenStudio::convert(acCrankcase,"kW","W").get)
-        clg_coil.setMaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation(OpenStudio::convert(acCrankcaseMaxT,"F","C").get)
+        clg_coil.setCrankcaseHeaterCapacity(UnitConversions.convert(acCrankcase,"kW","W"))
+        clg_coil.setMaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation(UnitConversions.convert(acCrankcaseMaxT,"F","C"))
         
         clg_coil.setFuelType("Electricity")
              
@@ -338,10 +351,10 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
         fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule, fan_power_curve, fan_eff_curve)
         fan.setName(obj_name + " supply fan")
         fan.setEndUseSubcategory(Constants.EndUseHVACFan)
-        fan.setFanEfficiency(HVAC.calculate_fan_efficiency(static, acSupplyFanPowerInstalled))
+        fan.setFanEfficiency(dse * HVAC.calculate_fan_efficiency(static, acSupplyFanPowerInstalled))
         fan.setPressureRise(static)
-        fan.setMotorEfficiency(1)
-        fan.setMotorInAirstreamFraction(1)
+        fan.setMotorEfficiency(dse * 1.0)
+        fan.setMotorInAirstreamFraction(1.0)
       
         # _processSystemAir
               
@@ -358,7 +371,7 @@ class ProcessVariableSpeedCentralAirConditioner < OpenStudio::Measure::ModelMeas
         air_loop_unitary.setSupplyFan(fan)
         air_loop_unitary.setFanPlacement("BlowThrough")
         air_loop_unitary.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-        air_loop_unitary.setMaximumSupplyAirTemperature(OpenStudio::convert(120.0,"F","C").get)
+        air_loop_unitary.setMaximumSupplyAirTemperature(UnitConversions.convert(120.0,"F","C"))
         air_loop_unitary.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)    
         
         perf = OpenStudio::Model::UnitarySystemPerformanceMultispeed.new(model)

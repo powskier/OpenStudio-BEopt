@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>timeseries_csv_export</name>
   <uid>2a3442c1-944d-4e91-9e11-11e0cf368c64</uid>
-  <version_id>cdba52e9-39ec-4bbe-8659-6c2e0c6d04c9</version_id>
-  <version_modified>20171023T133940Z</version_modified>
+  <version_id>e73c2400-b977-4f4d-aed0-0dfffd21b740</version_id>
+  <version_modified>20171212T162955Z</version_modified>
   <xml_checksum>15BF4E57</xml_checksum>
   <class_name>TimeseriesCSVExport</class_name>
   <display_name>Timeseries CSV Export</display_name>
@@ -45,6 +45,24 @@
       </choices>
     </argument>
     <argument>
+      <name>inc_end_use_subcategories</name>
+      <display_name>Include End Use Subcategories</display_name>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
       <name>inc_output_variables</name>
       <display_name>Include Output Variables</display_name>
       <type>Boolean</type>
@@ -62,6 +80,14 @@
         </choice>
       </choices>
     </argument>
+    <argument>
+      <name>output_variables</name>
+      <display_name>Output Variables</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Zone Mean Air Temperature, Zone Mean Air Humidity Ratio, Fan Runtime Fraction</default_value>
+    </argument>
   </arguments>
   <outputs/>
   <provenances/>
@@ -76,18 +102,6 @@
     </attribute>
   </attributes>
   <files>
-    <file>
-      <filename>SFD_Successful_EnergyPlus_Run_AMY.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>9D71F795</checksum>
-    </file>
-    <file>
-      <filename>SFD_Successful_EnergyPlus_Run_TMY.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>D9A8217C</checksum>
-    </file>
     <file>
       <filename>USA_CO_Denver_Intl_AP_725650_TMY3.epw</filename>
       <filetype>epw</filetype>
@@ -104,31 +118,31 @@
       <filename>psychrometrics.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>3C131B97</checksum>
+      <checksum>11E27E42</checksum>
     </file>
     <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>6BA22437</checksum>
+      <checksum>31924A51</checksum>
     </file>
     <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>64BC6389</checksum>
+      <checksum>BE5BF810</checksum>
     </file>
     <file>
       <filename>weather.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>03F09690</checksum>
+      <checksum>836D6EBC</checksum>
     </file>
     <file>
       <filename>timeseries_csv_export_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>003DCA9B</checksum>
+      <checksum>C900D84F</checksum>
     </file>
     <file>
       <version>
@@ -139,13 +153,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>4B17843A</checksum>
+      <checksum>E4229A8A</checksum>
     </file>
     <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>67FA663D</checksum>
+      <checksum>022C15E2</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_AMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>FEFDE263</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_Appl.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>022CD15A</checksum>
     </file>
   </files>
 </measure>

@@ -5,6 +5,7 @@ require "#{File.dirname(__FILE__)}/resources/util"
 require "#{File.dirname(__FILE__)}/resources/waterheater"
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/geometry"
+require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure
 class ResidentialHotWaterHeaterTankFuel < OpenStudio::Measure::ModelMeasure
@@ -220,7 +221,7 @@ class ResidentialHotWaterHeaterTankFuel < OpenStudio::Measure::ModelMeasure
                     end
                 end
                 if objects_to_remove.size > 0
-                    runner.registerInfo("Removed existing water heater from plant loop #{pl.name.to_s}.")
+                    runner.registerInfo("Removed existing water heater from plant loop '#{pl.name.to_s}'.")
                 end
                 objects_to_remove.uniq.each do |object|
                     begin
@@ -234,7 +235,7 @@ class ResidentialHotWaterHeaterTankFuel < OpenStudio::Measure::ModelMeasure
             if loop.nil?
                 runner.registerInfo("A new plant loop for DHW will be added to the model")
                 runner.registerInitialCondition("No water heater model currently exists")
-                loop = Waterheater.create_new_loop(model, Constants.PlantLoopDomesticWater(unit.name.to_s), t_set, "tank")
+                loop = Waterheater.create_new_loop(model, Constants.PlantLoopDomesticWater(unit.name.to_s), t_set, Constants.WaterHeaterTypeTank)
             end
 
             if loop.components(OpenStudio::Model::PumpVariableSpeed::iddObjectType).empty?
@@ -243,7 +244,7 @@ class ResidentialHotWaterHeaterTankFuel < OpenStudio::Measure::ModelMeasure
             end
 
             if loop.supplyOutletNode.setpointManagers.empty?
-                new_manager = Waterheater.create_new_schedule_manager(t_set, model, "tank")
+                new_manager = Waterheater.create_new_schedule_manager(t_set, model, Constants.WaterHeaterTypeTank)
                 new_manager.addToNode(loop.supplyOutletNode)
             end
         
@@ -283,9 +284,9 @@ class ResidentialHotWaterHeaterTankFuel < OpenStudio::Measure::ModelMeasure
             loopname = heater.plantLoop.get.name.get
 
             capacity_si = heater.getHeaterMaximumCapacity.get
-            capacity = OpenStudio.convert(capacity_si.value, capacity_si.units.standardString, "kBtu/hr").get
+            capacity = UnitConversions.convert(capacity_si.value, "W", "kBtu/hr")
             volume_si = heater.getTankVolume.get
-            volume = OpenStudio.convert(volume_si.value, volume_si.units.standardString, "gal").get
+            volume = UnitConversions.convert(volume_si.value, "m^3", "gal")
             te = heater.getHeaterThermalEfficiency
           
             water_heaters << "Water heater '#{heatername}' added to plant loop '#{loopname}', with a capacity of #{capacity.round(1)} kBtu/hr" +
