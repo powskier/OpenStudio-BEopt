@@ -217,7 +217,7 @@ class MonthWeekdayWeekendSchedule
     end
 
     def calcDesignLevelFromDailyTherm(daily_therm)
-        return calcDesignLevelFromDailykWh(OpenStudio.convert(daily_therm, "therm", "kWh").get)
+        return calcDesignLevelFromDailykWh(UnitConversions.convert(daily_therm, "therm", "kWh"))
     end
     
     def schedule
@@ -415,7 +415,7 @@ class HotWaterSchedule
         @days_shift = days_shift
         @nbeds = ([num_bedrooms, 5].min).to_i
         @file_prefix = file_prefix
-        @target_water_temperature = OpenStudio.convert(target_water_temperature, "F", "C").get
+        @target_water_temperature = UnitConversions.convert(target_water_temperature, "F", "C")
         
         timestep_minutes = (60/@model.getTimestep.numberOfTimestepsPerHour).to_i
         
@@ -435,15 +435,15 @@ class HotWaterSchedule
     end
     
     def calcDesignLevelFromDailykWh(daily_kWh)
-        return OpenStudio.convert(daily_kWh * 365 * 60 / (365 * @totflow / @maxflow), "kW", "W").get
+        return UnitConversions.convert(daily_kWh * 365 * 60 / (365 * @totflow / @maxflow), "kW", "W")
     end
     
     def calcPeakFlowFromDailygpm(daily_water)
-        return OpenStudio.convert(@maxflow * daily_water / @totflow, "gal/min", "m^3/s").get
+        return UnitConversions.convert(@maxflow * daily_water / @totflow, "gal/min", "m^3/s")
     end
     
     def calcDailyGpmFromPeakFlow(peak_flow)
-        return OpenStudio.convert(@totflow * peak_flow / @maxflow, "m^3/s", "gal/min").get 
+        return UnitConversions.convert(@totflow * peak_flow / @maxflow, "m^3/s", "gal/min")
     end
     
     def schedule
