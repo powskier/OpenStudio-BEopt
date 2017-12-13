@@ -3,7 +3,6 @@
 
 require "#{File.dirname(__FILE__)}/resources/weather"
 require "#{File.dirname(__FILE__)}/resources/constants"
-require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 # start the measure
 class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
@@ -132,13 +131,13 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # Set mains water temperatures
     # ----------------------------
     
-    avgOAT = UnitConversions.convert(weather.data.AnnualAvgDrybulb,"F","C")
+    avgOAT = OpenStudio::convert(weather.data.AnnualAvgDrybulb,"F","C").get
     monthlyOAT = weather.data.MonthlyAvgDrybulbs
     
     min_temp = monthlyOAT.min
     max_temp = monthlyOAT.max
     
-    maxDiffOAT = UnitConversions.convert(max_temp,"F","C") - UnitConversions.convert(min_temp,"F","C")
+    maxDiffOAT = OpenStudio::convert(max_temp,"F","C").get - OpenStudio::convert(min_temp,"F","C").get
     
     #Calc annual average mains temperature to report
     swmt = model.getSiteWaterMainsTemperature
@@ -152,6 +151,7 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # ----------------
     yd = model.getYearDescription
     if epw_file.startDateActualYear.is_initialized
+      yd.setIsLeapYear(true) # TODO: set this if?
       yd.setCalendarYear(epw_file.startDateActualYear.get)
     end
     
@@ -184,10 +184,10 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     
     # This correlation is the same that is used in DOE-2's src\WTH.f file, subroutine GTEMP.
     annual_temps = Array.new(12, weather.data.AnnualAvgDrybulb)
-    annual_temps = annual_temps.map {|i| UnitConversions.convert(i,"F","C")}
+    annual_temps = annual_temps.map {|i| OpenStudio::convert(i,"F","C").get}
     
     ground_temps = weather.data.GroundMonthlyTemps
-    ground_temps = ground_temps.map {|i| UnitConversions.convert(i,"F","C")}
+    ground_temps = ground_temps.map {|i| OpenStudio::convert(i,"F","C").get}
     
     s_gt_bs = model.getSiteGroundTemperatureBuildingSurface
     s_gt_bs.resetAllMonths
