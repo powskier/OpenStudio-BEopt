@@ -151,7 +151,9 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # ----------------
     yd = model.getYearDescription
     if epw_file.startDateActualYear.is_initialized
-      yd.setIsLeapYear(true) # TODO: set this if?
+			if weather.has_leap_day(model, runner, File.dirname(__FILE__))
+				yd.setIsLeapYear(true)
+			end
       yd.setCalendarYear(epw_file.startDateActualYear.get)
     end
     
