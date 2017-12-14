@@ -131,13 +131,13 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # Set mains water temperatures
     # ----------------------------
     
-    avgOAT = OpenStudio::convert(weather.data.AnnualAvgDrybulb,"F","C").get
+    avgOAT = UnitConversions.convert(weather.data.AnnualAvgDrybulb,"F","C")
     monthlyOAT = weather.data.MonthlyAvgDrybulbs
     
     min_temp = monthlyOAT.min
     max_temp = monthlyOAT.max
     
-    maxDiffOAT = OpenStudio::convert(max_temp,"F","C").get - OpenStudio::convert(min_temp,"F","C").get
+    maxDiffOAT = UnitConversions.convert(max_temp,"F","C") - UnitConversions.convert(min_temp,"F","C")
     
     #Calc annual average mains temperature to report
     swmt = model.getSiteWaterMainsTemperature
@@ -151,9 +151,6 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     # ----------------
     yd = model.getYearDescription
     if epw_file.startDateActualYear.is_initialized
-			if weather.has_leap_day(model, runner, File.dirname(__FILE__))
-				yd.setIsLeapYear(true)
-			end
       yd.setCalendarYear(epw_file.startDateActualYear.get)
     end
     
@@ -186,10 +183,10 @@ class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
     
     # This correlation is the same that is used in DOE-2's src\WTH.f file, subroutine GTEMP.
     annual_temps = Array.new(12, weather.data.AnnualAvgDrybulb)
-    annual_temps = annual_temps.map {|i| OpenStudio::convert(i,"F","C").get}
+    annual_temps = annual_temps.map {|i| UnitConversions.convert(i,"F","C")}
     
     ground_temps = weather.data.GroundMonthlyTemps
-    ground_temps = ground_temps.map {|i| OpenStudio::convert(i,"F","C").get}
+    ground_temps = ground_temps.map {|i| UnitConversions.convert(i,"F","C")}
     
     s_gt_bs = model.getSiteGroundTemperatureBuildingSurface
     s_gt_bs.resetAllMonths

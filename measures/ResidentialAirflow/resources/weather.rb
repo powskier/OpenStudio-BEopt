@@ -77,12 +77,6 @@ class WeatherProcess
     end
     return []
   end
-	
-	def has_leap_day(model, runner, measure_dir)
-		actual_timestamps = WeatherProcess.actual_timestamps(model, runner, measure_dir)
-		return true if actual_timestamps.any? { |timestamp| timestamp.include? "/02/29 " }		
-		return false
-	end
   
   def error?
     return @error
