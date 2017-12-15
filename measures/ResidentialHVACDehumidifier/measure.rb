@@ -169,10 +169,7 @@ class ProcessDehumidifier < OpenStudio::Measure::ModelMeasure
         zone_hvac.addToThermalZone(control_zone)
         runner.registerInfo("Added '#{zone_hvac.name}' to '#{control_zone.name}' of #{unit.name}")
         
-        HVAC.prioritize_zone_hvac(model, runner, control_zone).reverse.each do |object|
-          control_zone.setCoolingPriority(object, 1)
-          control_zone.setHeatingPriority(object, 1)
-        end
+        HVAC.prioritize_zone_hvac(model, runner, control_zone)
               
       end
     

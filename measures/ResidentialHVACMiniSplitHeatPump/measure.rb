@@ -419,10 +419,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
             vrf.addTerminal(tu_vrf)
             runner.registerInfo("Added '#{tu_vrf.name}' to '#{zone.name}' of #{unit.name}")        
             
-            HVAC.prioritize_zone_hvac(model, runner, zone).reverse.each do |object|
-              zone.setCoolingPriority(object, 1)
-              zone.setHeatingPriority(object, 1)
-            end
+            HVAC.prioritize_zone_hvac(model, runner, zone)
             
             # Supplemental heat
             unless baseboardOutputCapacity == 0.0

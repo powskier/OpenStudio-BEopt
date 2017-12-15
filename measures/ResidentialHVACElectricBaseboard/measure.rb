@@ -101,10 +101,7 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
           htg_coil.addToThermalZone(zone)
           runner.registerInfo("Added '#{htg_coil.name}' to '#{zone.name}' of #{unit.name}")
          
-          HVAC.prioritize_zone_hvac(model, runner, zone).reverse.each do |object|
-            zone.setCoolingPriority(object, 1)
-            zone.setHeatingPriority(object, 1)
-          end
+          HVAC.prioritize_zone_hvac(model, runner, zone)
           
         end
         

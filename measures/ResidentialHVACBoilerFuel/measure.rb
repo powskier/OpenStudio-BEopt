@@ -345,10 +345,7 @@ class ProcessBoilerFuel < OpenStudio::Measure::ModelMeasure
           baseboard_heater.addToThermalZone(zone)
           runner.registerInfo("Added '#{baseboard_heater.name}' to '#{zone.name}' of #{unit.name}")
           
-          HVAC.prioritize_zone_hvac(model, runner, zone).reverse.each do |object|
-            zone.setCoolingPriority(object, 1)
-            zone.setHeatingPriority(object, 1)
-          end
+          HVAC.prioritize_zone_hvac(model, runner, zone)
           
           plant_loop.addDemandBranchForComponent(baseboard_coil)
           
