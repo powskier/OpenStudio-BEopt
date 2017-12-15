@@ -301,7 +301,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         end
         if cols.empty?
           if reporting_frequency == "Hourly"
-            if actual_timestamps.nil?
+            if actual_timestamps.empty?
               date_times << format_datetime(date_time.to_s) # timestamps from the sqlfile (TMY)
             else
               date_times << actual_timestamps[i] # timestamps from the epw (AMY)
