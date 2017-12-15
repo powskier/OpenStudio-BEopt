@@ -13,6 +13,8 @@ class HelperMethods
             return "FuelOil#1"
         elsif fuel == Constants.FuelTypePropane
             return "PropaneGas"
+        elsif fuel == Constants.FuelTypeWood
+            return "OtherFuel1"
         end
     end
     
@@ -25,6 +27,8 @@ class HelperMethods
             return Constants.FuelTypeOil
         elsif fuel == "PropaneGas"
             return Constants.FuelTypePropane
+        elsif fuel == "OtherFuel1"
+            return Constants.FuelTypeWood
         end
     end    
     

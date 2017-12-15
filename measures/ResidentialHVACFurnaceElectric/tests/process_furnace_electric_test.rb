@@ -91,6 +91,14 @@ class ProcessFurnaceElectricTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
   end
   
+  def test_retrofit_replace_unit_heater
+    args_hash = {}
+    expected_num_del_objects = {"CoilHeatingGas"=>1, "AirLoopHVACUnitarySystem"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingElectric"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
+    expected_values = {"Efficiency"=>1, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
+  end
+  
   def test_retrofit_replace_mshp
     args_hash = {}
     expected_num_del_objects = {"FanOnOff"=>2, "AirConditionerVariableRefrigerantFlow"=>2, "ZoneHVACTerminalUnitVariableRefrigerantFlow"=>2, "CoilCoolingDXVariableRefrigerantFlow"=>2, "CoilHeatingDXVariableRefrigerantFlow"=>2, "ZoneHVACBaseboardConvectiveElectric"=>2, "OutputVariable"=>2, "EnergyManagementSystemSensor"=>3, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "EnergyManagementSystemActuator"=>1, "EnergyManagementSystemProgram"=>1, "EnergyManagementSystemProgramCallingManager"=>1}
@@ -139,6 +147,14 @@ class ProcessFurnaceElectricTest < MiniTest::Test
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 9)
   end  
 
+  def test_retrofit_replace_unit_heater_central_air_conditioner
+    args_hash = {}
+    expected_num_del_objects = {"AirLoopHVACUnitarySystem"=>2, "AirLoopHVAC"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilCoolingDXSingleSpeed"=>1, "CoilHeatingGas"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingElectric"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2, "CoilCoolingDXSingleSpeed"=>1}
+    expected_values = {"Efficiency"=>1, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+  end  
+
   def test_retrofit_replace_electric_baseboard_room_air_conditioner
     args_hash = {}
     expected_num_del_objects = {"ZoneHVACBaseboardConvectiveElectric"=>2}
@@ -153,6 +169,14 @@ class ProcessFurnaceElectricTest < MiniTest::Test
     expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingElectric"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
     expected_values = {"Efficiency"=>1, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_Boiler_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 7)
+  end
+
+  def test_retrofit_replace_unit_heater_room_air_conditioner
+    args_hash = {}
+    expected_num_del_objects = {"CoilHeatingGas"=>1, "AirLoopHVACUnitarySystem"=>1}
+    expected_num_new_objects = {"AirLoopHVACUnitarySystem"=>1, "AirLoopHVAC"=>1, "CoilHeatingElectric"=>1, "FanOnOff"=>1, "AirTerminalSingleDuctUncontrolled"=>2}
+    expected_values = {"Efficiency"=>1, "MaximumSupplyAirTemperature"=>48.88, "hvac_priority"=>1}
+    _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 5)
   end
 
   def test_retrofit_replace_gshp_vert_bore
