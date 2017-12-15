@@ -987,7 +987,7 @@ class HVAC
           zone_hvac_list << new_object
         end
       end
-      zone_hvac_list.each do |object|
+      zone_hvac_list.reverse.each do |object|
         zone.setCoolingPriority(object, 1)
         zone.setHeatingPriority(object, 1)
       end
