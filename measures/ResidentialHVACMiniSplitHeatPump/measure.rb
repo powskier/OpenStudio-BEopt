@@ -335,7 +335,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
       control_slave_zones_hash = HVAC.get_control_and_slave_zones(thermal_zones)
       control_slave_zones_hash.each do |control_zone, slave_zones|
       
-        (control_zone+slave_zones).each do |zone|
+        ([control_zone] + slave_zones).each do |zone|
         
             # Remove existing equipment
             HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameMiniSplitHeatPump, zone, false, unit)
@@ -445,7 +445,7 @@ class ProcessVRFMinisplit < OpenStudio::Measure::ModelMeasure
           vrf_sensor.setKeyName(obj_name + " #{control_zone.name} ac vrf")
           
           vrf_fbsmt_sensor = nil
-          if slave_zones.size > 0
+          slave_zones.each do |slave_zone|
             vrf_fbsmt_sensor = OpenStudio::Model::EnergyManagementSystemSensor.new(model, vrf_heating_output_var)
             vrf_fbsmt_sensor.setName("#{obj_name} vrf fbsmt energy sensor".gsub("|","_"))
             vrf_fbsmt_sensor.setKeyName(obj_name + " #{slave_zone.name} ac vrf")

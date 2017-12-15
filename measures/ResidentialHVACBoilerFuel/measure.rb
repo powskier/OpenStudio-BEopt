@@ -328,7 +328,7 @@ class ProcessBoilerFuel < OpenStudio::Measure::ModelMeasure
       control_slave_zones_hash = HVAC.get_control_and_slave_zones(thermal_zones)
       control_slave_zones_hash.each do |control_zone, slave_zones|
 
-        (control_zone+slave_zones).each do |zone|
+        ([control_zone] + slave_zones).each do |zone|
       
           # Remove existing equipment
           HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameBoiler, zone, false, unit)

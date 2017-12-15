@@ -86,7 +86,8 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
       control_slave_zones_hash = HVAC.get_control_and_slave_zones(thermal_zones)
       control_slave_zones_hash.each do |control_zone, slave_zones|
     
-        (control_zone+slave_zones).each to |zone|
+        ([control_zone] + slave_zones).each do |zone|
+        
           # Remove existing equipment
           HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameElectricBaseboard, zone, false, unit)
         
@@ -104,7 +105,10 @@ class ProcessElectricBaseboard < OpenStudio::Measure::ModelMeasure
             zone.setCoolingPriority(object, 1)
             zone.setHeatingPriority(object, 1)
           end
+          
         end
+        
+      end
         
     end
     
