@@ -3,6 +3,7 @@
 
 require "#{File.dirname(__FILE__)}/resources/weather"
 require "#{File.dirname(__FILE__)}/resources/constants"
+require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 # start the measure
 class SetResidentialEPWFile < OpenStudio::Measure::ModelMeasure
