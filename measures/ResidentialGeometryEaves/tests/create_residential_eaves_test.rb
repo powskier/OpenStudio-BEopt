@@ -288,11 +288,11 @@ class CreateResidentialEavesTest < MiniTest::Test
             if obj_type == "ShadingSurface"
                 l, w, h = Geometry.get_surface_dimensions(new_object)
                 if l < w
-                  next if OpenStudio::convert(l,"m","ft").get > 5
-                  assert_in_epsilon(expected_values["eaves_depth"], OpenStudio::convert(l,"m","ft").get, 0.01)
+                  next if UnitConversions.convert(l,"m","ft") > 5
+                  assert_in_epsilon(expected_values["eaves_depth"], UnitConversions.convert(l,"m","ft"), 0.01)
                 else
-                  next if OpenStudio::convert(w,"m","ft").get > 5
-                  assert_in_epsilon(expected_values["eaves_depth"], OpenStudio::convert(w,"m","ft").get, 0.01)
+                  next if UnitConversions.convert(w,"m","ft") > 5
+                  assert_in_epsilon(expected_values["eaves_depth"], UnitConversions.convert(w,"m","ft"), 0.01)
                 end
             end
         end

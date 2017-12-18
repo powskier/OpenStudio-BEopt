@@ -448,8 +448,9 @@ class ResidentialClothesWasherTest < MiniTest::Test
     
     # get new and deleted objects
     obj_type_exclusions = ["WaterUseConnections", "Node", "ScheduleTypeLimits", "ScheduleRule", "ScheduleDay"]
-    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions)
-    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions)
+    obj_name_exclusions = ["Always On Discrete"]
+    all_new_objects = get_object_additions(initial_objects, final_objects, obj_type_exclusions, obj_name_exclusions)
+    all_del_objects = get_object_additions(final_objects, initial_objects, obj_type_exclusions, obj_name_exclusions)
     
     # check we have the expected number of new/deleted objects
     check_num_objects(all_new_objects, expected_num_new_objects, "added")
@@ -463,11 +464,11 @@ class ResidentialClothesWasherTest < MiniTest::Test
             next if not new_object.name.to_s.start_with? Constants.ObjectNameClothesWasher
             if obj_type == "ElectricEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.schedule.get)
-                actual_values["Annual_kwh"] += OpenStudio.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh").get
+                actual_values["Annual_kwh"] += UnitConversions.convert(full_load_hrs * new_object.designLevel.get * new_object.multiplier, "Wh", "kWh")
                 actual_values["Space"] << new_object.space.get.name.to_s
             elsif obj_type == "WaterUseEquipment"
                 full_load_hrs = Schedule.annual_equivalent_full_load_hrs(model.yearDescription.get.assumedYear, new_object.flowRateFractionSchedule.get)
-                actual_values["HotWater_gpd"] += OpenStudio.convert(full_load_hrs * new_object.waterUseEquipmentDefinition.peakFlowRate * new_object.multiplier, "m^3/s", "gal/min").get * 60.0 / 365.0
+                actual_values["HotWater_gpd"] += UnitConversions.convert(full_load_hrs * new_object.waterUseEquipmentDefinition.peakFlowRate * new_object.multiplier, "m^3/s", "gal/min") * 60.0 / 365.0
                 actual_values["Space"] << new_object.space.get.name.to_s
             end
         end

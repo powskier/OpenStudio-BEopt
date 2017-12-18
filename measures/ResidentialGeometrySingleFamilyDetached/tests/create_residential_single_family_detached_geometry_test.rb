@@ -483,29 +483,29 @@ class CreateResidentialSingleFamilyDetachedGeometryTest < MiniTest::Test
             if obj_type == "Space"
                 if new_object.name.to_s.start_with?(Constants.GarageAtticSpace)
                     actual_values["GarageAtticHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["UnfinishedAtticFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["UnfinishedAtticFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.GarageSpace)
-                    actual_values["GarageFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["GarageFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.FinishedBasementFoundationType)
                     actual_values["FinishedBasementHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["FinishedBasementFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["FinishedBasementFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.UnfinishedBasementFoundationType)
                     actual_values["UnfinishedBasementHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["UnfinishedBasementFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["UnfinishedBasementFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.CrawlFoundationType)
                     actual_values["CrawlspaceHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["CrawlspaceFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["CrawlspaceFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.UnfinishedAtticType)
                     actual_values["UnfinishedAtticHeight"] = Geometry.get_height_of_spaces([new_object])
-                    actual_values["UnfinishedAtticFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["UnfinishedAtticFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 elsif new_object.name.to_s.start_with?(Constants.FinishedAtticType) or new_object.name.to_s.start_with?("garage #{Constants.FinishedAtticType}")
                     if Geometry.get_height_of_spaces([new_object]) > actual_values["FinishedAtticHeight"]
                       actual_values["FinishedAtticHeight"] = Geometry.get_height_of_spaces([new_object])
                     end
-                    actual_values["FinishedAtticFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["FinishedAtticFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 end
                 if Geometry.space_is_finished(new_object)
-                    actual_values["FinishedFloorArea"] += OpenStudio::convert(new_object.floorArea,"m^2","ft^2").get
+                    actual_values["FinishedFloorArea"] += UnitConversions.convert(new_object.floorArea,"m^2","ft^2")
                 end
                 new_spaces << new_object
             end

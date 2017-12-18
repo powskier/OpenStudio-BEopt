@@ -346,13 +346,13 @@ class WindowAreaTest < MiniTest::Test
     new_win_area = {Constants.FacadeFront=>0, Constants.FacadeBack=>0, 
                     Constants.FacadeLeft=>0, Constants.FacadeRight=>0}
     new_objects.each do |window|
-        new_win_area[Geometry.get_facade_for_surface(window)] += OpenStudio.convert(window.grossArea, "m^2", "ft^2").get
+        new_win_area[Geometry.get_facade_for_surface(window)] += UnitConversions.convert(window.grossArea, "m^2", "ft^2")
     end
 
     del_win_area = {Constants.FacadeFront=>0, Constants.FacadeBack=>0, 
                     Constants.FacadeLeft=>0, Constants.FacadeRight=>0}
     del_objects.each do |window|
-        del_win_area[Geometry.get_facade_for_surface(window)] += OpenStudio.convert(window.grossArea, "m^2", "ft^2").get
+        del_win_area[Geometry.get_facade_for_surface(window)] += UnitConversions.convert(window.grossArea, "m^2", "ft^2")
     end
 
     assert_in_epsilon(expected_fblr_win_area_added[0], new_win_area[Constants.FacadeFront], 0.01)

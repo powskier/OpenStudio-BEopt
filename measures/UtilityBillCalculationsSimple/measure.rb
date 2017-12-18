@@ -4,34 +4,33 @@
 require 'erb'
 require 'csv'
 require 'matrix'
-require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure
-class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
+class UtilityBillCalculations < OpenStudio::Measure::ReportingMeasure
 
   # human readable name
   def name
-    return "Calculate Simple Utility Bills"
+    return "Utility Bill Calculations"
   end
 
   # human readable description
   def description
-    return "Calls the SAM SDK for calculating utility bills."
+    return "Calls SAM SDK."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calls the utilityrate3 module in the SAM SDK."
+    return "Calls SAM SDK."
   end 
   
   def fuel_types
     fuel_types = [  
-      "Electricity",
-      "Gas",
-      "FuelOil#1",
-      "Propane",
-      "ElectricityProduced"
+      'Electricity',
+      'Gas',
+      'FuelOil#1',
+      'Propane',
+      'ElectricityProduced'
     ]
     
     return fuel_types
@@ -39,7 +38,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
   
   def end_uses
     end_uses = [
-      "Facility"
+      'Facility'
     ]
     
     return end_uses
@@ -49,17 +48,37 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
   def arguments()
     args = OpenStudio::Measure::OSArgumentVector.new
     
+    arg = OpenStudio::Measure::OSArgument.makeStringArgument("run_dir", true)
+    arg.setDisplayName("Run Directory")
+    arg.setDescription("Relative path of the run directory.")
+    arg.setDefaultValue("..")
+    args << arg    
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("api_key", false)
+    arg.setDisplayName("API Key")
+    arg.setDescription("Call the API and pull JSON tariff file(s) with EIA ID corresponding to the EPW region.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_directory", false)
+    arg.setDisplayName("Tariff Directory")
+    arg.setDescription("Absolute (or relative) directory to tariff files.")
+    args << arg
+    
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("tariff_file_name", false)
+    arg.setDisplayName("Tariff File Name")
+    arg.setDescription("Name of the JSON tariff file. Leave blank if pulling JSON tariff file(s) with EIA ID corresponding to the EPW region.")
+    args << arg
+    
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_fixed", false)
-    arg.setDisplayName("Electricity: Fixed Charge")
-    arg.setUnits("$/month")
-    arg.setDescription("Monthly fixed charge for electricity.")
+    arg.setDisplayName("Electricity Fixed Cost")
+    arg.setUnits("$")
+    arg.setDescription("Annual fixed cost of electricity.")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_rate", false)
-    arg.setDisplayName("Electricity: Marginal Rate")
+    arg.setDisplayName("Electricity Unit Cost")
     arg.setUnits("$/kWh")
     arg.setDescription("Price per kilowatt-hour for electricity.")
-    arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_fixed", false)
@@ -72,46 +91,26 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDisplayName("Natural Gas Unit Cost")
     arg.setUnits("$/therm")
     arg.setDescription("Price per therm for natural gas.")
-    arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("oil_rate", false)
-    arg.setDisplayName("Oil: Marginal Rate")
+    arg.setDisplayName("Fuel Oil Unit Cost")
     arg.setUnits("$/gal")
     arg.setDescription("Price per gallon for fuel oil.")
-    arg.setDefaultValue(Constants.Auto)
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("prop_rate", false)
-    arg.setDisplayName("Propane: Marginal Rate")
+    arg.setDisplayName("Propane Unit Cost")
     arg.setUnits("$/gal")
     arg.setDescription("Price per gallon for propane.")
-    arg.setDefaultValue(Constants.Auto)
-    args << arg
-
-    pv_compensation_types = OpenStudio::StringVector.new
-    pv_compensation_types << "Net Metering"
-    pv_compensation_types << "Feed-In Tariff"
-    arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("pv_compensation_type", pv_compensation_types, false)
-    arg.setDisplayName("PV: Compensation Type")
-    arg.setDescription("The type of compensation for PV.")
-    arg.setDefaultValue("Net Metering")
-    args << arg    
-    
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_sellback_rate", false)
-    arg.setDisplayName("PV: Net Metering Annual Excess Sellback Rate")
-    arg.setUnits("$/kWh")
-    arg.setDescription("The annual excess/net sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.")
-    arg.setDefaultValue("0.03")
-    args << arg
-
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("pv_tariff_rate", false)
-    arg.setDisplayName("PV: Feed-In Tariff Rate")
-    arg.setUnits("$/kWh")
-    arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is 'Feed-In Tariff'.")
-    arg.setDefaultValue("0.12")
     args << arg
     
+    arg = OpenStudio::Measure::OSArgument::makeBoolArgument("avg_rates", true)
+    arg.setDisplayName("Average Residential Rates")
+    arg.setDescription("Average across residential rates in a given EIA ID.")
+    arg.setDefaultValue(false)
+    args << arg
+
     return args
   end
   
@@ -124,7 +123,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     # Request the output for each end use/fuel type combination
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
-        variable_name = if end_use == "Facility"
+        variable_name = if end_use == 'Facility'
                   "#{fuel_type}:#{end_use}"
                 else
                   "#{end_use}:#{fuel_type}"
@@ -188,6 +187,13 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     prop_rate.is_initialized ? prop_rate = prop_rate.get : prop_rate = nil
     avg_rates = runner.getBoolArgumentValue("avg_rates", user_arguments)
 
+    if tariff_directory == "./resources/tariffs" and elec_fixed == 0 and elec_rate.nil?
+      if !File.directory? "#{File.dirname(__FILE__)}/resources/tariffs"
+        unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/tariffs.zip")
+        unzip_file.extractAllFiles(OpenStudio::toPath("#{File.dirname(__FILE__)}/resources/tariffs"))
+      end
+    end
+
     if not tariff_directory.nil?
     
       unless (Pathname.new tariff_directory).absolute?
@@ -205,7 +211,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       if !File.exist?(tariff_directory)
         FileUtils.mkdir_p(tariff_directory)
       end
-
+      
     end
     
     # get the last model and sql file
@@ -215,8 +221,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       return false
     end
     model = model.get
-
-    # Get the last sql file
+    
     sql = runner.lastEnergyPlusSqlFile
     if sql.empty?
       runner.registerError("Cannot find last sql file.")
@@ -235,41 +240,51 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
         end
       end
     end
-    if ann_env_pd == false
-      runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
-      return false
-    end
-
+    
     timeseries = {}
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
       
         var_name = "#{fuel_type}:#{end_use}"
 
-        # Get the y axis values
-        y_timeseries = sql.timeSeries(ann_env_pd, "Hourly", var_name, "")
+        y_timeseries = sql.timeSeries(ann_env_pd, "Hourly", var_name, '')
         if y_timeseries.empty?
           runner.registerWarning("No data found for Hourly #{var_name}.")
           next
         else
           y_timeseries = y_timeseries.get
-          values = y_timeseries.values
+        end
+        y_vals = y_timeseries.values
+                    
+        values = []
+        y_timeseries.dateTimes.each_with_index do |date_time, i|
+          values << y_vals[i]
         end
 
+        next if values.all? {|x| x.abs < 0.000000001}
+                    
+        # Unit conversion
         old_units = y_timeseries.units
-        new_units, unit_conv = UnitConversion.get_scalar_unit_conversion(var_name, old_units)
-
-        timeseries[var_name] = []
-        y_timeseries.dateTimes.each_with_index do |date_time, i|
-          y_val = values[i]
-          if unit_conv.nil? # these unit conversions are not scalars
-            if old_units == "C" and new_units == "F"
-              y_val = 1.8 * y_val + 32.0 # convert C to F
-            end
-          else # these are scalars
-            y_val *= unit_conv
+        new_units = case old_units
+                    when "J"
+                      if var_name.include?('Electricity')
+                        "kWh"
+                      else
+                        "kBtu"
+                      end
+                    when "m3"
+                      old_units = "m^3"
+                      "gal"
+                    else
+                      old_units
+                    end
+                    
+        values.each do |value|
+          if timeseries.keys.include? var_name
+            timeseries[var_name] << UnitConversions.convert(value, old_units, new_units)
+          else
+            timeseries[var_name] = [UnitConversions.convert(value, old_units, new_units)]
           end
-          timeseries[var_name] << y_val.round(3)
         end
         
       end
@@ -513,7 +528,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     timeseries["Electricity:Facility"].each_with_index do |val, i|
       timeseries["Electricity:Facility"][i] -= timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
     end
-
+    
     fuels = ["Electricity", "Natural gas", "Oil", "Propane"]
     fuels.each do |fuel|
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{fuel}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
@@ -552,9 +567,8 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       end
     end
 
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1")
     FileUtils.rm_rf("#{File.dirname(__FILE__)}/resources/tariffs")
-
+    
     return true
  
   end
@@ -586,7 +600,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     return {"Alabama"=>"AL", "Alaska"=>"AK", "Arizona"=>"AZ", "Arkansas"=>"AR","California"=>"CA","Colorado"=>"CO", "Connecticut"=>"CT", "Delaware"=>"DE", "District of Columbia"=>"DC",
             "Florida"=>"FL", "Georgia"=>"GA", "Hawaii"=>"HI", "Idaho"=>"ID", "Illinois"=>"IL","Indiana"=>"IN", "Iowa"=>"IA","Kansas"=>"KS", "Kentucky"=>"KY", "Louisiana"=>"LA",
             "Maine"=>"ME","Maryland"=>"MD", "Massachusetts"=>"MA", "Michigan"=>"MI", "Minnesota"=>"MN","Mississippi"=>"MS", "Missouri"=>"MO", "Montana"=>"MT","Nebraska"=>"NE", "Nevada"=>"NV",
-            "New Hampshire"=>"NH", "New Jersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY","North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
+            "New Hampshire"=>"NH", "NewJersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY","North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
             "Oregon"=>"OR", "Pennsylvania"=>"PA", "Puerto Rico"=>"PR", "Rhode Island"=>"RI","South Carolina"=>"SC", "South Dakota"=>"SD", "Tennessee"=>"TN", "Texas"=>"TX",
             "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV","Wisconsin"=>"WI", "Wyoming"=>"WY"}
   end
@@ -597,7 +611,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       total_val += val.to_f
     end
     unless desired_units == "gal"
-      runner.registerValue(name, (OpenStudio::convert(total_val, os_units, desired_units).get * rate.to_f + fixed.to_f).round(2))
+      runner.registerValue(name, (UnitConversions.convert(total_val, os_units, desired_units) * rate.to_f + fixed.to_f).round(2))
     else
       if name.include? "oil"
         runner.registerValue("fuel_oil", (total_val * 1000.0 / 139000 * rate.to_f + fixed.to_f).round(2))
@@ -624,7 +638,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
   def haversine(lat1, lon1, lat2, lon2)
     # convert decimal degrees to radians
     [lon1, lat1, lon2, lat2].each do |l|
-      l = OpenStudio.convert(l,"deg","rad").get
+      l = UnitConversions.convert(l,"deg","rad")
     end
     # haversine formula 
     dlon = lon2 - lon1 
@@ -638,4 +652,4 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
 end
 
 # register the measure to be used by the application
-UtilityBillCalculationsSimple.new.registerWithApplication
+UtilityBillCalculations.new.registerWithApplication

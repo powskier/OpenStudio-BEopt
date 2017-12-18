@@ -73,13 +73,14 @@ def get_objects(model)
     return objects
 end
   
-def get_object_additions(list1, list2, obj_type_exclusions=nil)
+def get_object_additions(list1, list2, obj_type_exclusions=nil, obj_name_exclusions=nil)
     # Identifies all objects in list2 that aren't in list1.
     # Returns a hash with key=ObjectTypeString, value=[ModelObjects]
     additions = {}
     list2.each do |obj_type2, obj2|
         next if list1.include?([obj_type2, obj2])
         next if not obj_type_exclusions.nil? and obj_type_exclusions.include?(obj_type2)
+        next if not obj_name_exclusions.nil? and obj_name_exclusions.include?(obj2.name.to_s)
         if not additions.keys.include?(obj_type2)
             additions[obj_type2] = []
         end
