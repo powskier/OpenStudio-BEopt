@@ -261,17 +261,8 @@ task :update_measures do
     
     # Add/update resource files as needed
     resources.each do |resource|
-      if resource.include? "*"
-        Dir[resource].each do |r|
-          resources << r
-        end
-      end
-    end
-    resources.each do |resource|
       if not File.exist?(resource)
-        unless resource.include? "*"
-          puts "Cannot find resource: #{resource}."
-        end
+        puts "Cannot find resource: #{resource}."
         next
       end
       r = File.basename(resource)
@@ -290,14 +281,6 @@ task :update_measures do
     end
     
     # Any extra resource files?
-    resources.each do |resource|
-      if resource.include? "*"
-        Dir[resource].each do |r|
-          resources << File.join(File.dirname(File.dirname(resource)), File.basename(r))
-          resources.delete(File.join(File.dirname(resource), File.basename(r)))
-        end
-      end
-    end
     if File.directory?(File.expand_path("../measures/#{m}/resources", __FILE__))
       Dir.foreach(File.expand_path("../measures/#{m}/resources", __FILE__)) do |item|
         next if item == '.' or item == '..'
