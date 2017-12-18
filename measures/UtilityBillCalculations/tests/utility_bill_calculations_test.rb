@@ -294,8 +294,8 @@ class UtilityBillCalculationsTest < MiniTest::Test
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
-    assert(result.info.size == num_infos)
-    assert(result.warnings.size == num_warnings)
+    assert_equal(result.info.size, num_infos)
+    assert_equal(result.warnings.size, num_warnings)
     
     FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
     

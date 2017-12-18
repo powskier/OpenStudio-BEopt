@@ -112,67 +112,62 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
       control_slave_zones_hash = HVAC.get_control_and_slave_zones(thermal_zones)
       control_slave_zones_hash.each do |control_zone, slave_zones|
       
-        # Remove existing equipment
-        HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameUnitHeater, control_zone, true, unit)
-        
-        # _processSystemHeatingCoil
-
-        htg_coil = OpenStudio::Model::CoilHeatingGas.new(model)
-        htg_coil.setName(obj_name + " heating coil")
-        htg_coil.setGasBurnerEfficiency(heaterEfficiency)
-        if heaterOutputCapacity != Constants.SizingAuto
-          htg_coil.setNominalCapacity(UnitConversions.convert(heaterOutputCapacity,"Btu/hr","W")) # Used by HVACSizing measure
-        end
-        htg_coil.setParasiticElectricLoad(0.0)
-        htg_coil.setParasiticGasLoad(0)
-        htg_coil.setFuelType(HelperMethods.eplus_fuel_map(heaterFuelType))
-        
-        fan = nil
-        if heaterFanPower > 0
-          fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule)
-          fan.setName(obj_name + " fan")
-          fan.setEndUseSubcategory(Constants.EndUseHVACFan)
-          fan.setFanEfficiency(UnitConversions.convert(static / heaterFanPower,"cfm","m^3/s")) # Overall Efficiency of the Fan, Motor and Drive
-          fan.setPressureRise(static)
-          fan.setMotorEfficiency(1.0)
-          fan.setMotorInAirstreamFraction(1.0)  
-        end
+        ([control_zone] + slave_zones).each do |zone|
       
-        # _processSystemAir
-        
-        unitary_system = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
-        unitary_system.setName(obj_name + " unitary system")
-        unitary_system.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
-        unitary_system.setHeatingCoil(htg_coil)
-        unitary_system.setSupplyAirFlowRateDuringCoolingOperation(0.0000001)
-        if not fan.nil?
-          unitary_system.setSupplyFan(fan)
-          unitary_system.setFanPlacement("BlowThrough")
-        end
-        unitary_system.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
-        unitary_system.setMaximumSupplyAirTemperature(UnitConversions.convert(120.0,"F","C"))      
-        unitary_system.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
-
-        #unitary_system.addToNode(air_supply_inlet_node)
-
-        if not fan.nil?
-          runner.registerInfo("Added '#{fan.name}' to '#{unitary_system.name}''")
-        end
-        runner.registerInfo("Added '#{htg_coil.name}' to '#{unitary_system.name}'")
-
-        unitary_system.setControllingZoneorThermostatLocation(control_zone)
-        unitary_system.addToThermalZone(control_zone)
-
-        HVAC.prioritize_zone_hvac(model, runner, control_zone)
-      
-        slave_zones.each do |slave_zone|
-        
           # Remove existing equipment
-          HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameUnitHeater, slave_zone, false, unit)
+          HVAC.remove_existing_hvac_equipment(model, runner, Constants.ObjectNameUnitHeater, zone, true, unit)
+          
+          # _processSystemHeatingCoil
+
+          htg_coil = OpenStudio::Model::CoilHeatingGas.new(model)
+          htg_coil.setName(obj_name + " heating coil")
+          htg_coil.setGasBurnerEfficiency(heaterEfficiency)
+          if heaterOutputCapacity != Constants.SizingAuto
+            htg_coil.setNominalCapacity(UnitConversions.convert(heaterOutputCapacity,"Btu/hr","W")) # Used by HVACSizing measure
+          end
+          htg_coil.setParasiticElectricLoad(0.0)
+          htg_coil.setParasiticGasLoad(0)
+          htg_coil.setFuelType(HelperMethods.eplus_fuel_map(heaterFuelType))
+          
+          fan = nil
+          if heaterFanPower > 0
+            fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule)
+            fan.setName(obj_name + " fan")
+            fan.setEndUseSubcategory(Constants.EndUseHVACFan)
+            fan.setFanEfficiency(UnitConversions.convert(static / heaterFanPower,"cfm","m^3/s")) # Overall Efficiency of the Fan, Motor and Drive
+            fan.setPressureRise(static)
+            fan.setMotorEfficiency(1.0)
+            fan.setMotorInAirstreamFraction(1.0)  
+          end
         
-          HVAC.prioritize_zone_hvac(model, runner, slave_zone)
-        
-        end    
+          # _processSystemAir
+          
+          unitary_system = OpenStudio::Model::AirLoopHVACUnitarySystem.new(model)
+          unitary_system.setName(obj_name + " unitary system")
+          unitary_system.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
+          unitary_system.setHeatingCoil(htg_coil)
+          unitary_system.setSupplyAirFlowRateDuringCoolingOperation(0.0000001)
+          if not fan.nil?
+            unitary_system.setSupplyFan(fan)
+            unitary_system.setFanPlacement("BlowThrough")
+          end
+          unitary_system.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
+          unitary_system.setMaximumSupplyAirTemperature(UnitConversions.convert(120.0,"F","C"))      
+          unitary_system.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
+
+          #unitary_system.addToNode(air_supply_inlet_node)
+
+          if not fan.nil?
+            runner.registerInfo("Added '#{fan.name}' to '#{unitary_system.name}''")
+          end
+          runner.registerInfo("Added '#{htg_coil.name}' to '#{unitary_system.name}'")
+
+          unitary_system.setControllingZoneorThermostatLocation(zone)
+          unitary_system.addToThermalZone(zone)
+
+          HVAC.prioritize_zone_hvac(model, runner, zone)
+          
+        end
       
       end
       
