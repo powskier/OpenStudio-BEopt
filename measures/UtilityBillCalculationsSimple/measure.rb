@@ -4,6 +4,7 @@
 require 'erb'
 require 'csv'
 require 'matrix'
+require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure

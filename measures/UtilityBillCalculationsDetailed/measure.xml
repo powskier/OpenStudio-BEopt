@@ -1,54 +1,47 @@
 <measure>
   <schema_version>3.0</schema_version>
-  <name>utility_bill_calculations</name>
+  <name>utility_bill_calculations_detailed</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>ebfcdee4-9572-423d-b2d1-2221ffc73e34</version_id>
-  <version_modified>20171213T184506Z</version_modified>
+  <version_id>e294d210-7d88-4127-a73d-283611e4166b</version_id>
+  <version_modified>20171218T181133Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
-  <class_name>UtilityBillCalculations</class_name>
-  <display_name>Utility Bill Calculations</display_name>
+  <class_name>UtilityBillCalculationsDetailed</class_name>
+  <display_name>Calculate Detailed Utility Bills</display_name>
   <description>Calls the SAM SDK for calculating utility bills.</description>
   <modeler_description>Calls the utilityrate3 module in the SAM SDK.</modeler_description>
   <arguments>
     <argument>
-      <name>api_key</name>
-      <display_name>API Key</display_name>
-      <description>Call the API and pull JSON tariff file(s) with EIA ID corresponding to the EPW region.</description>
-      <type>String</type>
+      <name>tariffs</name>
+      <display_name>Electricity: Tariff</display_name>
+      <description>The tariff(s) to use.</description>
+      <type>Choice</type>
       <required>false</required>
       <model_dependent>false</model_dependent>
+      <default_value>Autoselect Tariff(s)</default_value>
+      <choices>
+        <choice>
+          <value>Autoselect Tariff(s)</value>
+          <display_name>Autoselect Tariff(s)</display_name>
+        </choice>
+        <choice>
+          <value>Custom Tariff</value>
+          <display_name>Custom Tariff</display_name>
+        </choice>
+        <choice>
+          <value>Utility ID A: Tariff 1</value>
+          <display_name>Utility ID A: Tariff 1</display_name>
+        </choice>
+        <choice>
+          <value>Utility ID A: Tariff 2</value>
+          <display_name>Utility ID A: Tariff 2</display_name>
+        </choice>
+      </choices>
     </argument>
     <argument>
-      <name>tariff_directory</name>
-      <display_name>Tariff Directory</display_name>
-      <description>Absolute (or relative) directory to tariff files.</description>
+      <name>custom_tariff</name>
+      <display_name>Electricity: Custom Tariff File Location</display_name>
+      <description>Absolute (or relative) path to custom tariff file.</description>
       <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
-      <name>tariff_file_name</name>
-      <display_name>Tariff File Name</display_name>
-      <description>Name of the JSON tariff file. Leave blank if pulling JSON tariff file(s) with EIA ID corresponding to the EPW region.</description>
-      <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
-      <name>elec_fixed</name>
-      <display_name>Electricity Fixed Cost</display_name>
-      <description>Annual fixed cost of electricity.</description>
-      <type>String</type>
-      <units>$</units>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
-      <name>elec_rate</name>
-      <display_name>Electricity Unit Cost</display_name>
-      <description>Price per kilowatt-hour for electricity.</description>
-      <type>String</type>
-      <units>$/kWh</units>
       <required>false</required>
       <model_dependent>false</model_dependent>
     </argument>
@@ -69,43 +62,66 @@
       <units>$/therm</units>
       <required>false</required>
       <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
       <name>oil_rate</name>
-      <display_name>Fuel Oil Unit Cost</display_name>
+      <display_name>Oil: Marginal Rate</display_name>
       <description>Price per gallon for fuel oil.</description>
       <type>String</type>
       <units>$/gal</units>
       <required>false</required>
       <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
       <name>prop_rate</name>
-      <display_name>Propane Unit Cost</display_name>
+      <display_name>Propane: Marginal Rate</display_name>
       <description>Price per gallon for propane.</description>
       <type>String</type>
       <units>$/gal</units>
       <required>false</required>
       <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
-      <name>avg_rates</name>
-      <display_name>Average Residential Rates</display_name>
-      <description>Average across residential rates in a given EIA ID.</description>
-      <type>Boolean</type>
-      <required>true</required>
+      <name>pv_compensation_type</name>
+      <display_name>PV: Compensation Type</display_name>
+      <description>The type of compensation for PV.</description>
+      <type>Choice</type>
+      <required>false</required>
       <model_dependent>false</model_dependent>
-      <default_value>false</default_value>
+      <default_value>Net Metering</default_value>
       <choices>
         <choice>
-          <value>true</value>
-          <display_name>true</display_name>
+          <value>Net Metering</value>
+          <display_name>Net Metering</display_name>
         </choice>
         <choice>
-          <value>false</value>
-          <display_name>false</display_name>
+          <value>Feed-In Tariff</value>
+          <display_name>Feed-In Tariff</display_name>
         </choice>
       </choices>
+    </argument>
+    <argument>
+      <name>pv_sellback_rate</name>
+      <display_name>PV: Net Metering Annual Excess Sellback Rate</display_name>
+      <description>The annual excess/net sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.03</default_value>
+    </argument>
+    <argument>
+      <name>pv_tariff_rate</name>
+      <display_name>PV: Feed-In Tariff Rate</display_name>
+      <description>The annual full/gross tariff rate for PV. Only applies if the PV compensation type is 'Feed-In Tariff'.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.12</default_value>
     </argument>
   </arguments>
   <outputs>
@@ -235,12 +251,6 @@
       <checksum>83305586</checksum>
     </file>
     <file>
-      <filename>utility_bill_calculations_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>3DBF75EC</checksum>
-    </file>
-    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>2.0.5</identifier>
@@ -249,13 +259,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>EDE9D67F</checksum>
+      <checksum>AFB9F4D7</checksum>
+    </file>
+    <file>
+      <filename>utility_bill_calculations_detailed_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>3064FF88</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>260EF643</checksum>
     </file>
     <file>
       <filename>UtilityTariffs.zip</filename>
       <filetype>zip</filetype>
       <usage_type>resource</usage_type>
-      <checksum>D66DB680</checksum>
+      <checksum>C1721B54</checksum>
     </file>
   </files>
 </measure>

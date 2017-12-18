@@ -2,24 +2,142 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations_simple</name>
   <uid>c6235436-ae5a-407b-8d40-14fa3c564a70</uid>
-  <version_id>de313022-e2ce-40e5-9de2-51f94954bd12</version_id>
-  <version_modified>20171214T233721Z</version_modified>
+  <version_id>1aaf4c9b-3c4a-40ff-a906-7b9303c0626e</version_id>
+  <version_modified>20171218T181133Z</version_modified>
   <xml_checksum>17C66553</xml_checksum>
   <class_name>UtilityBillCalculationsSimple</class_name>
-  <display_name>UtilityBillCalculationsSimple</display_name>
-  <description></description>
-  <modeler_description></modeler_description>
+  <display_name>Calculate Simple Utility Bills</display_name>
+  <description>Calls the SAM SDK for calculating utility bills.</description>
+  <modeler_description>Calls the utilityrate3 module in the SAM SDK.</modeler_description>
   <arguments>
     <argument>
-      <name>space_name</name>
-      <display_name>New space name</display_name>
-      <description>This name will be used as the name of the new space.</description>
+      <name>elec_fixed</name>
+      <display_name>Electricity: Fixed Charge</display_name>
+      <description>Monthly fixed charge for electricity.</description>
       <type>String</type>
-      <required>true</required>
+      <units>$/month</units>
+      <required>false</required>
       <model_dependent>false</model_dependent>
     </argument>
+    <argument>
+      <name>elec_rate</name>
+      <display_name>Electricity: Marginal Rate</display_name>
+      <description>Price per kilowatt-hour for electricity.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>ng_fixed</name>
+      <display_name>Natural Gas Fixed Cost</display_name>
+      <description>Annual fixed cost of natural gas.</description>
+      <type>String</type>
+      <units>$</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+    </argument>
+    <argument>
+      <name>ng_rate</name>
+      <display_name>Natural Gas Unit Cost</display_name>
+      <description>Price per therm for natural gas.</description>
+      <type>String</type>
+      <units>$/therm</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>oil_rate</name>
+      <display_name>Oil: Marginal Rate</display_name>
+      <description>Price per gallon for fuel oil.</description>
+      <type>String</type>
+      <units>$/gal</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>prop_rate</name>
+      <display_name>Propane: Marginal Rate</display_name>
+      <description>Price per gallon for propane.</description>
+      <type>String</type>
+      <units>$/gal</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>pv_compensation_type</name>
+      <display_name>PV: Compensation Type</display_name>
+      <description>The type of compensation for PV.</description>
+      <type>Choice</type>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Net Metering</default_value>
+      <choices>
+        <choice>
+          <value>Net Metering</value>
+          <display_name>Net Metering</display_name>
+        </choice>
+        <choice>
+          <value>Feed-In Tariff</value>
+          <display_name>Feed-In Tariff</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>pv_sellback_rate</name>
+      <display_name>PV: Net Metering Annual Excess Sellback Rate</display_name>
+      <description>The annual excess/net sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.03</default_value>
+    </argument>
+    <argument>
+      <name>pv_tariff_rate</name>
+      <display_name>PV: Feed-In Tariff Rate</display_name>
+      <description>The annual full/gross tariff rate for PV. Only applies if the PV compensation type is 'Feed-In Tariff'.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>false</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.12</default_value>
+    </argument>
   </arguments>
-  <outputs/>
+  <outputs>
+    <output>
+      <name>electricity</name>
+      <display_name>electricity</display_name>
+      <short_name>electricity</short_name>
+      <type>String</type>
+      <model_dependent>false</model_dependent>
+    </output>
+    <output>
+      <name>natural_gas</name>
+      <display_name>natural_gas</display_name>
+      <short_name>natural_gas</short_name>
+      <type>Double</type>
+      <model_dependent>false</model_dependent>
+    </output>
+    <output>
+      <name>propane</name>
+      <display_name>propane</display_name>
+      <short_name>propane</short_name>
+      <type>Double</type>
+      <model_dependent>false</model_dependent>
+    </output>
+    <output>
+      <name>fuel_oil</name>
+      <display_name>fuel_oil</display_name>
+      <short_name>fuel_oil</short_name>
+      <type>Double</type>
+      <model_dependent>false</model_dependent>
+    </output>
+  </outputs>
   <provenances/>
   <tags>
     <tag>Reporting.QAQC</tag>
@@ -41,19 +159,109 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>441DE76C</checksum>
+      <checksum>0D513958</checksum>
     </file>
     <file>
       <filename>utility_bill_calculations_simple_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>70092B33</checksum>
+      <checksum>6F954EE9</checksum>
     </file>
     <file>
-      <filename>example_model.osm</filename>
+      <filename>DuPage_17043_725300_880860.epw</filename>
+      <filetype>epw</filetype>
+      <usage_type>test</usage_type>
+      <checksum>335AE046</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_AMY_PV.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>53D14E69</checksum>
+      <checksum>33BAE66E</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>EA761C8F</checksum>
+    </file>
+    <file>
+      <filename>USA_CO_Denver_Intl_AP_725650_TMY3.epw</filename>
+      <filetype>epw</filetype>
+      <usage_type>test</usage_type>
+      <checksum>E23378AA</checksum>
+    </file>
+    <file>
+      <filename>by_nsrdb.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>EB68CF2B</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>260EF643</checksum>
+    </file>
+    <file>
+      <filename>Electricity.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>6C2CC8FC</checksum>
+    </file>
+    <file>
+      <filename>Natural gas.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>43EDF817</checksum>
+    </file>
+    <file>
+      <filename>Oil.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>FBAE07C0</checksum>
+    </file>
+    <file>
+      <filename>Propane.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>D205D809</checksum>
+    </file>
+    <file>
+      <filename>sam-sdk-2017-1-17-r1.zip</filename>
+      <filetype>zip</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>14339B8F</checksum>
+    </file>
+    <file>
+      <filename>ssc_api.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>C9F510A2</checksum>
+    </file>
+    <file>
+      <filename>ssc_ffi.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>DD7DE19B</checksum>
+    </file>
+    <file>
+      <filename>unit_conversions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>83305586</checksum>
+    </file>
+    <file>
+      <filename>utilities.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>49E7C310</checksum>
+    </file>
+    <file>
+      <filename>UtilityTariffs.zip</filename>
+      <filetype>zip</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>C1721B54</checksum>
     </file>
   </files>
 </measure>
