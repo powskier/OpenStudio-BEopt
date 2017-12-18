@@ -656,6 +656,22 @@ class HVAC
       return true
     end
     
+    def self.has_ducted_mshp(model, runner, thermal_zone)
+      if not self.has_mshp(model, runner, thermal_zone)
+        return false
+      end
+      model.getBuildingUnits.each do |unit|
+        next if not Geometry.get_thermal_zones_from_spaces(unit.spaces).include?(thermal_zone)
+        is_ducted = unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump)
+        if not is_ducted.is_initialized
+          runner.registerError("Could not find value for '#{Constants.DuctedInfoMiniSplitHeatPump}' with datatype boolean.")
+          return nil
+        end
+        return is_ducted.get
+      end
+      return false
+    end
+    
     def self.has_room_ac(model, runner, thermal_zone)
       ptac = self.get_ptac(model, runner, thermal_zone)
       if not ptac.nil?
@@ -686,6 +702,21 @@ class HVAC
         return false
       end
       return true
+    end
+    
+    def self.has_ducted_equipment(model, runner, thermal_zone)
+      if HVAC.has_central_ac(model, runner, thermal_zone)
+        return true
+      elsif HVAC.has_furnace(model, runner, thermal_zone)
+        return true
+      elsif HVAC.has_ashp(model, runner, thermal_zone)
+        return true
+      elsif HVAC.has_gshp(model, runner, thermal_zone)
+        return true
+      elsif HVAC.has_ducted_mshp(model, runner, thermal_zone)
+        return true
+      end
+      return false
     end
     
     # Remove Equipment methods

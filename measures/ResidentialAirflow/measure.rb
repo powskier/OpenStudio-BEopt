@@ -2563,8 +2563,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
   def _processDuctsForUnit(model, runner, ducts, building, unit, building_unit)
   
     if unit.has_mini_split_heat_pump # has mshp
-      miniSplitHPIsDucted = building_unit.getFeatureAsBoolean(Constants.DuctedInfoMiniSplitHeatPump) # get ducted or not
-      miniSplitHPIsDucted = miniSplitHPIsDucted.get
+      miniSplitHPIsDucted = HVAC.has_ducted_mshp(model, runner, unit.living_zone)
       if ducts.DuctLocation != "none" and not miniSplitHPIsDucted # if not ducted but specified ducts, override
         runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
         ducts.DuctLocation = "none"
@@ -2574,7 +2573,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    no_ducted_equip = !HVAC.has_central_ac(model, runner, unit.living_zone) && !HVAC.has_furnace(model, runner, unit.living_zone) && !HVAC.has_ashp(model, runner, unit.living_zone) && !HVAC.has_gshp(model, runner, unit.living_zone).nil? && !unit.has_mini_split_heat_pump
+    no_ducted_equip = !HVAC.has_ducted_equipment(model, runner, unit.living_zone)
     if ducts.DuctLocation != "none" and no_ducted_equip
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
