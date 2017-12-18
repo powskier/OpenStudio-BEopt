@@ -90,7 +90,7 @@ class HourlyByMonthSchedule
             else
               day_endm = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
               day_startm = [0, 1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336]
-            end  
+            end
             
             time = []
             for h in 1..24
@@ -561,23 +561,45 @@ class HotWaterSchedule
             return totflow, maxflow, ontime
             
         end
-    
-        def createSchedule(data, timestep_minutes)
-            # OpenStudio does not yet support ScheduleFile. So we use ScheduleInterval instead.
-            # See https://unmethours.com/question/2877/has-anyone-used-the-variable-interval-schedule-sets-in-os-16/
-            # for an example.
+        
+        def createSchedule(data, timestep_minutes, first_timestamp=1, weeks=2) # first_timestamp=1 means Jan 1, 12AM; weeks is the unique window that repeats
             if data.size == 0
                 return nil
             end
+
+            last_day_of_year = 365
+            last_day_of_year += 1 if @model.getYearDescription.isLeapYear
+
+            time = []
+            (timestep_minutes..24*60).step(timestep_minutes).to_a.each_with_index do |m, i|
+                time[i] = OpenStudio::Time.new(0,0,m,0)
+            end
             
-            yd = @model.getYearDescription
-            start_date = yd.makeDate(1,1)
-            interval = OpenStudio::Time.new(0, 0, timestep_minutes)
-            
-            time_series = OpenStudio::TimeSeries.new(start_date, interval, OpenStudio::createVector(data), "")
-            
-            schedule = OpenStudio::Model::ScheduleInterval.fromTimeSeries(time_series, @model).get
+            schedule = OpenStudio::Model::ScheduleRuleset.new(@model)
             schedule.setName(@sch_name)
+
+            schedule_rules = []
+            for d in 1..7*weeks # how many unique day schedules
+              rule = OpenStudio::Model::ScheduleRule.new(schedule)
+              rule.setName(@sch_name + " #{Schedule.allday_name} ruleset#{d}")
+              day_schedule = rule.daySchedule
+              day_schedule.setName(@sch_name + " #{Schedule.allday_name}#{d}")
+              time.each_with_index do |m, i|
+                  day_schedule.addValue(m, data[(first_timestamp-1) + i + (d-1)*24*60/timestep_minutes]) # offset by first_timestamp (i.e., the unique window shifts)
+              end
+              rule.setApplySunday(true)
+              rule.setApplyMonday(true)
+              rule.setApplyTuesday(true)
+              rule.setApplyWednesday(true)
+              rule.setApplyThursday(true)
+              rule.setApplyFriday(true)
+              rule.setApplySaturday(true)
+              for w in 0..52 # max num of weeks
+                next if d + (w*7*weeks) > last_day_of_year
+                date_s = OpenStudio::Date::fromDayOfYear(d + (w*7*weeks), @model.getYearDescription.assumedYear)
+                rule.addSpecificDate(date_s)
+              end
+            end
             
             return schedule
         end
