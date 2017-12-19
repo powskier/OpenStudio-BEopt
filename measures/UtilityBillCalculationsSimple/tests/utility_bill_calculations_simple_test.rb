@@ -11,7 +11,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>-122.76, Constants.FuelTypeGas=>137.02, Constants.FuelTypeOil=>87.78}
+    expected_values = {Constants.FuelTypeElectric=>-13.06, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
   
@@ -20,7 +20,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["pv_compensation_type"] = "Feed-In Tariff"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>0, Constants.FuelTypeGas=>137.02, Constants.FuelTypeOil=>87.78}
+    expected_values = {Constants.FuelTypeElectric=>97.54, Constants.FuelTypeGas=>489.08, Constants.FuelTypePropane=>329.5} # TODO: test against BEopt
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end  
 

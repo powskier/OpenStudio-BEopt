@@ -7,80 +7,30 @@ require 'fileutils'
 
 class UtilityBillCalculationsDetailedTest < MiniTest::Test
   
-  def test_json_path_invalid
+  def test_custom_tariff_net_metering
     args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources"
-    args_hash["tariff_file_name"] = "result.txt"
-    result = _test_error_or_NA("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw")
-    assert(result.errors.size == 1)
-    assert_equal("Fail", result.value.valueName)
-    assert_includes(result.errors.map{ |x| x.logMessage }, "'#{File.expand_path(File.join(File.dirname(__FILE__), "..", args_hash["tariff_directory"], args_hash["tariff_file_name"]))}' does not exist or is not a JSON file.")
-  end
-  
-  def test_tmy_no_api_key_or_tariff_file_name
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources"
+    args_hash["tariff_label"] = "Custom Tariff"
+    args_hash["custom_tariff"] = "../../../custom_tariff.json" # this is 34_539fc3c4ec4f024c27d8bf7f.json
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 43, 1)
-  end
-  
-  def test_tmy_no_api_key_or_tariff_file_name_average_rates
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources"
-    args_hash["avg_rates"] = "true"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 43, 1)
-  end
-  
-  def test_amy_no_api_key_or_tariff_file_name
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 47, 1)
-  end  
-  
-  def test_tariff_file_name_valid
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["tariff_directory"] = "./resources"
-    args_hash["tariff_file_name"] = "3138_539fc46eec4f024c27d8c6ed.json"
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 4, 1)
-  end
-  
-  def test_state_rates
-    args_hash = {}
-    args_hash["run_dir"] = "."
-    expected_num_del_objects = {}
-    expected_num_new_objects = {}
-    expected_values = {}
+    expected_values = {Constants.FuelTypeElectric=>51.93, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
-  end  
+  end
   
-  def test_override_state_rates
+  def test_autoselect_tariffs_net_metering
     args_hash = {}
-    args_hash["run_dir"] = "."
-    args_hash["elec_fixed"] = "20"
-    args_hash["elec_rate"] = "0.11"
-    args_hash["ng_fixed"] = "20"
-    args_hash["ng_rate"] = "1.50"
-    args_hash["oil_rate"] = "2.25"
-    args_hash["prop_rate"] = "2.50"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {}
+    expected_values = {Constants.FuelTypeElectric=>51.93, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+  end
+  
+  def test_select_tariff_net_metering
+    args_hash = {}
+    args_hash["tariff_label"] = "34_539fc3c4ec4f024c27d8bf7f.json"
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {Constants.FuelTypeElectric=>-13.06, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
     _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
 
@@ -165,8 +115,6 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     if !File.exist?("#{run_dir(test_name)}/UtilityBillCalculations/resources")
       FileUtils.mkdir_p("#{resources_dir(test_name)}")
     end
-    FileUtils.cp("#{File.dirname(__FILE__)}/../resources/utilities.csv", "#{resources_dir(test_name)}")
-    FileUtils.cp("#{File.dirname(__FILE__)}/../resources/by_nsrdb.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/Natural gas.csv", "#{resources_dir(test_name)}")
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/unit_conversions.rb", "#{resources_dir(test_name)}")
     
@@ -297,8 +245,11 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
     assert(result.warnings.size == num_warnings)
-    
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
+
+    result.stepValues.each do |arg|
+      next unless expected_values.keys.include? arg.name
+      assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
+    end
     
     return model
   end  

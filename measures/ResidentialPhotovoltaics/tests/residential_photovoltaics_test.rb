@@ -363,8 +363,8 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     expected_num_new_objects = {"GeneratorMicroTurbine"=>1, "CurveBiquadratic"=>1, "CurveCubic"=>2, "ElectricLoadCenterDistribution"=>1, "ScheduleFixedInterval"=>1}
     expected_values = {"total_kwhs"=>2287}
     model = _test_measure("SFD_Successful_EnergyPlus_Run_TMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "TimeseriesCSVExport", "tests", "SFD_Successful_EnergyPlus_Run_TMY_PV.osm"), true)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculations", "tests", "SFD_Successful_EnergyPlus_Run_TMY_PV.osm"), true)
+    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculationsSimple", "tests", "SFD_Successful_EnergyPlus_Run_TMY_PV.osm"), true)
+    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculationsDetailed", "tests", "SFD_Successful_EnergyPlus_Run_TMY_PV.osm"), true)
   end
 
   def test_make_successful_energyplus_run_amy_with_pv
@@ -374,7 +374,6 @@ class ResidentialPhotovoltaicsTest < MiniTest::Test
     expected_values = {"total_kwhs"=>2105}
     model = _test_measure("SFD_Successful_EnergyPlus_Run_AMY.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 1)
     model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "TimeseriesCSVExport", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
-    model.save(File.join(File.dirname(__FILE__), "..", "..", "..", "measures", "UtilityBillCalculations", "tests", "SFD_Successful_EnergyPlus_Run_AMY_PV.osm"), true)
   end
 =end
   

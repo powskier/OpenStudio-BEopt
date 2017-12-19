@@ -1,9 +1,7 @@
 # see the URL below for information on how to write OpenStudio measures
 # http://nrel.github.io/OpenStudio-user-documentation/reference/measure_writing_guide/
 
-require 'erb'
 require 'csv'
-require 'matrix'
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
@@ -49,10 +47,11 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
   def arguments()
     args = OpenStudio::Measure::OSArgumentVector.new
     
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_fixed", false)
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_fixed", true)
     arg.setDisplayName("Electricity: Fixed Charge")
     arg.setUnits("$/month")
     arg.setDescription("Monthly fixed charge for electricity.")
+    arg.setDefaultValue("8.0")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("elec_rate", true)
@@ -62,10 +61,11 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_fixed", false)
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_fixed", true)
     arg.setDisplayName("Natural Gas: Fixed Charge")
     arg.setUnits("$/month")
     arg.setDescription("Monthly fixed charge for natural gas.")
+    arg.setDefaultValue("8.0")
     args << arg
     
     arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_rate", true)
@@ -270,7 +270,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
         if fuel == Constants.FuelTypeElectric and not timeseries["Electricity:Facility"].empty?
           report_output(runner, fuel, timeseries["Electricity:Facility"], "kWh", "kWh", rate, pv_compensation_type, pv_rate, timeseries["ElectricityProduced:Facility"], elec_fixed)
         elsif fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?
-          report_output(runner, fuel, timeseries["Gas:Facility"], "kBtu", "therm", rate, pv_compensation_type, pv_rate, ng_fixed)
+          report_output(runner, fuel, timeseries["Gas:Facility"], "kBtu", "therm", rate, pv_compensation_type, pv_rate, nil, ng_fixed)
         elsif fuel == Constants.FuelTypeOil and not timeseries["FuelOil#1:Facility"].empty?
           report_output(runner, fuel, timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate, pv_compensation_type, pv_rate)
         elsif fuel == Constants.FuelTypePropane and not timeseries["Propane:Facility"].empty?
@@ -298,15 +298,20 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     vals.each do |val|
       total_val += val.to_f
     end
+    fixed = fixed.to_f
     rate = rate.to_f
     if not fuel == Constants.FuelTypeElectric
       if to == "gal"
         total_val = UnitConversions.btu2gal(UnitConversions.convert(total_val, "kBtu", "Btu"), fuel)
-      elsif fuel == Constants.FuelTypeGas
+      else
         total_val = UnitConversions.convert(total_val, from, to)
       end
       runner.registerValue(fuel, 12.0 * fixed + total_val * rate)
-    else fuel == Constants.FuelTypeElectric
+    else
+      if vals.length == 8784 # leap year
+        vals = vals[0..1415] + vals[1440..-1] # remove leap day
+        produced = produced[0..1415] + produced[1440..-1] # remove leap day
+      end
       total_val = calculate_electricity_bills(vals, produced, fixed, rate, pv_compensation_type, pv_rate.to_f)
       runner.registerValue(fuel, total_val)
     end    

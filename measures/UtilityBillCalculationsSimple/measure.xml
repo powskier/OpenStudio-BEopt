@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations_simple</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>b6504162-3a9e-42e0-9e68-568da03cda95</version_id>
-  <version_modified>20171218T231812Z</version_modified>
+  <version_id>5c045a06-21b0-4379-8a45-3692a4b81dee</version_id>
+  <version_modified>20171219T164845Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
   <class_name>UtilityBillCalculationsSimple</class_name>
   <display_name>Calculate Simple Utility Bills</display_name>
@@ -16,8 +16,9 @@
       <description>Monthly fixed charge for electricity.</description>
       <type>String</type>
       <units>$/month</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
+      <default_value>8.0</default_value>
     </argument>
     <argument>
       <name>elec_rate</name>
@@ -35,8 +36,9 @@
       <description>Monthly fixed charge for natural gas.</description>
       <type>String</type>
       <units>$/month</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
+      <default_value>8.0</default_value>
     </argument>
     <argument>
       <name>ng_rate</name>
@@ -187,18 +189,6 @@
       <checksum>335AE046</checksum>
     </file>
     <file>
-      <filename>SFD_Successful_EnergyPlus_Run_AMY_PV.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>33BAE66E</checksum>
-    </file>
-    <file>
-      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>EA761C8F</checksum>
-    </file>
-    <file>
       <filename>constants.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -209,23 +199,6 @@
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>0234A4B1</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>2.0.5</identifier>
-        <min_compatible>2.0.5</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>45A40AE8</checksum>
-    </file>
-    <file>
-      <filename>utility_bill_calculations_simple_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>5CB8F3ED</checksum>
     </file>
     <file>
       <filename>sam-sdk-2017-1-17-r1.zip</filename>
@@ -244,6 +217,29 @@
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>DD7DE19B</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>752F343A</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>2.0.5</identifier>
+        <min_compatible>2.0.5</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>914578B3</checksum>
+    </file>
+    <file>
+      <filename>utility_bill_calculations_simple_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>4319DBD3</checksum>
     </file>
   </files>
 </measure>
