@@ -116,8 +116,13 @@ class HourlyByMonthSchedule
                     wkdy_rule.setName(@sch_name + " #{Schedule.allday_name} ruleset#{m}")
                     wkdy[m] = wkdy_rule.daySchedule
                     wkdy[m].setName(@sch_name + " #{Schedule.allday_name}#{m}")
+                    previous_value = wkdy_vals[1]
                     for h in 1..24
-                        wkdy[m].addValue(time[h],wkdy_vals[h])
+                        if h != 24
+                          next if wkdy_vals[h+1] == previous_value
+                        end
+                        wkdy[m].addValue(time[h], previous_value)
+                        previous_value = wkdy_vals[h+1]
                     end
                     wkdy_rule.setApplySunday(true)
                     wkdy_rule.setApplyMonday(true)
@@ -134,8 +139,13 @@ class HourlyByMonthSchedule
                     wkdy_rule.setName(@sch_name + " #{Schedule.weekday_name} ruleset#{m}")
                     wkdy[m] = wkdy_rule.daySchedule
                     wkdy[m].setName(@sch_name + " #{Schedule.weekday_name}#{m}")
+                    previous_value = wkdy_vals[1]
                     for h in 1..24
-                        wkdy[m].addValue(time[h],wkdy_vals[h])
+                        if h != 24
+                          next if wkdy_vals[h+1] == previous_value
+                        end
+                        wkdy[m].addValue(time[h], previous_value)
+                        previous_value = wkdy_vals[h+1]
                     end
                     wkdy_rule.setApplySunday(false)
                     wkdy_rule.setApplyMonday(true)
@@ -152,8 +162,13 @@ class HourlyByMonthSchedule
                     wknd_rule.setName(@sch_name + " #{Schedule.weekend_name} ruleset#{m}")
                     wknd[m] = wknd_rule.daySchedule
                     wknd[m].setName(@sch_name + " #{Schedule.weekend_name}#{m}")
+                    previous_value = wknd_vals[1]
                     for h in 1..24
-                        wknd[m].addValue(time[h],wknd_vals[h])
+                        if h != 24
+                          next if wknd_vals[h+1] == previous_value
+                        end
+                        wknd[m].addValue(time[h], previous_value)
+                        previous_value = wknd_vals[h+1]
                     end
                     wknd_rule.setApplySunday(true)
                     wknd_rule.setApplyMonday(false)
@@ -346,8 +361,13 @@ class MonthWeekdayWeekendSchedule
                     wkdy_rule.setName(@sch_name + " #{Schedule.allday_name} ruleset#{m}")
                     wkdy[m] = wkdy_rule.daySchedule
                     wkdy[m].setName(@sch_name + " #{Schedule.allday_name}#{m}")
+                    previous_value = wkdy_vals[1]
                     for h in 1..24
-                        wkdy[m].addValue(time[h],wkdy_vals[h])
+                        if h != 24
+                          next if wkdy_vals[h+1] == previous_value
+                        end
+                        wkdy[m].addValue(time[h], previous_value)
+                        previous_value = wkdy_vals[h+1]
                     end
                     wkdy_rule.setApplySunday(true)
                     wkdy_rule.setApplyMonday(true)
@@ -364,8 +384,13 @@ class MonthWeekdayWeekendSchedule
                     wkdy_rule.setName(@sch_name + " #{Schedule.weekday_name} ruleset#{m}")
                     wkdy[m] = wkdy_rule.daySchedule
                     wkdy[m].setName(@sch_name + " #{Schedule.weekday_name}#{m}")
+                    previous_value = wkdy_vals[1]
                     for h in 1..24
-                        wkdy[m].addValue(time[h],wkdy_vals[h])
+                        if h != 24
+                          next if wkdy_vals[h+1] == previous_value
+                        end
+                        wkdy[m].addValue(time[h], previous_value)
+                        previous_value = wkdy_vals[h+1]
                     end
                     wkdy_rule.setApplySunday(false)
                     wkdy_rule.setApplyMonday(true)
@@ -382,8 +407,13 @@ class MonthWeekdayWeekendSchedule
                     wknd_rule.setName(@sch_name + " #{Schedule.weekend_name} ruleset#{m}")
                     wknd[m] = wknd_rule.daySchedule
                     wknd[m].setName(@sch_name + " #{Schedule.weekend_name}#{m}")
+                    previous_value = wknd_vals[1]
                     for h in 1..24
-                        wknd[m].addValue(time[h],wknd_vals[h])
+                        if h != 24
+                          next if wknd_vals[h+1] == previous_value
+                        end
+                        wknd[m].addValue(time[h], previous_value)
+                        previous_value = wknd_vals[h+1]
                     end
                     wknd_rule.setApplySunday(true)
                     wknd_rule.setApplyMonday(false)
@@ -404,7 +434,7 @@ end
 
 class HotWaterSchedule
 
-    def initialize(model, runner, sch_name, temperature_sch_name, num_bedrooms, unit_index, days_shift, file_prefix, target_water_temperature, measure_dir, create_sch_object=true)
+    def initialize(model, runner, sch_name, temperature_sch_name, num_bedrooms, unit_index, days_shift, file_prefix, target_water_temperature, measure_dir, weeks=53, create_sch_object=true)
         @validated = true
         @model = model
         @runner = runner
@@ -425,7 +455,8 @@ class HotWaterSchedule
             return
         end
         if create_sch_object
-            @schedule = createSchedule(data, timestep_minutes)
+            # @schedule = createOldSchedule(data, timestep_minutes)
+            @schedule = createSchedule(data, timestep_minutes, weeks)
         end
     end
 
@@ -560,7 +591,27 @@ class HotWaterSchedule
             
         end
         
-        def createSchedule(data, timestep_minutes, first_timestamp=10000, weeks=2) # first_timestamp=1 means Jan 1, 12AM; weeks is the unique window that repeats
+        def createOldSchedule(data, timestep_minutes)
+            # OpenStudio does not yet support ScheduleFile. So we use ScheduleInterval instead.
+            # See https://unmethours.com/question/2877/has-anyone-used-the-variable-interval-schedule-sets-in-os-16/
+            # for an example.
+            if data.size == 0
+                return nil
+            end
+            
+            yd = @model.getYearDescription
+            start_date = yd.makeDate(1,1)
+            interval = OpenStudio::Time.new(0, 0, timestep_minutes)
+            
+            time_series = OpenStudio::TimeSeries.new(start_date, interval, OpenStudio::createVector(data), "")
+            
+            schedule = OpenStudio::Model::ScheduleInterval.fromTimeSeries(time_series, @model).get
+            schedule.setName(@sch_name)
+            
+            return schedule
+        end
+        
+        def createSchedule(data, timestep_minutes, weeks)
             if data.size == 0
                 return nil
             end
@@ -578,12 +629,18 @@ class HotWaterSchedule
 
             schedule_rules = []
             for d in 1..7*weeks # how many unique day schedules
+              next if d > last_day_of_year
               rule = OpenStudio::Model::ScheduleRule.new(schedule)
               rule.setName(@sch_name + " #{Schedule.allday_name} ruleset#{d}")
               day_schedule = rule.daySchedule
               day_schedule.setName(@sch_name + " #{Schedule.allday_name}#{d}")
+              previous_value = data[(d-1)*24*60/timestep_minutes]
               time.each_with_index do |m, i|
-                  day_schedule.addValue(m, data[(first_timestamp-1) + i + (d-1)*24*60/timestep_minutes]) # offset by first_timestamp (i.e., the unique window shifts)
+                if i != time.length-1
+                  next if data[i+1 + (d-1)*24*60/timestep_minutes] == previous_value
+                end
+                day_schedule.addValue(m, previous_value)
+                previous_value = data[i+1 + (d-1)*24*60/timestep_minutes]
               end
               rule.setApplySunday(true)
               rule.setApplyMonday(true)
@@ -702,7 +759,7 @@ class Schedule
     annual_flh = 0
     max_daily_flh = 0
     default_day_sch = schedule.defaultDaySchedule
-    day_sch_freq.each do |freq|
+    day_sch_freq.each_with_index do |freq, i|
       sch_index = freq[0]
       number_of_days_sch_used = freq[1].size
 

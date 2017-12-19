@@ -55,8 +55,8 @@ class ResidentialClothesWasherTest < MiniTest::Test
     args_hash["imef"] = (1.41 - 0.503) / 0.95
     args_hash["rated_annual_energy"] = 387
     expected_num_del_objects = {}
-    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "ScheduleRule"=>14, "ScheduleDay"=>15}
-    expected_values = {"Annual_kwh"=>33.79, "HotWater_gpd"=>7.87, "Space"=>args_hash["space"]}
+    expected_num_new_objects = {"ElectricEquipmentDefinition"=>1, "ElectricEquipment"=>1, "WaterUseEquipmentDefinition"=>1, "WaterUseEquipment"=>1, "ScheduleConstant"=>1, "ScheduleRuleset"=>1, "ScheduleRule"=>365, "ScheduleDay"=>366}
+    expected_values = {"Annual_kwh"=>37.29, "HotWater_gpd"=>8.68, "Space"=>args_hash["space"]}
     _test_measure(osm_geo_beds_loc_tankwh, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
   
