@@ -591,6 +591,15 @@ class HVAC
       return nil
     end
     
+    def self.get_dehumidifier(model, runner, thermal_zone)
+      # Returns the dehumidifier if available
+      model.getZoneHVACDehumidifierDXs.each do |dehum|
+        next unless thermal_zone.handle.to_s == dehum.thermalZone.get.handle.to_s
+        return dehum
+      end
+      return nil
+    end
+    
     # Has Equipment methods
     
     def self.has_central_ac(model, runner, thermal_zone)
@@ -699,6 +708,14 @@ class HVAC
     def self.has_unit_heater(model, runner, thermal_zone)
       system, clg_coil, htg_coil = self.get_unitary_system_zone_hvac(model, runner, thermal_zone)
       if system.nil? or htg_coil.nil?
+        return false
+      end
+      return true
+    end
+    
+    def self.has_dehumidifier(model, runner, thermal_zone)
+      dehum = self.get_dehumidifier(model, runner, thermal_zone)
+      if dehum.nil?
         return false
       end
       return true
