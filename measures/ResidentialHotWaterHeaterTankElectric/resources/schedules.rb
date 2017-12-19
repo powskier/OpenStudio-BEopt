@@ -455,7 +455,6 @@ class HotWaterSchedule
             return
         end
         if create_sch_object
-            # @schedule = createOldSchedule(data, timestep_minutes)
             @schedule = createSchedule(data, timestep_minutes, weeks)
         end
     end
@@ -589,26 +588,6 @@ class HotWaterSchedule
             end
             return totflow, maxflow, ontime
             
-        end
-        
-        def createOldSchedule(data, timestep_minutes)
-            # OpenStudio does not yet support ScheduleFile. So we use ScheduleInterval instead.
-            # See https://unmethours.com/question/2877/has-anyone-used-the-variable-interval-schedule-sets-in-os-16/
-            # for an example.
-            if data.size == 0
-                return nil
-            end
-            
-            yd = @model.getYearDescription
-            start_date = yd.makeDate(1,1)
-            interval = OpenStudio::Time.new(0, 0, timestep_minutes)
-            
-            time_series = OpenStudio::TimeSeries.new(start_date, interval, OpenStudio::createVector(data), "")
-            
-            schedule = OpenStudio::Model::ScheduleInterval.fromTimeSeries(time_series, @model).get
-            schedule.setName(@sch_name)
-            
-            return schedule
         end
         
         def createSchedule(data, timestep_minutes, weeks)
@@ -782,7 +761,7 @@ class Schedule
         time_hours = times[i].hours
         time_minutes = times[i].minutes
         time_seconds = times[i].seconds
-        time_decimal = (time_days*24) + time_hours + (time_minutes/60) + (time_seconds/3600)
+        time_decimal = (time_days*24.0) + time_hours + (time_minutes/60.0) + (time_seconds/3600.0)
         duration_of_value = time_decimal - previous_time_decimal
         daily_flh += values[i]*duration_of_value
         previous_time_decimal = time_decimal

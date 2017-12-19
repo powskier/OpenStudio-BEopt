@@ -761,7 +761,7 @@ class Schedule
         time_hours = times[i].hours
         time_minutes = times[i].minutes
         time_seconds = times[i].seconds
-        time_decimal = (time_days*24) + time_hours + (time_minutes/60) + (time_seconds/3600)
+        time_decimal = (time_days*24.0) + time_hours + (time_minutes/60.0) + (time_seconds/3600.0)
         duration_of_value = time_decimal - previous_time_decimal
         daily_flh += values[i]*duration_of_value
         previous_time_decimal = time_decimal
