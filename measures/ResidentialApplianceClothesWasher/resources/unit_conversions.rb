@@ -53,6 +53,8 @@ class UnitConversions
         return x / 29307.10701722222
       elsif from == 'wh' and to == 'mbtu'
         return x / 293071.0701722222
+      elsif from == 'kbtu' and to == 'btu'
+        return x * 1000.0
       
       # Power
       elsif from == 'btu/hr' and to == 'ton'
@@ -295,5 +297,27 @@ class UnitConversions
       end
       fail "Unhandled unit conversion for #{fueltype}."
     end
+    
+    def self.get_scalar_unit_conversion(var_name, old_units)
+      new_units = case old_units
+                  when "J"
+                    if var_name.include?("Electricity")
+                      "kWh"
+                    else
+                      "kBtu"
+                    end
+                  when "m3"
+                    old_units = "m^3"
+                    "gal"
+                  when "C"
+                    "F"
+                  else
+                    old_units
+                  end
+      if ["J", "m^3"].include? old_units
+        return new_units, self.convert(1.0, old_units, new_units)
+      end
+      return nil, nil
+    end    
 
 end

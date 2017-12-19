@@ -313,7 +313,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
         y_val = values[i]
         if unit_conv.nil? # these unit conversions are not scalars
           if old_units == "C" and new_units == "F"
-            y_val = 1.8 * y_val + 32.0 # convert C to F
+            y_val = UnitConversions.convert(y_val, "C", "F") # convert C to F
           end
         else # these are scalars
           y_val *= unit_conv

@@ -4,7 +4,6 @@
 require 'erb'
 require 'csv'
 require 'matrix'
-require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 
 #start the measure
@@ -473,7 +472,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
           energy_charges_flat = SscApi.get_array(p_data, 'charge_w_sys_ec_flat')[1]
           energy_charges_tou = SscApi.get_array(p_data, 'charge_w_sys_ec')[1]
 
-          utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')          
+          utility_bills = SscApi.get_array(p_data, 'year1_monthly_utility_bill_w_sys')
           
         rescue => error
         

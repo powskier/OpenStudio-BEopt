@@ -1,120 +1,111 @@
 <measure>
   <schema_version>3.0</schema_version>
-  <name>utility_bill_calculations</name>
+  <name>utility_bill_calculations_simple</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>efd84fe5-59ba-4bf2-b2b8-8482593806ce</version_id>
-  <version_modified>20171209T140701Z</version_modified>
+  <version_id>b6504162-3a9e-42e0-9e68-568da03cda95</version_id>
+  <version_modified>20171218T231812Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
-  <class_name>UtilityBillCalculations</class_name>
-  <display_name>Utility Bill Calculations</display_name>
-  <description>Calls SAM SDK.</description>
-  <modeler_description>Calls SAM SDK.</modeler_description>
+  <class_name>UtilityBillCalculationsSimple</class_name>
+  <display_name>Calculate Simple Utility Bills</display_name>
+  <description>Calculate utility bills using a simple method.</description>
+  <modeler_description>Calculate utility bills based on user-entered fixed charges and marginal rates. If 'auto' is selected for marginal rates, the state average is used.</modeler_description>
   <arguments>
     <argument>
-      <name>run_dir</name>
-      <display_name>Run Directory</display_name>
-      <description>Relative path of the run directory.</description>
-      <type>String</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value>..</default_value>
-    </argument>
-    <argument>
-      <name>api_key</name>
-      <display_name>API Key</display_name>
-      <description>Call the API and pull JSON tariff file(s) with EIA ID corresponding to the EPW region.</description>
-      <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
-      <name>tariff_directory</name>
-      <display_name>Tariff Directory</display_name>
-      <description>Absolute (or relative) directory to tariff files.</description>
-      <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
-      <name>tariff_file_name</name>
-      <display_name>Tariff File Name</display_name>
-      <description>Name of the JSON tariff file. Leave blank if pulling JSON tariff file(s) with EIA ID corresponding to the EPW region.</description>
-      <type>String</type>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
       <name>elec_fixed</name>
-      <display_name>Electricity Fixed Cost</display_name>
-      <description>Annual fixed cost of electricity.</description>
+      <display_name>Electricity: Fixed Charge</display_name>
+      <description>Monthly fixed charge for electricity.</description>
       <type>String</type>
-      <units>$</units>
+      <units>$/month</units>
       <required>false</required>
       <model_dependent>false</model_dependent>
     </argument>
     <argument>
       <name>elec_rate</name>
-      <display_name>Electricity Unit Cost</display_name>
+      <display_name>Electricity: Marginal Rate</display_name>
       <description>Price per kilowatt-hour for electricity.</description>
       <type>String</type>
       <units>$/kWh</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
       <name>ng_fixed</name>
-      <display_name>Natural Gas Fixed Cost</display_name>
-      <description>Annual fixed cost of natural gas.</description>
+      <display_name>Natural Gas: Fixed Charge</display_name>
+      <description>Monthly fixed charge for natural gas.</description>
       <type>String</type>
-      <units>$</units>
+      <units>$/month</units>
       <required>false</required>
       <model_dependent>false</model_dependent>
     </argument>
     <argument>
       <name>ng_rate</name>
-      <display_name>Natural Gas Unit Cost</display_name>
+      <display_name>Natural Gas: Marginal Rate</display_name>
       <description>Price per therm for natural gas.</description>
       <type>String</type>
       <units>$/therm</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
       <name>oil_rate</name>
-      <display_name>Fuel Oil Unit Cost</display_name>
+      <display_name>Oil: Marginal Rate</display_name>
       <description>Price per gallon for fuel oil.</description>
       <type>String</type>
       <units>$/gal</units>
-      <required>false</required>
+      <required>true</required>
       <model_dependent>false</model_dependent>
+      <default_value>auto</default_value>
     </argument>
     <argument>
       <name>prop_rate</name>
-      <display_name>Propane Unit Cost</display_name>
+      <display_name>Propane: Marginal Rate</display_name>
       <description>Price per gallon for propane.</description>
       <type>String</type>
       <units>$/gal</units>
-      <required>false</required>
-      <model_dependent>false</model_dependent>
-    </argument>
-    <argument>
-      <name>avg_rates</name>
-      <display_name>Average Residential Rates</display_name>
-      <description>Average across residential rates in a given EIA ID.</description>
-      <type>Boolean</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>false</default_value>
+      <default_value>auto</default_value>
+    </argument>
+    <argument>
+      <name>pv_compensation_type</name>
+      <display_name>PV: Compensation Type</display_name>
+      <description>The type of compensation for PV.</description>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Net Metering</default_value>
       <choices>
         <choice>
-          <value>true</value>
-          <display_name>true</display_name>
+          <value>Net Metering</value>
+          <display_name>Net Metering</display_name>
         </choice>
         <choice>
-          <value>false</value>
-          <display_name>false</display_name>
+          <value>Feed-In Tariff</value>
+          <display_name>Feed-In Tariff</display_name>
         </choice>
       </choices>
+    </argument>
+    <argument>
+      <name>pv_sellback_rate</name>
+      <display_name>PV: Net Metering Annual Excess Sellback Rate</display_name>
+      <description>The annual excess/net sellback rate for PV. Only applies if the PV compensation type is 'Net Metering'.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.03</default_value>
+    </argument>
+    <argument>
+      <name>pv_tariff_rate</name>
+      <display_name>PV: Feed-In Tariff Rate</display_name>
+      <description>The annual full/gross tariff rate for PV. Only applies if the PV compensation type is 'Feed-In Tariff'.</description>
+      <type>String</type>
+      <units>$/kWh</units>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0.12</default_value>
     </argument>
   </arguments>
   <outputs>
@@ -160,28 +151,10 @@
   </attributes>
   <files>
     <file>
-      <filename>ssc_api.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>C9F510A2</checksum>
-    </file>
-    <file>
       <filename>USA_CO_Denver_Intl_AP_725650_TMY3.epw</filename>
       <filetype>epw</filetype>
       <usage_type>test</usage_type>
       <checksum>E23378AA</checksum>
-    </file>
-    <file>
-      <filename>sam-sdk-2017-1-17-r1.zip</filename>
-      <filetype>zip</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>14339B8F</checksum>
-    </file>
-    <file>
-      <filename>utilities.csv</filename>
-      <filetype>csv</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>49E7C310</checksum>
     </file>
     <file>
       <filename>Natural gas.csv</filename>
@@ -202,40 +175,40 @@
       <checksum>D205D809</checksum>
     </file>
     <file>
-      <filename>by_nsrdb.csv</filename>
-      <filetype>csv</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>EB68CF2B</checksum>
-    </file>
-    <file>
       <filename>Electricity.csv</filename>
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
       <checksum>6C2CC8FC</checksum>
     </file>
     <file>
-      <filename>tariffs.zip</filename>
-      <filetype>zip</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>59E89075</checksum>
-    </file>
-    <file>
-      <filename>ssc_ffi.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>DD7DE19B</checksum>
-    </file>
-    <file>
-      <filename>utility_bill_calculations_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>8095BAD1</checksum>
-    </file>
-    <file>
       <filename>DuPage_17043_725300_880860.epw</filename>
       <filetype>epw</filetype>
       <usage_type>test</usage_type>
       <checksum>335AE046</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_AMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>33BAE66E</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>EA761C8F</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>022C15E2</checksum>
+    </file>
+    <file>
+      <filename>unit_conversions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>0234A4B1</checksum>
     </file>
     <file>
       <version>
@@ -246,25 +219,31 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>F0A94962</checksum>
+      <checksum>45A40AE8</checksum>
     </file>
     <file>
-      <filename>unit_conversions.rb</filename>
+      <filename>utility_bill_calculations_simple_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>5CB8F3ED</checksum>
+    </file>
+    <file>
+      <filename>sam-sdk-2017-1-17-r1.zip</filename>
+      <filetype>zip</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>14339B8F</checksum>
+    </file>
+    <file>
+      <filename>ssc_api.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>31924A51</checksum>
+      <checksum>C9F510A2</checksum>
     </file>
     <file>
-      <filename>SFD_Successful_EnergyPlus_Run_AMY_PV.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>FEFDE263</checksum>
-    </file>
-    <file>
-      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>8FF0EC1B</checksum>
+      <filename>ssc_ffi.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>DD7DE19B</checksum>
     </file>
   </files>
 </measure>
