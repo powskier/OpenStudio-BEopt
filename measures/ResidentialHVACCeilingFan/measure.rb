@@ -303,11 +303,21 @@ class ProcessCeilingFan < OpenStudio::Measure::ModelMeasure
       if thermostatsetpointdualsetpoint.is_initialized
         thermostatsetpointdualsetpoint.get.coolingSetpointTemperatureSchedule.get.to_Schedule.get.to_ScheduleRuleset.get.scheduleRules.each do |rule|
           coolingSetpoint = Array.new(24, Constants.NoCoolingSetpoint)
-          rule.daySchedule.values.each_with_index do |value, hour|
+          rule.daySchedule.values.each_with_index do |value, i|
+            hour = rule.daySchedule.times[i].hours - 1
             if value < coolingSetpoint[hour]
               coolingSetpoint[hour] = UnitConversions.convert(value,"C","F") + cooling_setpoint_offset
             end
           end
+          coolingSetpoint = coolingSetpoint.reverse # backfill the array values
+          previous_value = coolingSetpoint[0]
+          coolingSetpoint.each_with_index do |c, i|
+            if coolingSetpoint[i+1] == Constants.NoCoolingSetpoint
+              coolingSetpoint[i+1] = previous_value
+            end
+            previous_value = coolingSetpoint[i+1]
+          end
+          coolingSetpoint = coolingSetpoint.reverse
           # weekday
           if rule.applyMonday and rule.applyTuesday and rule.applyWednesday and rule.applyThursday and rule.applyFriday
             unless rule.daySchedule.values.all? {|x| x == Constants.NoCoolingSetpoint}

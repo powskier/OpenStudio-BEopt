@@ -192,22 +192,42 @@ class ProcessCoolingSetpoints < OpenStudio::Measure::ModelMeasure
         heating_season = Array.new(12, 0.0)
         thermostatsetpointdualsetpoint.heatingSetpointTemperatureSchedule.get.to_Schedule.get.to_ScheduleRuleset.get.scheduleRules.each do |rule|
           if rule.applyMonday and rule.applyTuesday and rule.applyWednesday and rule.applyThursday and rule.applyFriday
-            rule.daySchedule.values.each_with_index do |value, hour|
+            rule.daySchedule.values.each_with_index do |value, i|
+              hour = rule.daySchedule.times[i].hours - 1
               if value > htg_wkdy[hour]
                 htg_wkdy[hour] = value
               end
             end
           end
+          htg_wkdy = htg_wkdy.reverse # backfill the array values
+          previous_value = htg_wkdy[0]
+          htg_wkdy.each_with_index do |c, i|
+            if htg_wkdy[i+1] == Constants.NoHeatingSetpoint
+              htg_wkdy[i+1] = previous_value
+            end
+            previous_value = htg_wkdy[i+1]
+          end
+          htg_wkdy = htg_wkdy.reverse
           if rule.applySaturday and rule.applySunday
-            rule.daySchedule.values.each_with_index do |value, hour|
+            rule.daySchedule.values.each_with_index do |value, i|
+              hour = rule.daySchedule.times[i].hours - 1
               if value > htg_wked[hour]
                 htg_wked[hour] = value
-              end
+              end              
               if value > -50
                 heating_season[rule.startDate.get.monthOfYear.value-1] = 1.0
               end
             end
           end
+          htg_wked = htg_wked.reverse # backfill the array values
+          previous_value = htg_wked[0]
+          htg_wked.each_with_index do |c, i|
+            if htg_wked[i+1] == Constants.NoHeatingSetpoint
+              htg_wked[i+1] = previous_value
+            end
+            previous_value = htg_wked[i+1]
+          end
+          htg_wked = htg_wked.reverse
         end
         
         htg_wkdy_monthly = []

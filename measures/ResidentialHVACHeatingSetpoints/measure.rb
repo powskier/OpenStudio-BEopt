@@ -203,14 +203,25 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
         cooling_season = Array.new(12, 0.0)
         thermostatsetpointdualsetpoint.coolingSetpointTemperatureSchedule.get.to_Schedule.get.to_ScheduleRuleset.get.scheduleRules.each do |rule|
           if rule.applyMonday and rule.applyTuesday and rule.applyWednesday and rule.applyThursday and rule.applyFriday
-            rule.daySchedule.values.each_with_index do |value, hour|
+            rule.daySchedule.values.each_with_index do |value, i|
+              hour = rule.daySchedule.times[i].hours - 1
               if value < clg_wkdy[hour]
                 clg_wkdy[hour] = value
               end
             end
           end
+          clg_wkdy = clg_wkdy.reverse # backfill the array values
+          previous_value = clg_wkdy[0]
+          clg_wkdy.each_with_index do |c, i|
+            if clg_wkdy[i+1] == Constants.NoCoolingSetpoint
+              clg_wkdy[i+1] = previous_value
+            end
+            previous_value = clg_wkdy[i+1]
+          end
+          clg_wkdy = clg_wkdy.reverse
           if rule.applySaturday and rule.applySunday
-            rule.daySchedule.values.each_with_index do |value, hour|
+            rule.daySchedule.values.each_with_index do |value, i|
+              hour = rule.daySchedule.times[i].hours - 1
               if value < clg_wked[hour]
                 clg_wked[hour] = value
               end
@@ -219,8 +230,17 @@ class ProcessHeatingSetpoints < OpenStudio::Measure::ModelMeasure
               end
             end
           end
+          clg_wked = clg_wked.reverse # backfill the array values
+          previous_value = clg_wked[0]
+          clg_wked.each_with_index do |c, i|
+            if clg_wked[i+1] == Constants.NoCoolingSetpoint
+              clg_wked[i+1] = previous_value
+            end
+            previous_value = clg_wked[i+1]
+          end
+          clg_wked = clg_wked.reverse          
         end
-        
+
         htg_wkdy_monthly = []
         htg_wked_monthly = []
         clg_wkdy_monthly = []

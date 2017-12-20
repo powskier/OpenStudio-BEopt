@@ -83,7 +83,10 @@ class HourlyByMonthSchedule
             wkdy = []
             wknd = []
 
-            if not @model.getYearDescription.isLeapYear
+            year_description = @model.getYearDescription
+            assumed_year = year_description.assumedYear
+            
+            if not year_description.isLeapYear
               day_endm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
               day_startm = [0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
             else
@@ -100,8 +103,8 @@ class HourlyByMonthSchedule
             schedule.setName(@sch_name)
             
             for m in 1..12
-                date_s = OpenStudio::Date::fromDayOfYear(day_startm[m], @model.getYearDescription.assumedYear)
-                date_e = OpenStudio::Date::fromDayOfYear(day_endm[m], @model.getYearDescription.assumedYear)
+                date_s = OpenStudio::Date::fromDayOfYear(day_startm[m], assumed_year)
+                date_e = OpenStudio::Date::fromDayOfYear(day_endm[m], assumed_year)
                 
                 wkdy_vals = []
                 wknd_vals = []
@@ -328,7 +331,10 @@ class MonthWeekdayWeekendSchedule
             wkdy = []
             wknd = []
 
-            if not @model.getYearDescription.isLeapYear
+            year_description = @model.getYearDescription
+            assumed_year = year_description.assumedYear
+            
+            if not year_description.isLeapYear
               day_endm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
               day_startm = [0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
             else
@@ -345,8 +351,8 @@ class MonthWeekdayWeekendSchedule
             schedule.setName(@sch_name)
             
             for m in 1..12
-                date_s = OpenStudio::Date::fromDayOfYear(day_startm[m], @model.getYearDescription.assumedYear)
-                date_e = OpenStudio::Date::fromDayOfYear(day_endm[m], @model.getYearDescription.assumedYear)
+                date_s = OpenStudio::Date::fromDayOfYear(day_startm[m], assumed_year)
+                date_e = OpenStudio::Date::fromDayOfYear(day_endm[m], assumed_year)
                 
                 wkdy_vals = []
                 wknd_vals = []
@@ -595,8 +601,11 @@ class HotWaterSchedule
                 return nil
             end
 
+            year_description = @model.getYearDescription
+            assumed_year = year_description.assumedYear
+            
             last_day_of_year = 365
-            last_day_of_year += 1 if @model.getYearDescription.isLeapYear
+            last_day_of_year += 1 if year_description.isLeapYear
 
             time = []
             (timestep_minutes..24*60).step(timestep_minutes).to_a.each_with_index do |m, i|
@@ -630,7 +639,7 @@ class HotWaterSchedule
               rule.setApplySaturday(true)
               for w in 0..52 # max num of weeks
                 next if d + (w*7*weeks) > last_day_of_year
-                date_s = OpenStudio::Date::fromDayOfYear(d + (w*7*weeks), @model.getYearDescription.assumedYear)
+                date_s = OpenStudio::Date::fromDayOfYear(d + (w*7*weeks), assumed_year)
                 rule.addSpecificDate(date_s)
               end
             end
