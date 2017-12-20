@@ -129,13 +129,18 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
           htg_coil.setParasiticGasLoad(0)
           htg_coil.setFuelType(HelperMethods.eplus_fuel_map(heaterFuelType))
           
-          fan = nil
+          
+          fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule)
+          fan.setName(obj_name + " fan")
+          fan.setEndUseSubcategory(Constants.EndUseHVACFan)
           if heaterFanPower > 0
-            fan = OpenStudio::Model::FanOnOff.new(model, model.alwaysOnDiscreteSchedule)
-            fan.setName(obj_name + " fan")
-            fan.setEndUseSubcategory(Constants.EndUseHVACFan)
             fan.setFanEfficiency(UnitConversions.convert(static / heaterFanPower,"cfm","m^3/s")) # Overall Efficiency of the Fan, Motor and Drive
             fan.setPressureRise(static)
+            fan.setMotorEfficiency(1.0)
+            fan.setMotorInAirstreamFraction(1.0)  
+          else
+            fan.setFanEfficiency(1) # Overall Efficiency of the Fan, Motor and Drive
+            fan.setPressureRise(0)
             fan.setMotorEfficiency(1.0)
             fan.setMotorInAirstreamFraction(1.0)  
           end
@@ -147,19 +152,15 @@ class ProcessUnitHeater < OpenStudio::Measure::ModelMeasure
           unitary_system.setAvailabilitySchedule(model.alwaysOnDiscreteSchedule)
           unitary_system.setHeatingCoil(htg_coil)
           unitary_system.setSupplyAirFlowRateDuringCoolingOperation(0.0000001)
-          if not fan.nil?
-            unitary_system.setSupplyFan(fan)
-            unitary_system.setFanPlacement("BlowThrough")
-          end
+          unitary_system.setSupplyFan(fan)
+          unitary_system.setFanPlacement("BlowThrough")
           unitary_system.setSupplyAirFanOperatingModeSchedule(model.alwaysOffDiscreteSchedule)
           unitary_system.setMaximumSupplyAirTemperature(UnitConversions.convert(120.0,"F","C"))      
           unitary_system.setSupplyAirFlowRateWhenNoCoolingorHeatingisRequired(0)
 
           #unitary_system.addToNode(air_supply_inlet_node)
 
-          if not fan.nil?
-            runner.registerInfo("Added '#{fan.name}' to '#{unitary_system.name}''")
-          end
+          runner.registerInfo("Added '#{fan.name}' to '#{unitary_system.name}''")
           runner.registerInfo("Added '#{htg_coil.name}' to '#{unitary_system.name}'")
 
           unitary_system.setControllingZoneorThermostatLocation(zone)

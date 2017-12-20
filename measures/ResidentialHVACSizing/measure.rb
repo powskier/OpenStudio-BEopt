@@ -4043,11 +4043,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         system.setSupplyAirFlowRateMethodDuringHeatingOperation("SupplyAirFlowRate")
         system.setSupplyAirFlowRateDuringHeatingOperation(htg_airflow)
         
-        if system.supplyFan.is_initialized
-            # Fan
-            fanonoff = system.supplyFan.get.to_FanOnOff.get
-            fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s"))
-        end
+        # Fan
+        fanonoff = system.supplyFan.get.to_FanOnOff.get
+        fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s"))
         
         if not air_loop.nil?
             # Air Loop
@@ -4105,20 +4103,15 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         system, clg_coil, htg_coil = HVAC.get_unitary_system_zone_hvac(model, runner, thermal_zone)
         next if system.nil?
         
-        clg_airflow = UnitConversions.convert([unit_final.Cool_Airflow, 0.00001].max,"cfm","m^3/s") # A value of 0 does not change from autosize
-        htg_airflow = UnitConversions.convert([unit_final.Heat_Airflow, 0.00001].max,"cfm","m^3/s") # A value of 0 does not change from autosize
-    
         # Unitary System
         system.setSupplyAirFlowRateMethodDuringCoolingOperation("SupplyAirFlowRate")
-        system.setSupplyAirFlowRateDuringCoolingOperation(clg_airflow)
+        system.setSupplyAirFlowRateDuringCoolingOperation(UnitConversions.convert([unit_final.Cool_Airflow * unit_final.Zone_Ratios[thermal_zone], 0.00001].max,"cfm","m^3/s")) # A value of 0 does not change from autosize
         system.setSupplyAirFlowRateMethodDuringHeatingOperation("SupplyAirFlowRate")
-        system.setSupplyAirFlowRateDuringHeatingOperation(htg_airflow)
+        system.setSupplyAirFlowRateDuringHeatingOperation(UnitConversions.convert([unit_final.Heat_Airflow * unit_final.Zone_Ratios[thermal_zone], 0.00001].max,"cfm","m^3/s")) # A value of 0 does not change from autosize
         
-        if system.supplyFan.is_initialized
-            # Fan
-            fanonoff = system.supplyFan.get.to_FanOnOff.get
-            fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s"))
-        end
+        # Fan
+        fanonoff = system.supplyFan.get.to_FanOnOff.get
+        fanonoff.setMaximumFlowRate(hvac.FanspeedRatioCooling.max * UnitConversions.convert(unit_final.Fan_Airflow + 0.01,"cfm","m^3/s") * unit_final.Zone_Ratios[thermal_zone])
         
         # Coils
         setCoilsObjectValues(runner, unit, hvac, system, unit_final, unit_final.Zone_Ratios[thermal_zone])

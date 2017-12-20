@@ -1627,9 +1627,9 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.610228*2,
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.610228,
             'Coil:Heating:Fuel_Nominal Capacity {W}' => 12012.1,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.0*2,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.610228,
                       }
     _test_measure("SFD_HVACSizing_Equip_UnitHeater_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
@@ -1640,9 +1640,9 @@ class ProcessHVACSizingTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {
-            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.446462*2,
+            'AirLoopHVAC:UnitarySystem_Supply Air Flow Rate During Heating Operation {m3/s}' => 0.446462,
             'Coil:Heating:Fuel_Nominal Capacity {W}' => 8792.1321,
-            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.446462*2,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.446462,
                       }
     _test_measure("SFD_HVACSizing_Equip_UnitHeater_Fixed.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  

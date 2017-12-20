@@ -108,7 +108,7 @@ class ProcessBoilerFuelTest < MiniTest::Test
   
   def test_retrofit_replace_unit_heater
     args_hash = {}
-    expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2}
+    expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2, "FanOnOff"=>2}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
@@ -164,7 +164,7 @@ class ProcessBoilerFuelTest < MiniTest::Test
 
   def test_retrofit_replace_unit_heater_central_air_conditioner
     args_hash = {}
-    expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2}
+    expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2, "FanOnOff"=>2}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
@@ -188,7 +188,7 @@ class ProcessBoilerFuelTest < MiniTest::Test
   
   def test_retrofit_replace_unit_heater_room_air_conditioner
     args_hash = {}
-    expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2}
+    expected_num_del_objects = {"CoilHeatingGas"=>2, "AirLoopHVACUnitarySystem"=>2, "FanOnOff"=>2}
     expected_num_new_objects = {"BoilerHotWater"=>1, "ZoneHVACBaseboardConvectiveWater"=>2, "PlantLoop"=>1, "CoilHeatingWaterBaseboard"=>2, "SetpointManagerScheduled"=>1, "PumpVariableSpeed"=>1}
     expected_values = {"Efficiency"=>0.8, "FuelType"=>Constants.FuelTypeGas, "hvac_priority"=>1}
     _test_measure("SFD_2000sqft_2story_FB_UA_Denver_UnitHeater_RoomAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 4)
