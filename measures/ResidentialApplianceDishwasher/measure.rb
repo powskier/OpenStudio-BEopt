@@ -130,6 +130,13 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
     schedule_day_shift.setDefaultValue(0)
     args << schedule_day_shift
 
+    #make an argument for the number of weeks to grab as the repeating schedule window
+    weeks = OpenStudio::Measure::OSArgument::makeIntegerArgument("weeks",true)
+    weeks.setDisplayName("Weeks")
+    weeks.setDescription("")
+    weeks.setDefaultValue(53)
+    args << weeks    
+    
     return args
   end #end the arguments method
 
@@ -155,6 +162,7 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
     space_r = runner.getStringArgumentValue("space",user_arguments)
     plant_loop_s = runner.getStringArgumentValue("plant_loop", user_arguments)
     d_sh = runner.getIntegerArgumentValue("schedule_day_shift",user_arguments)
+    weeks = runner.getIntegerArgumentValue("weeks",user_arguments)
 
     #Check for valid inputs
     if dw_capacity < 1
@@ -436,7 +444,7 @@ class ResidentialDishwasher < OpenStudio::Measure::ModelMeasure
         if dw_ann > 0
             
             # Create schedule
-            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", Constants.ObjectNameDishwasher + " temperature schedule", nbeds, sch_unit_index, d_sh, "Dishwasher", wh_setpoint, File.dirname(__FILE__))
+            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameDishwasher + " schedule", Constants.ObjectNameDishwasher + " temperature schedule", nbeds, sch_unit_index, d_sh, "Dishwasher", wh_setpoint, File.dirname(__FILE__), weeks)
             if not sch.validated?
                 return false
             end

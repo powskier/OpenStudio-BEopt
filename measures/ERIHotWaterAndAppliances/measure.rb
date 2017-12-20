@@ -8,9 +8,17 @@ require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 class ERIHotWaterAndAppliances < OpenStudio::Measure::ModelMeasure
             
     def name
-        return "Set ERI Hot Water & Appliances"
+        return "Set ERI Hot Water and Appliances"
     end
 
+  def description
+    return "Sets ERI hot water use according to ANSI/RESNET 301-2014 Addendum A-2015 Amendment on Domestic Hot Water (DHW) Systems."
+  end
+    
+  def modeler_description
+    return "Creates three new WaterUse:Equipment objects to represent showers, sinks, and baths in a home. OtherEquipment objects are also added to take into account the heat gain in the space due to hot water use."
+  end
+    
     def arguments(model)
         args = OpenStudio::Measure::OSArgumentVector.new
         

@@ -1,10 +1,10 @@
 <measure>
   <schema_version>3.0</schema_version>
   <name>residential_hot_water_fixtures</name>
-  <uid>6159fd36-6bfa-4907-9200-9cb852d50799</uid>
-  <version_id>6c286ef8-c672-42bb-8bde-f74f0509615b</version_id>
-  <version_modified>20171220T204925Z</version_modified>
-  <xml_checksum>A6ACD89C</xml_checksum>
+  <uid>237908f8-8b4a-431c-9838-8f5e6f7ddbfa</uid>
+  <version_id>2399688d-52f6-4afb-83a4-c6a9e6f39880</version_id>
+  <version_modified>20171220T224240Z</version_modified>
+  <xml_checksum>6F6A3B31</xml_checksum>
   <class_name>ResidentialHotWaterFixtures</class_name>
   <display_name>Set Residential Hot Water Fixtures</display_name>
   <description>Adds (or replaces) residential hot water fixtures -- showers, sinks, and baths. For multifamily buildings, the hot water fixtures can be set for all units of the building. See https://github.com/NREL/OpenStudio-BEopt#workflows for supported workflows using this measure.</description>
@@ -76,6 +76,15 @@
       <model_dependent>false</model_dependent>
       <default_value>0</default_value>
     </argument>
+    <argument>
+      <name>weeks</name>
+      <display_name>Weeks</display_name>
+      <description></description>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>53</default_value>
+    </argument>
   </arguments>
   <outputs/>
   <provenances/>
@@ -88,13 +97,50 @@
       <value>ModelMeasure</value>
       <datatype>string</datatype>
     </attribute>
-    <attribute>
-      <name>Uses SketchUp API</name>
-      <value>false</value>
-      <datatype>boolean</datatype>
-    </attribute>
   </attributes>
   <files>
+    <file>
+      <filename>MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>7EA8043E</checksum>
+    </file>
+    <file>
+      <filename>ResidentialHotWaterFixtures_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>1C948313</checksum>
+    </file>
+    <file>
+      <filename>SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>696D3478</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>94A9A142</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>4620580B</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>910111B8</checksum>
+    </file>
+    <file>
+      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_HWFixtures_RecircDist.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>C2D4C98E</checksum>
+    </file>
     <file>
       <filename>USA_CO_Denver_Intl_AP_725650_TMY3.ddy</filename>
       <filetype>ddy</filetype>
@@ -106,12 +152,6 @@
       <filetype>epw</filetype>
       <usage_type>test</usage_type>
       <checksum>E23378AA</checksum>
-    </file>
-    <file>
-      <filename>MinuteDrawProfilesMaxFlows.csv</filename>
-      <filetype>csv</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>5CD21305</checksum>
     </file>
     <file>
       <filename>BathSchedule_1bed.csv</filename>
@@ -142,6 +182,36 @@
       <filetype>csv</filetype>
       <usage_type>resource</usage_type>
       <checksum>6F86EAD4</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>022C15E2</checksum>
+    </file>
+    <file>
+      <filename>geometry.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>A9382DBC</checksum>
+    </file>
+    <file>
+      <filename>MinuteDrawProfilesMaxFlows.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>5CD21305</checksum>
+    </file>
+    <file>
+      <filename>psychrometrics.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>11E27E42</checksum>
+    </file>
+    <file>
+      <filename>schedules.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>49CF4556</checksum>
     </file>
     <file>
       <filename>ShowerSchedule_1bed.csv</filename>
@@ -204,12 +274,6 @@
       <checksum>D13CEA26</checksum>
     </file>
     <file>
-      <filename>psychrometrics.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>11E27E42</checksum>
-    </file>
-    <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
@@ -228,81 +292,21 @@
       <checksum>A9CCB075</checksum>
     </file>
     <file>
-      <filename>geometry.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>A9382DBC</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.4.1</identifier>
-        <min_compatible>2.0.4</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>C8BC4862</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>022C15E2</checksum>
-    </file>
-    <file>
       <filename>weather.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>82988A63</checksum>
     </file>
     <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank_HWFixtures_RecircDist.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>C2D4C98E</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>94A9A142</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4620580B</checksum>
-    </file>
-    <file>
-      <filename>SFD_2000sqft_2story_FB_GRG_UA_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>910111B8</checksum>
-    </file>
-    <file>
-      <filename>MF_8units_1story_SL_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>7EA8043E</checksum>
-    </file>
-    <file>
-      <filename>SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>696D3478</checksum>
-    </file>
-    <file>
-      <filename>schedules.rb</filename>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>2.3.1</identifier>
+        <min_compatible>2.3.1</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
       <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>49CF4556</checksum>
-    </file>
-    <file>
-      <filename>ResidentialHotWaterFixtures_Test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>1C948313</checksum>
+      <usage_type>script</usage_type>
+      <checksum>D9C65A4D</checksum>
     </file>
   </files>
 </measure>
