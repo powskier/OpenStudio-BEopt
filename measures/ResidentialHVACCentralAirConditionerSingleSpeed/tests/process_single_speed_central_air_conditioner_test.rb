@@ -272,8 +272,6 @@ class ProcessSingleSpeedCentralAirConditionerTest < MiniTest::Test
     measure.run(model, runner, argument_map)
     result = runner.result
     
-    File.write("C:/Users/shorowit/Documents/GitHub/OpenStudio-BEopt/out.osm", model.to_s)
-
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert_equal(result.info.size, num_infos)
