@@ -183,24 +183,6 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       pv_rate = pv_tariff_rate
     end
     
-    tariff = nil
-    if tariff_label == "Custom Tariff" and custom_tariff.is_initialized
-      custom_tariff = custom_tariff.get
-      if File.exists?(File.expand_path(custom_tariff))
-        tariff = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
-      end
-    elsif tariff_label != "Autoselect Tariff(s)"
-      Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
-        tariff = JSON.parse(zip_file.read(tariff_label), :symbolize_names=>true)[:items][0]
-      end
-    else
-      weather_file = model.getSite.weatherFile.get
-      cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
-      closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to simulation epw
-      runner.registerInfo("Nearest usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
-      # tariff = TODO
-    end
-    
     marginal_rates = {
                       Constants.FuelTypeElectric=>nil, 
                       Constants.FuelTypeGas=>runner.getStringArgumentValue("ng_rate", user_arguments),
@@ -224,6 +206,67 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     end
     sql = sql.get
     model.setSqlFile(sql)
+    
+    tariff = nil
+    if tariff_label == "Custom Tariff" and custom_tariff.is_initialized
+      custom_tariff = custom_tariff.get
+      if File.exists?(File.expand_path(custom_tariff))
+        tariff = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
+      end
+    elsif tariff_label != "Autoselect Tariff(s)"
+      Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
+        tariff = JSON.parse(zip_file.read(tariff_label), :symbolize_names=>true)[:items][0]
+      end
+    else # autoselect tariff based on distance to simulation epw location
+      weather_file = model.getSite.weatherFile.get
+      cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
+      closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to simulation epw
+      runner.registerInfo("Nearest usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
+      
+      usafs = cols[1].collect { |i| i.to_s }
+      indexes = usafs.each_index.select{|i| usafs[i] == closest_usaf}
+      utility_ids = {}
+      indexes.each do |ix|
+        next if cols[4][ix].nil?
+        cols[4][ix].split("|").each do |utility_id|
+          next if utility_id == "no data"
+          if utility_ids.keys.include? utility_id
+            utility_ids[utility_id] << cols[0][ix]
+          else
+            utility_ids[utility_id] = [cols[0][ix]]
+          end
+        end
+      end
+
+      rate_ids = {}
+      cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
+      cols.each do |col|
+        next unless col[0].include? "eiaid"
+        utility_ids.keys.each do |utility_id|
+          utility_ixs = col.each_index.select{|i| col[i] == utility_id}
+          utility_ixs.each do |utility_ix|
+            if rate_ids.keys.include? utility_id
+              rate_ids[utility_id] << cols[3][utility_ix]
+            else
+              rate_ids[utility_id] = [cols[3][utility_ix]]
+            end
+          end
+        end
+      end
+
+      tariffs = []
+      rate_ids.each do |utility_id, getpages|
+        getpages.each do |getpage|    
+    
+          Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
+            tariffs << JSON.parse(zip_file.read("#{utility_id}_#{getpage}.json"), :symbolize_names=>true)[:items][0]
+          end
+
+        end          
+      end
+      
+      tariff = tariffs[0] # FIXME: average these? register all of them?
+    end
     
     # Get the weather file run period (as opposed to design day run period)
     ann_env_pd = nil
@@ -426,6 +469,33 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     
     return utility_bills.inject(0){ |sum, x| sum + x }
   
+  end
+  
+  def closest_usaf_to_epw(bldg_lat, bldg_lon, usafs)
+    distances = [1000000]
+    usafs.each do |usaf|
+      if (bldg_lat.to_f - usaf[3].to_f).abs > 1 and (bldg_lon.to_f - usaf[2].to_f).abs > 1 # reduce the set to save some time
+        distances << 100000
+        next
+      end
+      km = haversine(bldg_lat.to_f, bldg_lon.to_f, usaf[3].to_f, usaf[2].to_f)
+      distances << km
+    end    
+    return usafs[distances.index(distances.min)][1]    
+  end
+
+  def haversine(lat1, lon1, lat2, lon2)
+    # convert decimal degrees to radians
+    [lon1, lat1, lon2, lat2].each do |l|
+      l = UnitConversions.convert(l,"deg","rad")
+    end
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = Math.sin(dlat/2)**2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2)**2
+    c = 2 * Math.asin(Math.sqrt(a)) 
+    km = 6367 * c
+    return km
   end
   
 end

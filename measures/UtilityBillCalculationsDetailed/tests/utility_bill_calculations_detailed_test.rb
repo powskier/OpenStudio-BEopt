@@ -21,8 +21,8 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>51.93, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    expected_values = {Constants.FuelTypeElectric=>642.69, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
+    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 4, 1)
   end
   
   def test_select_tariff_net_metering
@@ -30,8 +30,8 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     args_hash["tariff_label"] = "34_539fc3c4ec4f024c27d8bf7f.json"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>-13.06, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    expected_values = {Constants.FuelTypeElectric=>61.17, Constants.FuelTypeGas=>516.7, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
+    _test_measure("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
 
   private
