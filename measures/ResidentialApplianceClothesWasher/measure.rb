@@ -136,8 +136,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
     plant_loop.setDisplayName("Plant Loop")
     plant_loop.setDescription("Select the plant loop for the dishwasher. '#{Constants.Auto}' will try to choose the plant loop associated with the specified space. For multifamily buildings, '#{Constants.Auto}' will choose the plant loop for each unit of the building.")
     plant_loop.setDefaultValue(Constants.Auto)
-    args << plant_loop
-    
+    args << plant_loop    
         
     #make an argument for the number of days to shift the draw profile by
     schedule_day_shift = OpenStudio::Measure::OSArgument::makeIntegerArgument("schedule_day_shift",true)
@@ -145,6 +144,13 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
     schedule_day_shift.setDescription("Draw profiles are shifted to prevent coincident hot water events when performing portfolio analyses. For multifamily buildings, draw profiles for each unit are automatically shifted by one week.")
     schedule_day_shift.setDefaultValue(0)
     args << schedule_day_shift
+    
+    #make an argument for the number of weeks to grab as the repeating schedule window
+    weeks = OpenStudio::Measure::OSArgument::makeIntegerArgument("weeks",true)
+    weeks.setDisplayName("Weeks")
+    weeks.setDescription("")
+    weeks.setDefaultValue(53)
+    args << weeks
     
     return args
   end #end the arguments method
@@ -173,6 +179,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
     space_r = runner.getStringArgumentValue("space",user_arguments)
     plant_loop_s = runner.getStringArgumentValue("plant_loop", user_arguments)
     d_sh = runner.getIntegerArgumentValue("schedule_day_shift",user_arguments)
+    weeks = runner.getIntegerArgumentValue("weeks",user_arguments)
 
     #Check for valid inputs
     if cw_imef <= 0
@@ -544,7 +551,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
         if cw_ann_e > 0
         
             # Create schedule
-            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameClothesWasher + " schedule", Constants.ObjectNameClothesWasher + " temperature schedule", nbeds, sch_unit_index, d_sh, "ClothesWasher", cw_water_temp, File.dirname(__FILE__))
+            sch = HotWaterSchedule.new(model, runner, Constants.ObjectNameClothesWasher + " schedule", Constants.ObjectNameClothesWasher + " temperature schedule", nbeds, sch_unit_index, d_sh, "ClothesWasher", cw_water_temp, File.dirname(__FILE__), weeks)
             if not sch.validated?
                 return false
             end
