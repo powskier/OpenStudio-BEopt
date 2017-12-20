@@ -2574,7 +2574,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       end
     end
 
-    no_ducted_equip = !HVAC.has_central_ac(model, runner, unit.living_zone) && !HVAC.has_furnace(model, runner, unit.living_zone) && !HVAC.has_ashp(model, runner, unit.living_zone) && !HVAC.has_gshp(model, runner, unit.living_zone).nil? && !unit.has_mini_split_heat_pump
+    no_ducted_equip = !HVAC.has_central_ac(model, runner, unit.living_zone) && !HVAC.has_furnace(model, runner, unit.living_zone) && !HVAC.has_ashp(model, runner, unit.living_zone) && !HVAC.has_gshp(model, runner, unit.living_zone) && !unit.has_mini_split_heat_pump
     if ducts.DuctLocation != "none" and no_ducted_equip
       runner.registerWarning("No ducted HVAC equipment was found but ducts were specified. Overriding duct specification.")
       ducts.DuctLocation = "none"
