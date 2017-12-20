@@ -2514,7 +2514,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                     
                 end
                     
-            else
+            else # MSHP
                 
                 dehumid_AC_TotCap_i_1 = 0
                 for i in 0..(hvac.NumSpeedsCooling - 1)
@@ -2855,7 +2855,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     ducts = DuctsInfo.new
     
     ducts.Has = false
-    if (hvac.HasForcedAirHeating or hvac.HasForcedAirCooling) and not hvac.HasMiniSplitHeatPump
+    if hvac.HasForcedAirHeating or hvac.HasForcedAirCooling
         ducts.Has = true
         ducts.NotInLiving = false # init
         
@@ -2975,8 +2975,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     hvac.HasElecBaseboard = HVAC.has_electric_baseboard(model, runner, control_zone)
     hvac.HasUnitHeater = HVAC.has_unit_heater(model, runner, control_zone)
     hvac.HasAirSourceHeatPump = HVAC.has_ashp(model, runner, control_zone)
-    hvac.HasMiniSplitHeatPump = HVAC.has_mshp(model, runner, control_zone)
     hvac.HasGroundSourceHeatPump = HVAC.has_gshp(model, runner, control_zone)
+    hvac.HasMiniSplitHeatPump = HVAC.has_mshp(model, runner, control_zone)
+    has_ducted_mshp = HVAC.has_ducted_mshp(model, runner, control_zone)
     
     if hvac.HasAirSourceHeatPump or hvac.HasMiniSplitHeatPump
         hvac.HPSizedForMaxLoad = get_unit_feature(runner, unit, Constants.SizingInfoHPSizedForMaxLoad, 'boolean', true)
@@ -3002,7 +3003,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         if clg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem
             hvac.HasForcedAirCooling = true
         elsif clg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-            hvac.HasForcedAirCooling = true
+            if has_ducted_mshp
+                hvac.HasForcedAirCooling = true
+            end
         end
         
         # Cooling coil
@@ -3178,7 +3181,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         if htg_equip.is_a? OpenStudio::Model::AirLoopHVACUnitarySystem
             hvac.HasForcedAirHeating = true
         elsif htg_equip.is_a? OpenStudio::Model::ZoneHVACTerminalUnitVariableRefrigerantFlow
-            hvac.HasForcedAirHeating = true
+            if has_ducted_mshp
+                hvac.HasForcedAirHeating = true
+            end
         end
         
         # Heating coil

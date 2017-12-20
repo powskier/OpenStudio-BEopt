@@ -1917,6 +1917,34 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Equip_MSHP_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end  
   
+  def test_equip_ducted_mshp_autosize
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'AirConditioner:VariableRefrigerantFlow_Living_Gross Rated Total Cooling Capacity {W}' => 11404,
+            'AirConditioner:VariableRefrigerantFlow_Living_Gross Rated Total Heating Capacity {W}' => 12176,
+            'AirConditioner:VariableRefrigerantFlow_Basement_Gross Rated Total Cooling Capacity {W}' => 541,
+            'AirConditioner:VariableRefrigerantFlow_Basement_Gross Rated Total Heating Capacity {W}' => 578,
+            'Coil:Heating:DX:VariableRefrigerantFlow_Living_Gross Rated Total Heating Capacity {W}' => 12176,
+            'Coil:Heating:DX:VariableRefrigerantFlow_Living_Rated Air Flow Rate {m3/s}' => 0.545,
+            'Coil:Heating:DX:VariableRefrigerantFlow_Basement_Gross Rated Total Heating Capacity {W}' => 578,
+            'Coil:Heating:DX:VariableRefrigerantFlow_Basement_Rated Air Flow Rate {m3/s}' => 0.026,
+            'Coil:Cooling:DX:VariableRefrigerantFlow_Living_Gross Rated Total Cooling Capacity {W}' => 11404,
+            'Coil:Cooling:DX:VariableRefrigerantFlow_Living_Rated Air Flow Rate {m3/s}' => 0.542,
+            'Coil:Cooling:DX:VariableRefrigerantFlow_Basement_Gross Rated Total Cooling Capacity {W}' => 541,
+            'Coil:Cooling:DX:VariableRefrigerantFlow_Basement_Rated Air Flow Rate {m3/s}' => 0.026,
+            'Fan:OnOff_Living_Maximum Flow Rate {m3/s}' => 0.545,
+            'Fan:OnOff_Basement_Maximum Flow Rate {m3/s}' => 0.026,
+            'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow_Living_Cooling Supply Air Flow Rate {m3/s}' => 0.542,
+            'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow_Living_Heating Supply Air Flow Rate {m3/s}' => 0.545,
+            'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow_Basement_Cooling Supply Air Flow Rate {m3/s}' => 0.026,
+            'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow_Basement_Heating Supply Air Flow Rate {m3/s}' => 0.026,
+                      }
+    _test_measure("SFD_HVACSizing_Equip_MSHPDucted_Autosize.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end  
+  
   def test_equip_mshp_fixedsize
     args_hash = {}
     args_hash["show_debug_info"] = true
@@ -2628,14 +2656,14 @@ class ProcessHVACSizingTest < MiniTest::Test
         
         str = ""
         if is_flowrate
+            str = "#{beopt_key.gsub(flowrate_units,'').strip}: #{beopt_val.round(3)} (Expected) vs. #{os_val.round(3)} (Actual)"
             os_val = UnitConversions.convert(os_val,"m^3/s","cfm")
             beopt_val = UnitConversions.convert(beopt_val,"m^3/s","cfm")
-            str = "#{beopt_key.gsub(flowrate_units,'').strip}: #{beopt_val.round(1)} (Expected) vs. #{os_val.round(1)} (Actual)"
             tolerance = airflow_tolerance
         elsif is_capacity
+            str = "#{beopt_key.gsub(capacity_units,'').strip}: #{beopt_val.round(0)} (Expected) vs. #{os_val.round(0)} (Actual)"
             os_val = UnitConversions.convert(os_val,"W","Btu/hr")
             beopt_val = UnitConversions.convert(beopt_val,"W","Btu/hr")
-            str = "#{beopt_key.gsub(capacity_units,'').strip}: #{beopt_val.round(0)} (Expected) vs. #{os_val.round(0)} (Actual)"
             tolerance = load_total_tolerance
         elsif is_water_removal
             str = "#{beopt_key.gsub(water_removal_units,'').strip}: #{beopt_val.round(1)} (Expected) vs. #{os_val.round(1)} (Actual)"
@@ -2647,9 +2675,9 @@ class ProcessHVACSizingTest < MiniTest::Test
             str = "#{beopt_key.gsub(ua_units,'').strip}: #{beopt_val.round(0)} (Expected) vs. #{os_val.round(0)} (Actual)"
             tolerance = ua_tolerance
         elsif is_length
+            str = "#{beopt_key.gsub(length_units,'').strip}: #{beopt_val.round(0)} (Expected) vs. #{os_val.round(0)} (Actual)"
             os_val = UnitConversions.convert(os_val,"m","ft")
             beopt_val = UnitConversions.convert(beopt_val,"m","ft")
-            str = "#{beopt_key.gsub(length_units,'').strip}: #{beopt_val.round(0)} (Expected) vs. #{os_val.round(0)} (Actual)"
             tolerance = length_tolerance
         elsif is_unitless
             str = "#{beopt_key.strip}: #{beopt_val.round(0)} (Expected) vs. #{os_val.round(0)} (Actual)"
