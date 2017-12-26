@@ -145,7 +145,7 @@ class Geometry
         return p
     end
     
-    def self.get_building_units(model, runner=nil)
+    def self.get_building_units(model, runner=nil, unit_type=Constants.BuildingUnitTypeResidential)
         if model.getSpaces.size == 0
             if !runner.nil?
                 runner.registerError("No building geometry has been defined.")
@@ -156,11 +156,11 @@ class Geometry
         return_units = []
         model.getBuildingUnits.each do |unit|
             # Remove any units from list that have no associated spaces or are not residential
-            next if not (unit.spaces.size > 0 and unit.buildingUnitType == Constants.BuildingUnitTypeResidential)
+            next if not (unit.spaces.size > 0 and unit.buildingUnitType == unit_type)
             return_units << unit
         end
         
-        if return_units.size == 0
+        if return_units.size == 0 and unit_type == Constants.BuildingUnitTypeResidential
             # Assume SFD; create single building unit for entire model
             if !runner.nil?
                 runner.registerWarning("No building units defined; assuming single-family detached building.")

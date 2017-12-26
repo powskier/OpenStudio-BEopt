@@ -405,7 +405,6 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             space.surfaces.each do |surface|
                 next if surface.surfaceType.downcase != "roofceiling"
                 tot_roof_area += surface.netArea
-
                 roof_color = get_unit_feature(runner, space.buildingUnit.get, Constants.SizingInfoRoofColor(surface), 'string')
                 roof_material = get_unit_feature(runner, space.buildingUnit.get, Constants.SizingInfoRoofMaterial(surface), 'string')
                 return nil if roof_color.nil? or roof_material.nil?
@@ -2888,8 +2887,16 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             ducts.LocationSpace = zone.spaces[0]
         end
         if ducts.LocationSpace.nil?
-            runner.registerError("Could not determine duct location.")
-            return nil
+            units = Geometry.get_building_units(model, runner, Constants.BuildingUnitTypeNonResidential)
+            if units.nil?
+                runner.registerError("Could not determine duct location.")
+                return nil
+            end
+            unit = units[0]
+            Geometry.get_thermal_zones_from_spaces(unit.spaces).each do |zone|
+                next if not zone.name.to_s.start_with?(get_unit_feature(runner, unit, Constants.SizingInfoDuctsLocationZone, 'string'))
+                ducts.LocationSpace = zone.spaces[0]
+            end
         end
         if not Geometry.is_living(ducts.LocationSpace)
             ducts.NotInLiving = true
@@ -4370,6 +4377,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
 
         end
     end
+    
+    return true
     
   end
   

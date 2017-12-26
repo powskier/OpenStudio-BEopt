@@ -176,6 +176,9 @@ class Constants
   def self.BuildingUnitTypeResidential
     return 'Residential'
   end
+  def self.BuildingUnitTypeNonResidential
+    return 'NonResidential'
+  end
   def self.CalcTypeERIRatedHome
     return 'HERS Rated Home'
   end

@@ -1892,7 +1892,7 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       unless unit.finished_basement_zone.nil?
         building_unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(unit.finished_basement_zone), unit.finished_basement.inf_flow)
       end
-      
+
     end # end unit loop
     
     # Store info for HVAC Sizing measure
@@ -1908,6 +1908,13 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       end
       unless building.unfinished_attic_zone.nil?
         building_unit.setFeature(Constants.SizingInfoZoneInfiltrationCFM(building.unfinished_attic_zone), building.unfinished_attic.inf_flow)
+      end
+    end
+    
+    units = Geometry.get_building_units(model, runner, Constants.BuildingUnitTypeNonResidential)
+    unless units.nil?
+      units.each do |building_unit|
+        building_unit.setFeature(Constants.SizingInfoDuctsLocationZone, ducts.duct_location_name)
       end
     end
 

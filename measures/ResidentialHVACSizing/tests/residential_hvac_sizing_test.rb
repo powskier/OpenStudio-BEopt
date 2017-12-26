@@ -123,7 +123,7 @@ class ProcessHVACSizingTest < MiniTest::Test
             'Dehumid_WaterRemoval_Auto' => 0,
                       }
     _test_measure("SFD_HVACSizing_Load_2story_FB_GRG_FA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
-  end  
+  end
 
   def test_loads_2story_finished_basement_garage_finished_attic_ducts_in_fininshed_basement
     args_hash = {}
@@ -3606,6 +3606,120 @@ class ProcessHVACSizingTest < MiniTest::Test
     args_hash = {}
     result = _test_error("SFD_HVACSizing_Equip_MissingBeds.osm", args_hash)
     assert_equal(result.errors.map{ |x| x.logMessage }[0], "Could not determine number of bedrooms or bathrooms. Run the 'Add Residential Bedrooms And Bathrooms' measure first.")
+  end
+  
+  def test_loads_single_family_attached_1story_finished_basement_unfinished_attic
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'DehumidLoad_Inf_Sens' => -1567,
+            'DehumidLoad_Inf_Lat' => -1161,
+            'DehumidLoad_Int_Sens' => 2303,
+            'DehumidLoad_Int_Lat' => 1065,
+            'Heat Windows' => 8623,
+            'Heat Doors' => 252,
+            'Heat Walls' => 12768,
+            'Heat Roofs' => 2242,
+            'Heat Floors' => 2049,
+            'Heat Infil' => 15650,
+            'Dehumid Windows' => -1053,
+            'Dehumid Doors' => -30,
+            'Dehumid Walls' => -1069,
+            'Dehumid Roofs' => -273,
+            'Dehumid Floors' => 9,
+            'Cool Windows' => 5778,
+            'Cool Doors' => 91,
+            'Cool Walls' => 1777,
+            'Cool Roofs' => 591,
+            'Cool Floors' => 230,
+            'Cool Infil Sens' => 1963,
+            'Cool Infil Lat' => -3226,
+            'Cool IntGains Sens' => 2912,
+            'Cool IntGains Lat' => 1062,
+            'Heat Load' => 41587,
+            'Cool Load Sens' => 13344,
+            'Cool Load Lat' => 0,
+            'Dehumid Load Sens' => -1682,
+            'Dehumid Load Lat' => -95,
+            'Heat Airflow' => 0,
+            'Cool Airflow' => 866,
+            'HeatingLoad' => 41587,
+            'HeatingDuctLoad' => 0,
+            'CoolingLoad_Lat' => 0,
+            'CoolingLoad_Sens' => 13344,
+            'CoolingLoad_Ducts_Lat' => 0,
+            'CoolingLoad_Ducts_Sens' => 0,
+            'DehumidLoad_Sens' => -1682,
+            'DehumidLoad_Ducts_Lat' => 0,
+            'Cool_Capacity' => 0,
+            'Cool_SensCap' => 0,
+            'Heat_Capacity' => 0,
+            'SuppHeat_Capacity' => 0,
+            'Cool_AirFlowRate' => 0,
+            'Heat_AirFlowRate' => 0,
+            'Fan_AirFlowRate' => 0,
+            'Dehumid_WaterRemoval_Auto' => 0,
+                      }
+    _test_measure("SFA_HVACSizing_Load_4units_1story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
+  end
+  
+  def test_loads_multifamily_1story_slab
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {
+            'DehumidLoad_Inf_Sens' => -1567,
+            'DehumidLoad_Inf_Lat' => -1161,
+            'DehumidLoad_Int_Sens' => 2303,
+            'DehumidLoad_Int_Lat' => 1065,
+            'Heat Windows' => 8623,
+            'Heat Doors' => 252,
+            'Heat Walls' => 12768,
+            'Heat Roofs' => 2242,
+            'Heat Floors' => 2049,
+            'Heat Infil' => 15650,
+            'Dehumid Windows' => -1053,
+            'Dehumid Doors' => -30,
+            'Dehumid Walls' => -1069,
+            'Dehumid Roofs' => -273,
+            'Dehumid Floors' => 9,
+            'Cool Windows' => 5778,
+            'Cool Doors' => 91,
+            'Cool Walls' => 1777,
+            'Cool Roofs' => 591,
+            'Cool Floors' => 230,
+            'Cool Infil Sens' => 1963,
+            'Cool Infil Lat' => -3226,
+            'Cool IntGains Sens' => 2912,
+            'Cool IntGains Lat' => 1062,
+            'Heat Load' => 41587,
+            'Cool Load Sens' => 13344,
+            'Cool Load Lat' => 0,
+            'Dehumid Load Sens' => -1682,
+            'Dehumid Load Lat' => -95,
+            'Heat Airflow' => 0,
+            'Cool Airflow' => 866,
+            'HeatingLoad' => 41587,
+            'HeatingDuctLoad' => 0,
+            'CoolingLoad_Lat' => 0,
+            'CoolingLoad_Sens' => 13344,
+            'CoolingLoad_Ducts_Lat' => 0,
+            'CoolingLoad_Ducts_Sens' => 0,
+            'DehumidLoad_Sens' => -1682,
+            'DehumidLoad_Ducts_Lat' => 0,
+            'Cool_Capacity' => 0,
+            'Cool_SensCap' => 0,
+            'Heat_Capacity' => 0,
+            'SuppHeat_Capacity' => 0,
+            'Cool_AirFlowRate' => 0,
+            'Heat_AirFlowRate' => 0,
+            'Fan_AirFlowRate' => 0,
+            'Dehumid_WaterRemoval_Auto' => 0,
+                      }
+    _test_measure("MF_HVACSizing_Load_8units_1story_UB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, true)
   end
   
   private

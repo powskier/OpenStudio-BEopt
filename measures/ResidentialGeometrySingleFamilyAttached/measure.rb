@@ -688,8 +688,12 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
       attic_zone = OpenStudio::Model::ThermalZone.new(model)
       attic_zone.setName(Constants.UnfinishedAtticZone)
       attic_space.setThermalZone(attic_zone)
+      unit = OpenStudio::Model::BuildingUnit.new(model)
+      unit.setBuildingUnitType(Constants.BuildingUnitTypeNonResidential)
+      unit.setName(Constants.UnfinishedAtticSpace)
+      attic_space.setBuildingUnit(unit)
     end
-    
+
     unit_hash = {}
     unit_spaces_hash.each do |unit_num, spaces|
       # Store building unit information
