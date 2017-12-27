@@ -1914,6 +1914,8 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
     units = Geometry.get_building_units(model, runner, Constants.BuildingUnitTypeNonResidential)
     unless units.nil?
       units.each do |building_unit|
+        zones = Geometry.get_thermal_zones_from_spaces(building_unit.spaces)
+        next unless zones[0].name.to_s.start_with? ducts.duct_location_name
         building_unit.setFeature(Constants.SizingInfoDuctsLocationZone, ducts.duct_location_name)
       end
     end

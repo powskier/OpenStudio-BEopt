@@ -91,7 +91,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     end
     attr_accessor(:Has, :NotInLiving, :SupplySurfaceArea, :ReturnSurfaceArea, 
                   :SupplyLoss, :ReturnLoss, :SupplyRvalue, :ReturnRvalue,
-                  :Location, :LocationSpace, :LocationFrac)
+                  :Location, :LocationSpace, :LocationFrac, :Unit)
   end
   
   #define the name that a user will see, this method may be deprecated as
@@ -207,7 +207,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         end
         
         # Set object values
-        if not setObjectValues(runner, model, unit, hvac, ducts, clg_equips, htg_equips, unit_final)
+        if not setObjectValues(runner, model, unit, hvac, clg_equips, htg_equips, unit_final)
             return false
         end
         
@@ -1483,7 +1483,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     # TODO: Combine processDuctLoads_Cool_Dehum with processDuctLoads_Heating? Some duplicate code
     unit_final = UnitFinalValues.new
     unit_final = processDuctRegainFactors(runner, unit, unit_final, ducts)
-    unit_final = processDuctLoads_Heating(runner, mj8, unit_final, weather, hvac, unit_init.Heat_Load, ducts)
+    unit_final = processDuctLoads_Heating(runner, mj8, unit_final, weather, hvac, unit_init.Heat_Load, ducts)    
     unit_init, unit_final = processDuctLoads_Cool_Dehum(runner, mj8, unit, zones_loads, unit_init, unit_final, weather, hvac, ducts)
     unit_final = processCoolingEquipmentAdjustments(runner, mj8, unit, unit_init, unit_final, weather, hvac)
     unit_final = processFixedEquipment(runner, unit_final, hvac)
@@ -1505,8 +1505,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         # values used for forced air systems in proposed ASHRAE Std. 152"
         if Geometry.is_unfinished_basement(ducts.LocationSpace) or Geometry.is_finished_basement(ducts.LocationSpace)
 
-            walls_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
-            ceiling_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
+            walls_insulated = get_unit_feature(runner, ducts.Unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
+            ceiling_insulated = get_unit_feature(runner, ducts.Unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
             return nil if walls_insulated.nil? or ceiling_insulated.nil?
 
             infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(ducts.LocationSpace.thermalZone.get), 'double', false)
@@ -1540,8 +1540,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             
         elsif Geometry.is_crawl(ducts.LocationSpace) or Geometry.is_pier_beam(ducts.LocationSpace)
             
-            walls_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
-            ceiling_insulated = get_unit_feature(runner, unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
+            walls_insulated = get_unit_feature(runner, ducts.Unit, Constants.SizingInfoSpaceWallsInsulated(ducts.LocationSpace), 'boolean')
+            ceiling_insulated = get_unit_feature(runner, ducts.Unit, Constants.SizingInfoSpaceCeilingInsulated(ducts.LocationSpace), 'boolean')
             return nil if walls_insulated.nil? or ceiling_insulated.nil?
 
             infiltration_cfm = get_unit_feature(runner, unit, Constants.SizingInfoZoneInfiltrationCFM(ducts.LocationSpace.thermalZone.get), 'double', false)
@@ -1705,9 +1705,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                 end
                 
                 dse_Tamb_cooling = t_attic_iter
-                Geometry.get_thermal_zones_from_spaces(unit.spaces).each do |thermal_zone|
+                Geometry.get_thermal_zones_from_spaces(ducts.Unit.spaces).each do |thermal_zone|
                     next if not Geometry.zone_is_finished(thermal_zone)
-                    zones_loads[thermal_zone] = processLoadFloors(runner, mj8, unit, thermal_zone, zones_loads[thermal_zone], weather, mj8.htd)
+                    zones_loads[thermal_zone] = processLoadFloors(runner, mj8, ducts.Unit, thermal_zone, zones_loads[thermal_zone], weather, mj8.htd)
                 end
                 unit_init = processIntermediateTotalLoads(runner, mj8, zones_loads, weather, hvac)
         
@@ -2888,7 +2888,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
         end
         if ducts.LocationSpace.nil?
             units = Geometry.get_building_units(model, runner, Constants.BuildingUnitTypeNonResidential)
-            if units.nil?
+            if units.empty?
                 runner.registerError("Could not determine duct location.")
                 return nil
             end
@@ -2902,6 +2902,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
             ducts.NotInLiving = true
         end
     end
+    ducts.Unit = unit
     
     return ducts
   end
@@ -4025,7 +4026,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     return val.get
   end
   
-  def setObjectValues(runner, model, unit, hvac, ducts, clg_equips, htg_equips, unit_final)
+  def setObjectValues(runner, model, unit, hvac, clg_equips, htg_equips, unit_final)
     # Updates object properties in the model
     
     # Cooling coils

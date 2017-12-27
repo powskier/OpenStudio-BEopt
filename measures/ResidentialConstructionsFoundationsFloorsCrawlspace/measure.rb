@@ -287,7 +287,7 @@ class ProcessConstructionsFoundationsFloorsCrawlspace < OpenStudio::Measure::Mod
     end
 
     # Store info for HVAC Sizing measure
-    units = Geometry.get_building_units(model, runner)
+    units = Geometry.get_building_units(model, runner, Constants.BuildingUnitTypeResidential) + Geometry.get_building_units(model, runner, Constants.BuildingUnitTypeNonResidential)
     if units.nil?
         return false
     end

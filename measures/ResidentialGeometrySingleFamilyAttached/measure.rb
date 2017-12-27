@@ -645,17 +645,22 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     
       if [Constants.CrawlFoundationType, Constants.UnfinishedBasementFoundationType].include? foundation_type
         foundation_space = Geometry.make_one_space_from_multiple_spaces(model, foundation_spaces)
+        unit = OpenStudio::Model::BuildingUnit.new(model)
+        unit.setBuildingUnitType(Constants.BuildingUnitTypeNonResidential)
         if foundation_type == Constants.CrawlFoundationType
           foundation_space.setName(Constants.CrawlSpace)
           foundation_zone = OpenStudio::Model::ThermalZone.new(model)
           foundation_zone.setName(Constants.CrawlZone)
           foundation_space.setThermalZone(foundation_zone)
+          unit.setName(Constants.CrawlSpace)
         elsif foundation_type == Constants.UnfinishedBasementFoundationType
           foundation_space.setName(Constants.UnfinishedBasementSpace)
           foundation_zone = OpenStudio::Model::ThermalZone.new(model)
           foundation_zone.setName(Constants.UnfinishedBasementZone)
           foundation_space.setThermalZone(foundation_zone)
+          unit.setName(Constants.UnfinishedBasementSpace)
         end
+        foundation_space.setBuildingUnit(unit)
       end
     
       # set foundation walls to ground
