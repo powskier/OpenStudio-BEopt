@@ -939,13 +939,21 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       model.getEnergyManagementSystemActuators.each do |actuator|
         next unless [obj_name_infil + " flow"].map{|x| "#{x} act".gsub(" ","_")}.include? actuator.name.to_s or [obj_name_natvent + " flow"].map{|x| "#{x} act".gsub(" ","_")}.include? actuator.name.to_s
-        actuator.actuatedComponent.remove
+        actuatedComponent = actuator.actuatedComponent
+        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
+          actuatedComponent = actuatedComponent.get
+        end
+        actuatedComponent.remove
         actuator.remove      
       end      
       
       model.getEnergyManagementSystemActuators.each do |actuator|
         next unless [obj_name_infil + " house exh", obj_name_infil + " range hood", obj_name_infil + " bath exh"].map{|x| "#{x} fan load equip act".gsub(" ","_")}.include? actuator.name.to_s
-        actuator.actuatedComponent.to_ElectricEquipment.get.electricEquipmentDefinition.remove
+        actuatedComponent = actuator.actuatedComponent
+        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
+          actuatedComponent = actuatedComponent.get
+        end
+        actuatedComponent.to_ElectricEquipment.get.electricEquipmentDefinition.remove
         actuator.remove
       end
       
@@ -1009,7 +1017,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       living_to_air_handler_flow_rate = "#{obj_name_ducts} liv to ah".gsub(" ","_")
       model.getEnergyManagementSystemActuators.each do |actuator|
         next unless [air_handler_to_living_flow_rate, living_to_air_handler_flow_rate].map{|x| "#{x} mix act".gsub(" ","_")}.include? actuator.name.to_s
-        actuator.actuatedComponent.remove
+        actuatedComponent = actuator.actuatedComponent
+        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
+          actuatedComponent = actuatedComponent.get
+        end
+        actuatedComponent.remove
         actuator.remove
       end
       
@@ -1031,7 +1043,11 @@ class ResidentialAirflow < OpenStudio::Measure::ModelMeasure
       
       model.getEnergyManagementSystemActuators.each do |actuator|
         next unless [supply_sensible_lkage_to_living, supply_latent_lkage_to_living, supply_duct_conduction_to_living, supply_duct_conduction_to_air_handler, return_duct_conduction_to_plenum, return_duct_conduction_to_air_handler, supply_sensible_lkage_to_air_handler, supply_latent_lkage_to_air_handler, return_sensible_lkage, return_latent_lkage].map{|x| "#{x} equip act".gsub(" ","_")}.include? actuator.name.to_s
-        actuator.actuatedComponent.to_OtherEquipment.get.otherEquipmentDefinition.remove
+        actuatedComponent = actuator.actuatedComponent
+        if actuatedComponent.is_a? OpenStudio::Model::OptionalModelObject # 2.4.0 or higher
+          actuatedComponent = actuatedComponent.get
+        end
+        actuatedComponent.to_OtherEquipment.get.otherEquipmentDefinition.remove
         actuator.remove
       end
     
