@@ -2677,9 +2677,9 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     if mechVentType == Constants.VentTypeExhaust
         q_unb = mechVentWholeHouseRate
         ventMultiplier = 1
-    elsif mechVentType == Constants.VentTypeSupply
+    elsif mechVentType == Constants.VentTypeSupply or mechVentType == Constants.VentTypeCFIS
         q_unb = mechVentWholeHouseRate
-        ventMultiplier = -1
+        ventMultiplier = 1
     elsif mechVentType == Constants.VentTypeBalanced
         totalEfficiency = get_unit_feature(runner, unit, Constants.SizingInfoMechVentTotalEfficiency, 'double')
         apparentSensibleEffectiveness = get_unit_feature(runner, unit, Constants.SizingInfoMechVentApparentSensibleEffectiveness, 'double')

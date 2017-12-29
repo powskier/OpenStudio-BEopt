@@ -1167,6 +1167,9 @@ class Constants
   def self.VentTypeBalanced
     return 'balanced'
   end
+  def self.VentTypeCFIS
+    return 'cfis'
+  end
   def self.WaterHeaterTypeTankless
     return 'tankless'
   end

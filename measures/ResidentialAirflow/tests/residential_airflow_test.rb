@@ -62,6 +62,26 @@ class ResidentialAirflowTest < MiniTest::Test
     model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)       
   end
   
+  def test_mech_vent_cfis
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    args_hash["mech_vent_type"] = Constants.VentTypeCFIS
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>7, "ScheduleRule"=>84, "Surface"=>6, "EnergyManagementSystemSubroutine"=>1, "EnergyManagementSystemProgramCallingManager"=>2, "EnergyManagementSystemProgram"=>3, "EnergyManagementSystemSensor"=>21, "EnergyManagementSystemActuator"=>17, "EnergyManagementSystemGlobalVariable"=>23, "AirLoopHVACReturnPlenum"=>1, "OtherEquipmentDefinition"=>10, "OtherEquipment"=>10, "ThermalZone"=>1, "ZoneMixing"=>2, "OutputVariable"=>14, "SpaceInfiltrationDesignFlowRate"=>2, "SpaceInfiltrationEffectiveLeakageArea"=>1, "Construction"=>1, "Space"=>1, "Material"=>1, "ElectricEquipmentDefinition"=>3, "ElectricEquipment"=>3, "SurfacePropertyConvectionCoefficients"=>6, "EnergyManagementSystemOutputVariable"=>1}
+    expected_values = {"erv_priority"=>nil, "terrain_type"=>"Suburbs", "duct_location"=>"unfinished attic zone", "infiltration_c"=>0.0696580370384, "infiltration_cs"=>0.0862380821416, "infiltration_cw"=>0.128435824905, "natvent_cs"=>0.000179260407789, "natvent_cw"=>0.000282172823794, "duct_leak_supply"=>0.136963386963, "duct_leak_return"=>0.1000999001, "f_oa"=>0.0368634868631, "faneff_wh"=>0.47194744, "fan_frac_to_space"=>1, "ra_duct_volume"=>90}
+    model, result = _test_measure("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_Furnace_CentralAC.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, 0, 1)       
+  end
+  
+  def test_mech_vent_cfis_no_ducts
+    args_hash = {}
+    args_hash["has_hvac_flue"] = "true"
+    args_hash["mech_vent_type"] = Constants.VentTypeCFIS
+    result = _test_error("SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard.osm", args_hash)
+    assert(result.errors.size == 1)
+    assert_equal("Fail", result.value.valueName)
+    assert_includes(result.errors.map{ |x| x.logMessage }, "A CFIS ventilation system has been selected but the building does not have central, forced air equipment.")
+  end
+  
   def test_mech_vent_exhaust_ashrae_622_2013
     args_hash = {}
     args_hash["has_hvac_flue"] = "true"   
