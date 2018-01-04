@@ -114,6 +114,7 @@ namespace :test do
   desc 'regenerate test osm files from osw files'
   task :regenerate_osms do
 
+    start_time = Time.now
     num_tot = 0
     num_success = 0
     
@@ -158,7 +159,8 @@ namespace :test do
         puts "[#{num_tot}/#{osw_map.size}] Regenerating osm from #{osw}..."
         osw = File.expand_path("../test/osw_files/#{osw}", __FILE__)
         osm = File.expand_path("../test/osw_files/run/in.osm", __FILE__)
-        command = "\"#{os_cli}\" run -w #{osw} -m >> log"
+        osw_gem = File.expand_path("gems/OpenStudio-workflow-gem/lib/") # Speed up osm generation
+        command = "\"#{os_cli}\" -I #{osw_gem} run -w #{osw} -m >> log"
         for _retry in 1..3
             system(command)
             break if File.exists?(osm)
@@ -222,7 +224,7 @@ namespace :test do
         end
     end    
     
-    puts "Completed. #{num_success} of #{num_tot} osm files were regenerated successfully."
+    puts "Completed. #{num_success} of #{num_tot} osm files were regenerated successfully (#{Time.now - start_time} seconds)."
     
   end
 
