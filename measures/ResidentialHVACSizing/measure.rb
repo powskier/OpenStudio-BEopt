@@ -4192,7 +4192,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
                 
                 found_vrf = true
                 mshp_indices = get_unit_feature(runner, unit, Constants.SizingInfoMSHPIndices, 'string')
-                return nil if mshp_indices.nil?
+                return false if mshp_indices.nil?
                 mshp_indices = mshp_indices.split(",").map(&:to_i)
 
                 htg_cap = UnitConversions.convert(unit_final.Heat_Capacity,"Btu/hr","W") * hvac.CapacityRatioHeating[mshp_indices[-1]] * unit_final.Zone_FlowRatios[thermal_zone]
@@ -4370,6 +4370,8 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
 
         end
     end
+    
+    return true
     
   end
   
