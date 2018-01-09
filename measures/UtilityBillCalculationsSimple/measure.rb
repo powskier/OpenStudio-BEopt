@@ -62,14 +62,14 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDefaultValue(Constants.Auto)
     args << arg
     
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_fixed", true)
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("gas_fixed", true)
     arg.setDisplayName("Natural Gas: Fixed Charge")
     arg.setUnits("$/month")
     arg.setDescription("Monthly fixed charge for natural gas.")
     arg.setDefaultValue("8.0")
     args << arg
     
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("ng_rate", true)
+    arg = OpenStudio::Measure::OSArgument::makeStringArgument("gas_rate", true)
     arg.setDisplayName("Natural Gas: Marginal Rate")
     arg.setUnits("$/therm")
     arg.setDescription("Price per therm for natural gas.")
@@ -112,12 +112,6 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     arg.setDescription("The annual full/gross tariff rate for PV. Only applies if the PV compensation type is 'Feed-In Tariff'.")
     arg.setDefaultValue("0.12")
     args << arg
-    
-    arg = OpenStudio::Measure::OSArgument::makeStringArgument("enduse_timeseries", true)
-    arg.setDisplayName("Output: File Path")
-    arg.setDescription("Absolute (or relative) directory to timeseries output.")
-    arg.setDefaultValue("")
-    args << arg    
     
     return args
   end
@@ -169,8 +163,8 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     # Assign the user inputs to variables
     elec_fixed = runner.getOptionalStringArgumentValue("elec_fixed", user_arguments)
     elec_fixed.is_initialized ? elec_fixed = elec_fixed.get : elec_fixed = 0
-    ng_fixed = runner.getOptionalStringArgumentValue("ng_fixed", user_arguments)
-    ng_fixed.is_initialized ? ng_fixed = ng_fixed.get : ng_fixed = 0
+    gas_fixed = runner.getOptionalStringArgumentValue("gas_fixed", user_arguments)
+    gas_fixed.is_initialized ? gas_fixed = gas_fixed.get : gas_fixed = 0
     pv_compensation_type = runner.getStringArgumentValue("pv_compensation_type", user_arguments)
     pv_sellback_rate = runner.getStringArgumentValue("pv_sellback_rate", user_arguments)
     pv_tariff_rate = runner.getStringArgumentValue("pv_tariff_rate", user_arguments)
@@ -179,16 +173,18 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     elsif pv_compensation_type == "Feed-In Tariff"
       pv_rate = pv_tariff_rate
     end
-    enduse_timeseries = runner.getStringArgumentValue("enduse_timeseries", user_arguments)
+    
+    fixed_rates = {
+                   Constants.FuelTypeElectric=>elec_fixed.to_f,
+                   Constants.FuelTypeGas=>gas_fixed.to_f
+                  }
     
     marginal_rates = {
                       Constants.FuelTypeElectric=>runner.getStringArgumentValue("elec_rate", user_arguments), 
-                      Constants.FuelTypeGas=>runner.getStringArgumentValue("ng_rate", user_arguments),
+                      Constants.FuelTypeGas=>runner.getStringArgumentValue("gas_rate", user_arguments),
                       Constants.FuelTypeOil=>runner.getStringArgumentValue("oil_rate", user_arguments),
                       Constants.FuelTypePropane=>runner.getStringArgumentValue("prop_rate", user_arguments)
                      }
-    
-    ann_env_pd = nil
 
     # get the last model
     model = runner.lastOpenStudioModel
@@ -197,36 +193,29 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
       return false
     end
     model = model.get
-    
-    if enduse_timeseries.empty?
 
-      # Get the last sql file      
-      sql = runner.lastEnergyPlusSqlFile
-      if sql.empty?
-        runner.registerError("Cannot find last sql file.")
-        return false
-      end
-      sql = sql.get
-      model.setSqlFile(sql)
-      
-      # Get the weather file run period (as opposed to design day run period)      
-      sql.availableEnvPeriods.each do |env_pd|
-        env_type = sql.environmentType(env_pd)
-        if env_type.is_initialized
-          if env_type.get == OpenStudio::EnvironmentType.new("WeatherRunPeriod")
-            ann_env_pd = env_pd
-          end
+    # Get the last sql file      
+    sql = runner.lastEnergyPlusSqlFile
+    if sql.empty?
+      runner.registerError("Cannot find last sql file.")
+      return false
+    end
+    sql = sql.get
+    model.setSqlFile(sql)
+    
+    # Get the weather file run period (as opposed to design day run period)
+    ann_env_pd = nil
+    sql.availableEnvPeriods.each do |env_pd|
+      env_type = sql.environmentType(env_pd)
+      if env_type.is_initialized
+        if env_type.get == OpenStudio::EnvironmentType.new("WeatherRunPeriod")
+          ann_env_pd = env_pd
         end
       end
-      if ann_env_pd == false
-        runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
-        return false
-      end
-      
-    else
-
-      sql = Timeseries.new(enduse_timeseries)
-      
+    end
+    if ann_env_pd == false
+      runner.registerError("Can't find a weather runperiod, make sure you ran an annual simulation, not just the design days.")
+      return false
     end
 
     timeseries = {}
@@ -242,36 +231,40 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
           runner.registerWarning("No data found for Hourly #{var_name}.")
           next
         else
-          y_timeseries = get(y_timeseries)
-          values = values(y_timeseries)
+          y_timeseries = y_timeseries.get
+          values = y_timeseries.values
         end
 
-        old_units = units(y_timeseries)
-        new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units)
-        dateTimes(y_timeseries).each_with_index do |date_time, i|
+        old_units = y_timeseries.units
+        new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, fuel_type)
+        y_timeseries.dateTimes.each_with_index do |date_time, i|
           y_val = values[i].to_f
-          if unit_conv.nil? # these unit conversions are not scalars
-            if old_units == "C" and new_units == "F"
-              y_val = UnitConversions.convert(y_val, "C", "F") # convert C to F
-            end
-          else # these are scalars
+          unless unit_conv.nil?
             y_val *= unit_conv
           end
-          timeseries[var_name] << y_val.round(3)
+          timeseries[var_name] << y_val.round(5)
         end
         
       end
     end
     
+    weather_file_state = model.getSite.weatherFile.get.stateProvinceRegion
+    calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_rate)
+
+    return true
+ 
+  end
+  
+  def calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, pv_compensation_type, pv_rate)
+  
     if timeseries["ElectricityProduced:Facility"].empty?
       timeseries["ElectricityProduced:Facility"] = Array.new(timeseries["Electricity:Facility"].length, 0)
     end
-   
-    timeseries["ElectricityProduced:Facility"].each_with_index do |val, i|
-      timeseries["Electricity:Facility"][i] -= timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
-    end
 
-    weather_file_state = model.getSite.weatherFile.get.stateProvinceRegion
+    timeseries["ElectricityProduced:Facility"].each_with_index do |val, i|
+      timeseries["Electricity:Facility"][i] += timeseries["ElectricityProduced:Facility"][i] # http://bigladdersoftware.com/epx/docs/8-7/input-output-reference/input-for-output.html
+    end
+  
     fuels = {Constants.FuelTypeElectric=>"Electricity", Constants.FuelTypeGas=>"Natural gas", Constants.FuelTypeOil=>"Oil", Constants.FuelTypePropane=>"Propane"}
     fuels.each do |fuel, file|
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
@@ -279,51 +272,48 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
         unless HelperMethods.state_code_map(weather_file_state).nil?
           weather_file_state = HelperMethods.state_code_map(weather_file_state)
         end
-        rate = marginal_rates[fuel]
-        if rate == Constants.Auto
-          rate = cols[1][i]
-        end
         next unless rate_state == weather_file_state
+        marginal_rate = marginal_rates[fuel]
+        if marginal_rate == Constants.Auto
+          average_rate = cols[1][i].to_f
+          if [Constants.FuelTypeElectric, Constants.FuelTypeGas].include? fuel
+            household_consumption = cols[2][i].to_f
+            marginal_rate = average_rate - 12.0 * fixed_rates[fuel] / household_consumption
+          else
+            marginal_rate = average_rate
+          end
+        end
         if fuel == Constants.FuelTypeElectric and not timeseries["Electricity:Facility"].empty?
-          report_output(runner, fuel, timeseries["Electricity:Facility"], "kWh", "kWh", rate, pv_compensation_type, pv_rate, timeseries["ElectricityProduced:Facility"], elec_fixed)
+          report_output(runner, fuel, timeseries["Electricity:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f, fixed_rates[fuel], timeseries["ElectricityProduced:Facility"])
         elsif fuel == Constants.FuelTypeGas and not timeseries["Gas:Facility"].empty?
-          report_output(runner, fuel, timeseries["Gas:Facility"], "kBtu", "therm", rate, pv_compensation_type, pv_rate, nil, ng_fixed)
+          report_output(runner, fuel, timeseries["Gas:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f, fixed_rates[fuel])
         elsif fuel == Constants.FuelTypeOil and not timeseries["FuelOil#1:Facility"].empty?
-          report_output(runner, fuel, timeseries["FuelOil#1:Facility"], "kBtu", "gal", rate, pv_compensation_type, pv_rate)
+          report_output(runner, fuel, timeseries["FuelOil#1:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f)
         elsif fuel == Constants.FuelTypePropane and not timeseries["Propane:Facility"].empty?
-          report_output(runner, fuel, timeseries["Propane:Facility"], "kBtu", "gal", rate, pv_compensation_type, pv_rate)
+          report_output(runner, fuel, timeseries["Propane:Facility"], marginal_rate.to_f, pv_compensation_type, pv_rate.to_f)
         end
         break
       end
-    end
-
-    return true
- 
+    end  
+  
   end
   
-  def report_output(runner, fuel, vals, from, to, rate, pv_compensation_type, pv_rate, produced=nil, fixed=0)
-    total_val = vals.inject(0){ |sum, x| sum + x }
-    fixed = fixed.to_f
-    rate = rate.to_f
+  def report_output(runner, fuel, consumed, rate, pv_compensation_type, pv_rate, fixed=0, produced=nil)
+    total_val = consumed.inject(0){ |sum, x| sum + x }
     if not fuel == Constants.FuelTypeElectric
-      if to == "gal"
-        total_val = UnitConversions.btu2gal(UnitConversions.convert(total_val, "kBtu", "Btu"), fuel)
-      else
-        total_val = UnitConversions.convert(total_val, from, to)
-      end
       total_val = 12.0 * fixed + total_val * rate
     else
-      if vals.length == 8784 # leap year
-        vals = vals[0..1415] + vals[1440..-1] # remove leap day
+      if consumed.length == 8784 # leap year
+        consumed = consumed[0..1415] + consumed[1440..-1] # remove leap day
         produced = produced[0..1415] + produced[1440..-1] # remove leap day
       end
-      total_val = calculate_electricity_bills(vals, produced, fixed, rate, pv_compensation_type, pv_rate.to_f)
+      total_val = calculate_electricity_bills(consumed, produced, fixed, rate, pv_compensation_type, pv_rate)
     end
     runner.registerValue(fuel, total_val)
     runner.registerInfo("Registering #{fuel} utility bills.")
   end
   
-  def calculate_electricity_bills(vals, produced, fixed, rate, pv_compensation_type, pv_rate)
+  def calculate_electricity_bills(load, gen, fixed, rate, pv_compensation_type, pv_rate)
   
     if !File.directory? "#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1"
       unzip_file = OpenStudio::UnzipFile.new("#{File.dirname(__FILE__)}/resources/sam-sdk-2017-1-17-r1.zip")
@@ -336,15 +326,14 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     p_data = SscApi.create_data_object
     SscApi.set_number(p_data, "analysis_period", 1) # years
     SscApi.set_array(p_data, "degradation", [0]) # annual energy degradation
-    SscApi.set_array(p_data, "gen", produced) # system power generated, kW
-    SscApi.set_array(p_data, "load", vals) # electricity load, kW
+    SscApi.set_array(p_data, "gen", gen) # system power generated, kW
+    SscApi.set_array(p_data, "load", load) # electricity load, kW
     SscApi.set_number(p_data, "system_use_lifetime_output", 0) # 0=hourly first year, 1=hourly lifetime
     SscApi.set_number(p_data, "inflation_rate", 0) # TODO: assume what?
     SscApi.set_number(p_data, "ur_enable_net_metering", 1)
     SscApi.set_number(p_data, "ur_monthly_fixed_charge", fixed)
     SscApi.set_number(p_data, "ur_flat_buy_rate", rate)
     if pv_compensation_type == "Net Metering"
-      SscApi.set_number(p_data, "ur_flat_sell_rate", rate)
       SscApi.set_number(p_data, "ur_nm_yearend_sell_rate", pv_rate)
     elsif pv_compensation_type == "Feed-In Tariff"
       SscApi.set_number(p_data, "ur_flat_sell_rate", pv_rate)
@@ -357,67 +346,6 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
     
     return utility_bills.inject(0){ |sum, x| sum + x }
   
-  end
-  
-  def get(y_timeseries)
-    begin
-      return y_timeseries.get
-    rescue
-      return y_timeseries
-    end
-  end
-  
-  def values(y_timeseries)
-    begin
-      return y_timeseries["values"]
-    rescue
-      return y_timeseries.values
-    end
-  end
-  
-  def units(y_timeseries)
-    begin
-      return y_timeseries["units"]
-    rescue
-      return y_timeseries.units
-    end
-  end
-  
-  def dateTimes(y_timeseries)
-    begin
-      return y_timeseries["dateTimes"]
-    rescue
-      return y_timeseries.dateTimes
-    end
-  end
-  
-  class Timeseries
-
-    def initialize(enduse_timeseries)
-      @enduse_timeseries = enduse_timeseries
-      @timeseries = {}
-      @cols = CSV.read(File.expand_path(@enduse_timeseries)).transpose
-      dateTimes = []
-      @cols.each do |col|
-        next unless col[0] == "Time"
-        dateTimes = col[1..8760]
-      end
-      @cols.each do |col|
-        var_name = col[0].split("  ")[0]
-        units = col[0].split("  ")[1]
-        next unless var_name.include? "Facility"
-        @timeseries[var_name] = {"values"=>col[1..8760], "units"=>units, "dateTimes"=>dateTimes}
-      end
-    end
-    
-    def timeSeries(ann_env_pd, freq, var_name, kv)      
-      if @timeseries.keys.include? var_name
-        return @timeseries[var_name]
-      else
-        return []
-      end
-    end
-
   end
   
 end

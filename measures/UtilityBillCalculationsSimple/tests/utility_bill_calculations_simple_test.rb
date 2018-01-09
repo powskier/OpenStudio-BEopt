@@ -7,50 +7,131 @@ require 'fileutils'
 
 class UtilityBillCalculationsSimpleTest < MiniTest::Test
   
-  def test_state_rates_net_metering
+  def test_functionality_net_metering
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>-13.06, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93}
+    expected_values = {}
     _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
   
-  def test_state_rates_feed_in_tariff
+  def test_functionality_feed_in_tariff
     args_hash = {}
     args_hash["pv_compensation_type"] = "Feed-In Tariff"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>97.54, Constants.FuelTypeGas=>489.08, Constants.FuelTypePropane=>329.5}
+    expected_values = {}
     _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
-=begin
-  def test_calculations_no_pv
+
+  def test_calculations_0kW_pv_net_metering
     args_hash = {}
-    args_hash["enduse_timeseries"] = File.expand_path("../SFD_Successful_EnergyPlus_Run_TMY_PV_None.csv", __FILE__)
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure_calculations("SFD_Successful_EnergyPlus_Run_TMY_AllFuels_PV_None.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
   end
 
-  def test_calculations_1kW_pv
+  def test_calculations_1kW_pv_net_metering
     args_hash = {}
-    args_hash["enduse_timeseries"] = File.expand_path("../SFD_Successful_EnergyPlus_Run_TMY_PV_1kW.csv", __FILE__)
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure_calculations("SFD_Successful_EnergyPlus_Run_TMY_AllFuels_PV_1kW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    expected_values = {Constants.FuelTypeElectric=>564, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
   end
   
-  def test_calculations_10kW_pv
+  def test_calculations_10kW_pv_net_metering
     args_hash = {}
-    args_hash["enduse_timeseries"] = File.expand_path("../SFD_Successful_EnergyPlus_Run_TMY_PV_10kW.csv", __FILE__)
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Net Metering"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {}
-    _test_measure_calculations("SFD_Successful_EnergyPlus_Run_TMY_AllFuels_PV_10kW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    expected_values = {Constants.FuelTypeElectric=>-176, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
   end
-=end  
+
+  def test_calculations_0kW_pv_feed_in_tariff
+    args_hash = {}
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_None.csv", __FILE__))
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {Constants.FuelTypeElectric=>724, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+  end
+
+  def test_calculations_1kW_pv_feed_in_tariff
+    args_hash = {}
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_1kW.csv", __FILE__))
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {Constants.FuelTypeElectric=>564, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+  end
+  
+  def test_calculations_10kW_pv_feed_in_tariff
+    args_hash = {}
+    args_hash["elec_fixed"] = "8.0"
+    args_hash["elec_rate"] = Constants.Auto
+    args_hash["gas_fixed"] = "8.0"
+    args_hash["gas_rate"] = Constants.Auto
+    args_hash["oil_rate"] = Constants.Auto
+    args_hash["prop_rate"] = Constants.Auto
+    args_hash["pv_compensation_type"] = "Feed-In Tariff"
+    args_hash["pv_sellback_rate"] = "0.03"
+    args_hash["pv_tariff_rate"] = "0.12"
+    timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {Constants.FuelTypeElectric=>96, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
+    _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+  end
+  
   private
 
   def model_in_path_default(osm_file_or_model)
@@ -213,7 +294,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     return model
   end
   
-  def _test_measure_calculations(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)  
+  def _test_measure_calculations(timeseries, args_hash, weather_file_state, expected_values, num_infos=0, num_warnings=0, debug=false)  
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 
@@ -238,28 +319,45 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
       argument_map[arg.name] = temp_arg_var
     end
 
-    # get the energyplus output requests, this will be done automatically by OS App and PAT
-    idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    assert(idf_output_requests.size == measure.fuel_types.length*measure.end_uses.length)
+    marginal_rates = {Constants.FuelTypeElectric=>args_hash["elec_rate"], Constants.FuelTypeGas=>args_hash["gas_rate"], Constants.FuelTypeOil=>args_hash["oil_rate"], Constants.FuelTypePropane=>args_hash["prop_rate"]}
+    fixed_rates = {Constants.FuelTypeElectric=>args_hash["elec_fixed"].to_f, Constants.FuelTypeGas=>args_hash["gas_fixed"].to_f}
+    if args_hash["pv_compensation_type"] == "Net Metering"
+      pv_rate = args_hash["pv_sellback_rate"]
+    elsif args_hash["pv_compensation_type"] == "Feed-In Tariff"
+      pv_rate = args_hash["pv_tariff_rate"]
+    end
+    measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], pv_rate)
 
-    # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
-    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(File.expand_path("#{File.dirname(__FILE__)}/#{osm_file_or_model}")))
-    
-    # run the measure
-    measure.run(runner, argument_map)
     result = runner.result
-    show_output(result)
-
+    # show_output(result)
+    
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
-    puts result.info.size, result.warnings.size
     assert(result.warnings.size == num_warnings)
 
     result.stepValues.each do |arg|
       next unless expected_values.keys.include? arg.name
       assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
     end 
+  end
+  
+  def get_timeseries(enduse_timeseries)
+    timeseries = {}
+    cols = CSV.read(File.expand_path(enduse_timeseries)).transpose
+    cols.each do |col|
+      next unless col[0].include? "Facility"
+      var_name = col[0].split("  ")[0]
+      old_units = col[0].split("  ")[1].gsub("[", "").gsub("]", "")
+      fuel_type = col[0].split(":")[0]
+      new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, fuel_type)
+      vals = []
+      col[1..8760].each do |val|        
+        vals << unit_conv * val.to_f
+      end
+      timeseries[var_name] = vals
+    end
+    return timeseries
   end
   
 end
