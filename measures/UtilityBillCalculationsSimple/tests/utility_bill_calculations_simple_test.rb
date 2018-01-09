@@ -11,8 +11,8 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash = {}
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>-13.06, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93} # TODO: test against BEopt
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    expected_values = {Constants.FuelTypeElectric=>-13.06, Constants.FuelTypeGas=>489.08, Constants.FuelTypeOil=>319.93}
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
   end
   
   def test_state_rates_feed_in_tariff
@@ -20,10 +20,37 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     args_hash["pv_compensation_type"] = "Feed-In Tariff"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
-    expected_values = {Constants.FuelTypeElectric=>97.54, Constants.FuelTypeGas=>489.08, Constants.FuelTypePropane=>329.5} # TODO: test against BEopt
-    _test_measure("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
-  end  
+    expected_values = {Constants.FuelTypeElectric=>97.54, Constants.FuelTypeGas=>489.08, Constants.FuelTypePropane=>329.5}
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+  end
+=begin
+  def test_calculations_no_pv
+    args_hash = {}
+    args_hash["enduse_timeseries"] = File.expand_path("../SFD_Successful_EnergyPlus_Run_TMY_PV_None.csv", __FILE__)
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure_calculations("SFD_Successful_EnergyPlus_Run_TMY_AllFuels_PV_None.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+  end
 
+  def test_calculations_1kW_pv
+    args_hash = {}
+    args_hash["enduse_timeseries"] = File.expand_path("../SFD_Successful_EnergyPlus_Run_TMY_PV_1kW.csv", __FILE__)
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure_calculations("SFD_Successful_EnergyPlus_Run_TMY_AllFuels_PV_1kW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+  end
+  
+  def test_calculations_10kW_pv
+    args_hash = {}
+    args_hash["enduse_timeseries"] = File.expand_path("../SFD_Successful_EnergyPlus_Run_TMY_PV_10kW.csv", __FILE__)
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    expected_values = {}
+    _test_measure_calculations("SFD_Successful_EnergyPlus_Run_TMY_AllFuels_PV_10kW.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+  end
+=end  
   private
 
   def model_in_path_default(osm_file_or_model)
@@ -32,7 +59,6 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
 
   def epw_path_default(epw_name)
     # make sure we have a weather data location
-    epw = nil
     epw = OpenStudio::Path.new("#{File.dirname(__FILE__)}/#{epw_name}")
     assert(File.exist?(epw.to_s))
     return epw.to_s
@@ -61,7 +87,6 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
   
   # create test files if they do not exist when the test first runs
   def setup_test(osm_file_or_model, test_name, idf_output_requests, epw_path, model_in_path)
-
     if !File.exist?(run_dir(test_name))
       FileUtils.mkdir_p(run_dir(test_name))
     end
@@ -102,7 +127,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     if !File.exist?("#{run_dir(test_name)}")
       FileUtils.mkdir_p("#{run_dir(test_name)}")
     end
-    if !File.exist?("#{run_dir(test_name)}/UtilityBillCalculations/resources")
+    if !File.exist?("#{resources_dir(test_name)}")
       FileUtils.mkdir_p("#{resources_dir(test_name)}")
     end
     FileUtils.cp("#{File.dirname(__FILE__)}/../resources/Natural gas.csv", "#{resources_dir(test_name)}")
@@ -114,67 +139,11 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     system(cmd)
     
     FileUtils.cp(epw_path, "#{tests_dir(test_name)}")    
-    
-    return model
-    
+
+    return model    
   end
-
-  def _test_error_or_NA(osm_file_or_model, args_hash, test_name, epw_name)
-    # create an instance of the measure
-    measure = UtilityBillCalculationsSimple.new
-
-    # create an instance of a runner
-    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
-
-    model = get_model(File.dirname(__FILE__), osm_file_or_model)
-
-    # get arguments
-    arguments = measure.arguments()
-    argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
-
-    # populate argument with specified hash value if specified
-    arguments.each do |arg|
-      temp_arg_var = arg.clone
-      if args_hash[arg.name]
-        assert(temp_arg_var.setValue(args_hash[arg.name]))
-      end
-      argument_map[arg.name] = temp_arg_var
-    end
-
-    # get the energyplus output requests, this will be done automatically by OS App and PAT
-    idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
-    assert(idf_output_requests.size == measure.fuel_types.length*measure.end_uses.length)
-
-    # mimic the process of running this measure in OS App or PAT. Optionally set custom model_in_path and custom epw_path.
-    setup_test(osm_file_or_model, test_name, idf_output_requests, File.expand_path(epw_path_default(epw_name)), model_in_path_default(osm_file_or_model))
-
-    assert(File.exist?(model_out_path(osm_file_or_model, test_name)))
-
-    # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
-    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(model_out_path(osm_file_or_model, test_name)))
-    runner.setLastEpwFilePath(File.expand_path(epw_path_default(epw_name)))
-    runner.setLastEnergyPlusSqlFilePath(OpenStudio::Path.new(sql_path(test_name)))
-
-    # temporarily change directory to the run directory and run the measure
-    start_dir = Dir.pwd
-    begin
-      Dir.chdir(run_dir(test_name))
-
-      # run the measure
-      measure.run(runner, argument_map)
-      result = runner.result
-      # show_output(result)
-    ensure
-      Dir.chdir(start_dir)
-    end
-      
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/output")
-      
-    return result
-    
-  end  
   
-  def _test_measure(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)
+  def _test_measure_functionality(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)
     # create an instance of the measure
     measure = UtilityBillCalculationsSimple.new
 
@@ -242,6 +211,55 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     end
     
     return model
-  end  
+  end
+  
+  def _test_measure_calculations(osm_file_or_model, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, test_name, epw_name, num_infos=0, num_warnings=0, debug=false)  
+    # create an instance of the measure
+    measure = UtilityBillCalculationsSimple.new
+
+    # check for standard methods
+    assert(!measure.name.empty?)
+    assert(!measure.description.empty?)
+    assert(!measure.modeler_description.empty?)
+
+    # create an instance of a runner
+    runner = OpenStudio::Measure::OSRunner.new(OpenStudio::WorkflowJSON.new)
+    
+    # get arguments
+    arguments = measure.arguments()
+    argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
+
+    # populate argument with specified hash value if specified
+    arguments.each do |arg|
+      temp_arg_var = arg.clone
+      if args_hash[arg.name]
+        assert(temp_arg_var.setValue(args_hash[arg.name]))
+      end
+      argument_map[arg.name] = temp_arg_var
+    end
+
+    # get the energyplus output requests, this will be done automatically by OS App and PAT
+    idf_output_requests = measure.energyPlusOutputRequests(runner, argument_map)
+    assert(idf_output_requests.size == measure.fuel_types.length*measure.end_uses.length)
+
+    # set up runner, this will happen automatically when measure is run in PAT or OpenStudio
+    runner.setLastOpenStudioModelPath(OpenStudio::Path.new(File.expand_path("#{File.dirname(__FILE__)}/#{osm_file_or_model}")))
+    
+    # run the measure
+    measure.run(runner, argument_map)
+    result = runner.result
+    show_output(result)
+
+    # assert that it ran correctly
+    assert_equal("Success", result.value.valueName)
+    assert(result.info.size == num_infos)
+    puts result.info.size, result.warnings.size
+    assert(result.warnings.size == num_warnings)
+
+    result.stepValues.each do |arg|
+      next unless expected_values.keys.include? arg.name
+      assert_in_epsilon(expected_values[arg.name], arg.valueAsVariant.to_f, 0.05)
+    end 
+  end
   
 end

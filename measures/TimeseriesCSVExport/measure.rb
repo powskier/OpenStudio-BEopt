@@ -225,10 +225,10 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     end_uses.each do |end_use|
       fuel_types.each do |fuel_type|
         variable_name = if end_use == "Facility"
-            "#{fuel_type}:#{end_use}"
-          else
-            "#{end_use}:#{fuel_type}"
-          end
+          "#{fuel_type}:#{end_use}"
+        else
+          "#{end_use}:#{fuel_type}"
+        end
         variables_to_graph << [variable_name, reporting_frequency, ""]
         runner.registerInfo("Exporting #{variable_name}")
       end
@@ -254,7 +254,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
     date_times = []
     cols = []
     variables_to_graph.each_with_index do |var_to_graph, j|
-    
+
       var_name = var_to_graph[0]
       freq = var_to_graph[1]
       kv = var_to_graph[2]
@@ -335,7 +335,7 @@ class TimeseriesCSVExport < OpenStudio::Measure::ReportingMeasure
       rows.each do |row|
         csv << row
       end
-    end    
+    end
     csv_path = File.absolute_path(csv_path)
     runner.registerFinalCondition("CSV file saved to <a href='file:///#{csv_path}'>enduse_timeseries.csv</a>.")
 

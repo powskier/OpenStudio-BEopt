@@ -335,8 +335,8 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       else    
         cols = CSV.read("#{File.dirname(__FILE__)}/resources/#{file}.csv", {:encoding=>'ISO-8859-1'})[3..-1].transpose
         cols[0].each_with_index do |rate_state, i|
-          if state_name_to_code.keys.include? weather_file_state
-            weather_file_state = state_name_to_code[weather_file_state]
+          unless HelperMethods.state_code_map(weather_file_state).nil?
+            weather_file_state = HelperMethods.state_code_map(weather_file_state)
           end
           rate = marginal_rates[fuel]
           if rate == Constants.Auto
@@ -358,16 +358,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     return true
  
   end
-  
-  def state_name_to_code
-    return {"Alabama"=>"AL", "Alaska"=>"AK", "Arizona"=>"AZ", "Arkansas"=>"AR","California"=>"CA","Colorado"=>"CO", "Connecticut"=>"CT", "Delaware"=>"DE", "District of Columbia"=>"DC",
-            "Florida"=>"FL", "Georgia"=>"GA", "Hawaii"=>"HI", "Idaho"=>"ID", "Illinois"=>"IL","Indiana"=>"IN", "Iowa"=>"IA","Kansas"=>"KS", "Kentucky"=>"KY", "Louisiana"=>"LA",
-            "Maine"=>"ME","Maryland"=>"MD", "Massachusetts"=>"MA", "Michigan"=>"MI", "Minnesota"=>"MN","Mississippi"=>"MS", "Missouri"=>"MO", "Montana"=>"MT","Nebraska"=>"NE", "Nevada"=>"NV",
-            "New Hampshire"=>"NH", "New Jersey"=>"NJ", "New Mexico"=>"NM", "New York"=>"NY","North Carolina"=>"NC", "North Dakota"=>"ND", "Ohio"=>"OH", "Oklahoma"=>"OK",
-            "Oregon"=>"OR", "Pennsylvania"=>"PA", "Puerto Rico"=>"PR", "Rhode Island"=>"RI","South Carolina"=>"SC", "South Dakota"=>"SD", "Tennessee"=>"TN", "Texas"=>"TX",
-            "Utah"=>"UT", "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA", "West Virginia"=>"WV","Wisconsin"=>"WI", "Wyoming"=>"WY"}
-  end
-  
+
   def report_output(runner, fuel, vals, from, to, rate, pv_compensation_type, pv_rate, produced=nil, fixed=0, tariff=nil)
     total_val = 0.0
     vals.each do |val|

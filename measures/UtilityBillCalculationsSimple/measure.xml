@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations_simple</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>800c15f2-4261-4f3d-8291-12f67e756d24</version_id>
-  <version_modified>20171220T195907Z</version_modified>
+  <version_id>1bc9e3cb-2b17-4b48-9323-61ec41d33079</version_id>
+  <version_modified>20180108T235647Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
   <class_name>UtilityBillCalculationsSimple</class_name>
   <display_name>Calculate Simple Utility Bills</display_name>
@@ -108,6 +108,15 @@
       <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>0.12</default_value>
+    </argument>
+    <argument>
+      <name>enduse_timeseries</name>
+      <display_name>Output: File Path</display_name>
+      <description>Absolute (or relative) directory to timeseries output.</description>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value></default_value>
     </argument>
   </arguments>
   <outputs>
@@ -222,13 +231,13 @@
       <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
-      <checksum>752F343A</checksum>
+      <checksum>3A877070</checksum>
     </file>
     <file>
       <filename>utility_bill_calculations_simple_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>4319DBD3</checksum>
+      <checksum>57CDA038</checksum>
     </file>
     <file>
       <version>
@@ -239,7 +248,25 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>7580F8FB</checksum>
+      <checksum>34EB0D54</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_Appl.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>6C175AFA</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_Appl_timeseries.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>test</usage_type>
+      <checksum>2393B5FA</checksum>
+    </file>
+    <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>4D27E1EF</checksum>
     </file>
   </files>
 </measure>
