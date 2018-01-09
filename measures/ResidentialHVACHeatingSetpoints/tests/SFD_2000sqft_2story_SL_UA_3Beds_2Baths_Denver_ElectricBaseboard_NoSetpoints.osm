@@ -1,8 +1,8 @@
 !- NOTE: Auto-generated from /test/osw_files/SFD_2000sqft_2story_SL_UA_3Beds_2Baths_Denver_ElectricBaseboard_NoSetpoints.osw
 
 OS:Version,
-  {d8d552f4-1aa9-4dfb-ab6a-31cdd8d3ef3e}, !- Handle
-  2.3.1;                                  !- Version Identifier
+  {2a24ef1a-aab8-4e69-be64-f8df8ad6a770}, !- Handle
+  2.4.0;                                  !- Version Identifier
 
 OS:Building,
   {bf305633-c5a1-4881-9edf-ca5e1a8e1274}, !- Handle
@@ -77,7 +77,7 @@ OS:ZoneCapacitanceMultiplier:ResearchSpecial,
   ;                                       !- Carbon Dioxide Capacity Multiplier
 
 OS:ThermalZone,
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}, !- Handle
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}, !- Handle
   living zone,                            !- Name
   ,                                       !- Multiplier
   ,                                       !- Ceiling Height {m}
@@ -86,9 +86,9 @@ OS:ThermalZone,
   ,                                       !- Zone Inside Convection Algorithm
   ,                                       !- Zone Outside Convection Algorithm
   ,                                       !- Zone Conditioning Equipment List Name
-  {8030f951-f834-4440-90bc-b968b2a603e7}, !- Zone Air Inlet Port List
-  {948bbe36-184f-4dbd-9cc2-e7e58cdccfed}, !- Zone Air Exhaust Port List
-  {545f2523-ea01-4a33-839b-c7e18e79898a}, !- Zone Air Node Name
+  {f6fd0cd8-e85f-496e-8cdd-231d2c4f6112}, !- Zone Air Inlet Port List
+  {4125e922-cbe6-4883-ab49-68cb9e2f1124}, !- Zone Air Exhaust Port List
+  {19a9fcd7-c445-48b9-998c-d7fec0e915eb}, !- Zone Air Node Name
   ,                                       !- Zone Return Air Node Name
   ,                                       !- Primary Daylighting Control Name
   ,                                       !- Fraction of Zone Controlled by Primary Daylighting Control
@@ -100,32 +100,32 @@ OS:ThermalZone,
   No;                                     !- Use Ideal Air Loads
 
 OS:Node,
-  {e9183369-b2bd-44c9-9d9e-59da08d15aee}, !- Handle
+  {a2d45493-37c0-4c3b-8f0a-3dc9eb57d947}, !- Handle
   Node 1,                                 !- Name
-  {545f2523-ea01-4a33-839b-c7e18e79898a}, !- Inlet Port
+  {19a9fcd7-c445-48b9-998c-d7fec0e915eb}, !- Inlet Port
   ;                                       !- Outlet Port
 
 OS:Connection,
-  {545f2523-ea01-4a33-839b-c7e18e79898a}, !- Handle
-  {fcecc8b9-c070-4c75-8bad-7e9fbe2a6c88}, !- Name
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}, !- Source Object
+  {19a9fcd7-c445-48b9-998c-d7fec0e915eb}, !- Handle
+  {42ba98cd-4ef9-4fb5-84e9-615c000b4932}, !- Name
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}, !- Source Object
   11,                                     !- Outlet Port
-  {e9183369-b2bd-44c9-9d9e-59da08d15aee}, !- Target Object
+  {a2d45493-37c0-4c3b-8f0a-3dc9eb57d947}, !- Target Object
   2;                                      !- Inlet Port
 
 OS:PortList,
-  {8030f951-f834-4440-90bc-b968b2a603e7}, !- Handle
-  {353c24aa-612a-49cc-9b6d-606f654d1e2d}, !- Name
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}; !- HVAC Component
+  {f6fd0cd8-e85f-496e-8cdd-231d2c4f6112}, !- Handle
+  {1d68325c-4d3b-4c17-b925-cb2b4662bc3b}, !- Name
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}; !- HVAC Component
 
 OS:PortList,
-  {948bbe36-184f-4dbd-9cc2-e7e58cdccfed}, !- Handle
-  {78f461c1-bf0f-44ee-9f5e-e8f2f1ec8909}, !- Name
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}; !- HVAC Component
+  {4125e922-cbe6-4883-ab49-68cb9e2f1124}, !- Handle
+  {d7ceaaaa-094f-4f83-a48d-87eb0651783d}, !- Name
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}; !- HVAC Component
 
 OS:Sizing:Zone,
-  {00f8ca7f-5294-4dc0-8d2e-21696985600d}, !- Handle
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}, !- Zone or ZoneList Name
+  {dc18143b-c970-4f28-b857-6e67e69f1271}, !- Handle
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}, !- Zone or ZoneList Name
   SupplyAirTemperature,                   !- Zone Cooling Design Supply Air Temperature Input Method
   14,                                     !- Zone Cooling Design Supply Air Temperature {C}
   11.11,                                  !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
@@ -154,15 +154,15 @@ OS:Sizing:Zone,
   autosize;                               !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
 OS:ZoneHVAC:EquipmentList,
-  {c08e0d0f-23e7-4dc0-a9d9-784e53d1b27c}, !- Handle
+  {f2c18e62-1d82-419a-8eeb-882f2a6d6a50}, !- Handle
   Zone HVAC Equipment List 1,             !- Name
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}, !- Thermal Zone
-  {b16fbc93-7a3d-4e03-a941-c474a91859f5}, !- Zone Equipment 1
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}, !- Thermal Zone
+  {751fbe74-02bf-4df7-89c9-b7566a7b6a1a}, !- Zone Equipment 1
   1,                                      !- Zone Equipment Cooling Sequence 1
   1;                                      !- Zone Equipment Heating or No-Load Sequence 1
 
 OS:Space,
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Handle
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Handle
   living space,                           !- Name
   ,                                       !- Space Type Name
   ,                                       !- Default Construction Set Name
@@ -172,17 +172,17 @@ OS:Space,
   0,                                      !- Y Origin {m}
   0,                                      !- Z Origin {m}
   ,                                       !- Building Story Name
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}, !- Thermal Zone Name
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}, !- Thermal Zone Name
   ,                                       !- Part of Total Floor Area
   ,                                       !- Design Specification Outdoor Air Object Name
-  {a2cec7e1-cde7-423a-9ff6-0b4cc8138427}; !- Building Unit Name
+  {1a0d6edd-b925-4878-96ff-d95bacdf25b3}; !- Building Unit Name
 
 OS:Surface,
-  {6b7180b4-0c15-4f02-af70-92e8008c00d6}, !- Handle
+  {e3605cd4-22d0-4402-a958-69da172419a7}, !- Handle
   Surface 1,                              !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Space Name
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Space Name
   Ground,                                 !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
@@ -195,11 +195,11 @@ OS:Surface,
   13.6310703908387, 0, 0;                 !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {c6ebf839-6aec-40b7-aeef-72e214b83b10}, !- Handle
+  {a56c49e1-dca7-492d-b875-177fc2b21eed}, !- Handle
   Surface 2,                              !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Space Name
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -212,11 +212,11 @@ OS:Surface,
   0, 0, 2.4384;                           !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {dcc30efe-7296-4e79-a106-4e0fa09519e7}, !- Handle
+  {9845d0c3-ba83-47d2-9a9f-c9d85438a850}, !- Handle
   Surface 3,                              !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Space Name
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -229,11 +229,11 @@ OS:Surface,
   0, 6.81553519541936, 2.4384;            !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {bb4b5a5c-13cc-4333-b505-fe85c34ed194}, !- Handle
+  {90a1014e-67f7-4b66-8b72-ebcf92fcc9fb}, !- Handle
   Surface 4,                              !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Space Name
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -246,11 +246,11 @@ OS:Surface,
   13.6310703908387, 6.81553519541936, 2.4384; !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {b6c754b3-d0d4-449c-80c5-fcd7c49a4c0c}, !- Handle
+  {4bc503fc-78f9-492a-90b6-c6efa0b23304}, !- Handle
   Surface 5,                              !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Space Name
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -263,13 +263,13 @@ OS:Surface,
   13.6310703908387, 0, 2.4384;            !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {52f28cb2-0814-4c28-9ce8-9c31a97e80c2}, !- Handle
+  {50205d36-1658-44bf-a2cd-5266a2b0e7bb}, !- Handle
   Surface 6,                              !- Name
   RoofCeiling,                            !- Surface Type
   ,                                       !- Construction Name
-  {5f43e87f-2d7e-4dcc-9079-dffdbfbbff76}, !- Space Name
+  {3b8f448f-2aa8-4334-9e3d-b329c872199f}, !- Space Name
   Surface,                                !- Outside Boundary Condition
-  {b1df54e1-5672-4249-a986-9b87598d876a}, !- Outside Boundary Condition Object
+  {c3fd319f-c2c0-41da-92b1-94810079c9e6}, !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
   NoWind,                                 !- Wind Exposure
   ,                                       !- View Factor to Ground
@@ -280,7 +280,7 @@ OS:Surface,
   0, 0, 2.4384;                           !- X,Y,Z Vertex 4 {m}
 
 OS:Space,
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Handle
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Handle
   living space|story 2,                   !- Name
   ,                                       !- Space Type Name
   ,                                       !- Default Construction Set Name
@@ -290,19 +290,19 @@ OS:Space,
   0,                                      !- Y Origin {m}
   2.4384,                                 !- Z Origin {m}
   ,                                       !- Building Story Name
-  {f9472fa1-7665-46e9-9a61-a4570981eb50}, !- Thermal Zone Name
+  {63f3e455-462a-4d0b-9f0b-995590b44fc3}, !- Thermal Zone Name
   ,                                       !- Part of Total Floor Area
   ,                                       !- Design Specification Outdoor Air Object Name
-  {a2cec7e1-cde7-423a-9ff6-0b4cc8138427}; !- Building Unit Name
+  {1a0d6edd-b925-4878-96ff-d95bacdf25b3}; !- Building Unit Name
 
 OS:Surface,
-  {b1df54e1-5672-4249-a986-9b87598d876a}, !- Handle
+  {c3fd319f-c2c0-41da-92b1-94810079c9e6}, !- Handle
   Surface 7,                              !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Space Name
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Space Name
   Surface,                                !- Outside Boundary Condition
-  {52f28cb2-0814-4c28-9ce8-9c31a97e80c2}, !- Outside Boundary Condition Object
+  {50205d36-1658-44bf-a2cd-5266a2b0e7bb}, !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
   NoWind,                                 !- Wind Exposure
   ,                                       !- View Factor to Ground
@@ -313,11 +313,11 @@ OS:Surface,
   13.6310703908387, 0, 0;                 !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {ff2ff8fe-f089-4db2-97b6-75e7de830c66}, !- Handle
+  {8b187094-dc6f-4d5e-9c8e-af794298d6bd}, !- Handle
   Surface 8,                              !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Space Name
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -330,11 +330,11 @@ OS:Surface,
   0, 0, 2.4384;                           !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {8554a72a-30c1-49f3-be8e-c1aa781f59ce}, !- Handle
+  {1c909708-8a37-41be-818f-4d4ba173ac76}, !- Handle
   Surface 9,                              !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Space Name
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -347,11 +347,11 @@ OS:Surface,
   0, 6.81553519541936, 2.4384;            !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {1824410b-b884-492c-ac15-5723cca72451}, !- Handle
+  {4148aa10-ad4c-4014-b242-0527cbd5a6ab}, !- Handle
   Surface 10,                             !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Space Name
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -364,11 +364,11 @@ OS:Surface,
   13.6310703908387, 6.81553519541936, 2.4384; !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {b9703a18-cc00-4663-9a0a-f08ded8ac736}, !- Handle
+  {7d4448d6-5114-4ecf-885a-7dc16ae7d3da}, !- Handle
   Surface 11,                             !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Space Name
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -381,13 +381,13 @@ OS:Surface,
   13.6310703908387, 0, 2.4384;            !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {20f8e8c9-52e5-46df-8e6b-2d4efe5efdcb}, !- Handle
+  {d0a49376-447b-4f38-a7bf-c0cc285a418d}, !- Handle
   Surface 12,                             !- Name
   RoofCeiling,                            !- Surface Type
   ,                                       !- Construction Name
-  {c79b6aa9-3a7e-478d-9387-0174e082b076}, !- Space Name
+  {336e4982-bcb9-4f05-be06-bdd5533c1df7}, !- Space Name
   Surface,                                !- Outside Boundary Condition
-  {5f122562-592a-43ad-8cc8-86cfc74af61e}, !- Outside Boundary Condition Object
+  {f3db6da6-31dd-4f73-95ed-b09570ebcd7b}, !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
   NoWind,                                 !- Wind Exposure
   ,                                       !- View Factor to Ground
@@ -398,13 +398,13 @@ OS:Surface,
   0, 0, 2.4384;                           !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {5f122562-592a-43ad-8cc8-86cfc74af61e}, !- Handle
+  {f3db6da6-31dd-4f73-95ed-b09570ebcd7b}, !- Handle
   Surface 13,                             !- Name
   Floor,                                  !- Surface Type
   ,                                       !- Construction Name
-  {40ddc3d6-1e96-4974-ac5a-977c24d3fa58}, !- Space Name
+  {85172c72-eaed-415c-b640-414abe031036}, !- Space Name
   Surface,                                !- Outside Boundary Condition
-  {20f8e8c9-52e5-46df-8e6b-2d4efe5efdcb}, !- Outside Boundary Condition Object
+  {d0a49376-447b-4f38-a7bf-c0cc285a418d}, !- Outside Boundary Condition Object
   NoSun,                                  !- Sun Exposure
   NoWind,                                 !- Wind Exposure
   ,                                       !- View Factor to Ground
@@ -415,11 +415,11 @@ OS:Surface,
   0, 0, 0;                                !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {6b9cbf30-c651-44a7-aceb-e1cfb014dc0f}, !- Handle
+  {6b1ee40d-45c4-4798-9c73-1dbce4f182a8}, !- Handle
   Surface 14,                             !- Name
   RoofCeiling,                            !- Surface Type
   ,                                       !- Construction Name
-  {40ddc3d6-1e96-4974-ac5a-977c24d3fa58}, !- Space Name
+  {85172c72-eaed-415c-b640-414abe031036}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -432,11 +432,11 @@ OS:Surface,
   13.6310703908387, 0, 0;                 !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {ddd0e7b0-cd0f-43b6-ab10-8dee79fe6a91}, !- Handle
+  {f6b212ce-309b-4fe4-9d05-0b2e85c1250f}, !- Handle
   Surface 15,                             !- Name
   RoofCeiling,                            !- Surface Type
   ,                                       !- Construction Name
-  {40ddc3d6-1e96-4974-ac5a-977c24d3fa58}, !- Space Name
+  {85172c72-eaed-415c-b640-414abe031036}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -449,11 +449,11 @@ OS:Surface,
   0, 6.81553519541936, 0;                 !- X,Y,Z Vertex 4 {m}
 
 OS:Surface,
-  {64d98d1c-ed7b-4363-a8a3-f0713dffa903}, !- Handle
+  {04693f09-feb4-4a76-9307-d18a640812ca}, !- Handle
   Surface 16,                             !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {40ddc3d6-1e96-4974-ac5a-977c24d3fa58}, !- Space Name
+  {85172c72-eaed-415c-b640-414abe031036}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -465,11 +465,11 @@ OS:Surface,
   0, 0, 0;                                !- X,Y,Z Vertex 3 {m}
 
 OS:Surface,
-  {7baf3637-b746-4bb9-b94b-4de592658557}, !- Handle
+  {ac3115c7-4d9f-421f-8f57-cd14ece8214f}, !- Handle
   Surface 17,                             !- Name
   Wall,                                   !- Surface Type
   ,                                       !- Construction Name
-  {40ddc3d6-1e96-4974-ac5a-977c24d3fa58}, !- Space Name
+  {85172c72-eaed-415c-b640-414abe031036}, !- Space Name
   Outdoors,                               !- Outside Boundary Condition
   ,                                       !- Outside Boundary Condition Object
   SunExposed,                             !- Sun Exposure
@@ -481,7 +481,7 @@ OS:Surface,
   13.6310703908387, 6.81553519541936, 0;  !- X,Y,Z Vertex 3 {m}
 
 OS:Space,
-  {40ddc3d6-1e96-4974-ac5a-977c24d3fa58}, !- Handle
+  {85172c72-eaed-415c-b640-414abe031036}, !- Handle
   unfinished attic space,                 !- Name
   ,                                       !- Space Type Name
   ,                                       !- Default Construction Set Name
@@ -491,13 +491,13 @@ OS:Space,
   0,                                      !- Y Origin {m}
   4.8768,                                 !- Z Origin {m}
   ,                                       !- Building Story Name
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}, !- Thermal Zone Name
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}, !- Thermal Zone Name
   ,                                       !- Part of Total Floor Area
   ,                                       !- Design Specification Outdoor Air Object Name
-  {a2cec7e1-cde7-423a-9ff6-0b4cc8138427}; !- Building Unit Name
+  {1a0d6edd-b925-4878-96ff-d95bacdf25b3}; !- Building Unit Name
 
 OS:ThermalZone,
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}, !- Handle
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}, !- Handle
   unfinished attic zone,                  !- Name
   ,                                       !- Multiplier
   ,                                       !- Ceiling Height {m}
@@ -506,9 +506,9 @@ OS:ThermalZone,
   ,                                       !- Zone Inside Convection Algorithm
   ,                                       !- Zone Outside Convection Algorithm
   ,                                       !- Zone Conditioning Equipment List Name
-  {4a90c63d-c0c4-4e30-a9f7-0d735710e842}, !- Zone Air Inlet Port List
-  {4b973785-b425-4154-995e-d64f5928a4cf}, !- Zone Air Exhaust Port List
-  {f0a89efd-8ddb-486f-868a-861c315dbde1}, !- Zone Air Node Name
+  {1327057f-bb61-47be-ad97-ad241b8454a8}, !- Zone Air Inlet Port List
+  {d8e39836-e850-4465-9bd5-a0ed81516c7d}, !- Zone Air Exhaust Port List
+  {27d3451e-bd4a-43ff-bec1-3509d7498009}, !- Zone Air Node Name
   ,                                       !- Zone Return Air Node Name
   ,                                       !- Primary Daylighting Control Name
   ,                                       !- Fraction of Zone Controlled by Primary Daylighting Control
@@ -520,32 +520,32 @@ OS:ThermalZone,
   No;                                     !- Use Ideal Air Loads
 
 OS:Node,
-  {01b636df-a947-4b60-8f79-579e031cd75f}, !- Handle
+  {458cedb8-2132-4ad2-883d-a5b280dc0bfb}, !- Handle
   Node 2,                                 !- Name
-  {f0a89efd-8ddb-486f-868a-861c315dbde1}, !- Inlet Port
+  {27d3451e-bd4a-43ff-bec1-3509d7498009}, !- Inlet Port
   ;                                       !- Outlet Port
 
 OS:Connection,
-  {f0a89efd-8ddb-486f-868a-861c315dbde1}, !- Handle
-  {c09a469a-1612-4fd7-8c9b-e0fac7dc77a2}, !- Name
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}, !- Source Object
+  {27d3451e-bd4a-43ff-bec1-3509d7498009}, !- Handle
+  {6f59cd05-a5fb-4735-b437-cef3f65fd313}, !- Name
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}, !- Source Object
   11,                                     !- Outlet Port
-  {01b636df-a947-4b60-8f79-579e031cd75f}, !- Target Object
+  {458cedb8-2132-4ad2-883d-a5b280dc0bfb}, !- Target Object
   2;                                      !- Inlet Port
 
 OS:PortList,
-  {4a90c63d-c0c4-4e30-a9f7-0d735710e842}, !- Handle
-  {ca5197aa-32b4-4970-bddf-9118f32d3ae3}, !- Name
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}; !- HVAC Component
+  {1327057f-bb61-47be-ad97-ad241b8454a8}, !- Handle
+  {74e6a040-524e-495c-92ae-2f79db0e7e1d}, !- Name
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}; !- HVAC Component
 
 OS:PortList,
-  {4b973785-b425-4154-995e-d64f5928a4cf}, !- Handle
-  {51cda6a4-68aa-483b-aa9d-0b5140aed6a1}, !- Name
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}; !- HVAC Component
+  {d8e39836-e850-4465-9bd5-a0ed81516c7d}, !- Handle
+  {7e26bee5-e87f-4dfd-a559-294f7b64b462}, !- Name
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}; !- HVAC Component
 
 OS:Sizing:Zone,
-  {2d6ea40d-dbf3-44ae-99f9-03adac44b200}, !- Handle
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}, !- Zone or ZoneList Name
+  {08b2449c-7c19-4fec-af06-328d60729f1e}, !- Handle
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}, !- Zone or ZoneList Name
   SupplyAirTemperature,                   !- Zone Cooling Design Supply Air Temperature Input Method
   14,                                     !- Zone Cooling Design Supply Air Temperature {C}
   11.11,                                  !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
@@ -574,12 +574,12 @@ OS:Sizing:Zone,
   autosize;                               !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
 OS:ZoneHVAC:EquipmentList,
-  {6d1d0abb-0d8a-4d4c-9983-8e230695dddf}, !- Handle
+  {b08fb611-d1e2-4609-93dd-0406d4f1ea10}, !- Handle
   Zone HVAC Equipment List 2,             !- Name
-  {0df98ce8-5222-4b31-856c-c93ef1cab8af}; !- Thermal Zone
+  {88b5e554-cd26-40fe-9ebf-0fccfd2372cd}; !- Thermal Zone
 
 OS:BuildingUnit,
-  {a2cec7e1-cde7-423a-9ff6-0b4cc8138427}, !- Handle
+  {1a0d6edd-b925-4878-96ff-d95bacdf25b3}, !- Handle
   unit 1,                                 !- Name
   ,                                       !- Rendering Color
   Residential,                            !- Building Unit Type
@@ -591,7 +591,7 @@ OS:BuildingUnit,
   2;                                      !- Building Unit Feature Value 2
 
 OS:Site,
-  {88fa83b7-b2e4-4f5c-97b2-9e9d1eaae876}, !- Handle
+  {07315133-3612-4c5b-b1da-e73347b00e15}, !- Handle
   Denver Intl Ap_CO_USA,                  !- Name
   39.83,                                  !- Latitude {deg}
   -104.65,                                !- Longitude {deg}
@@ -600,7 +600,7 @@ OS:Site,
   ;                                       !- Terrain
 
 OS:WeatherFile,
-  {015aea03-b7d0-42aa-8029-c945fba79780}, !- Handle
+  {ecd91a04-70a2-4b79-8a42-35fec0502bd2}, !- Handle
   Denver Intl Ap,                         !- City
   CO,                                     !- State Province Region
   USA,                                    !- Country
@@ -614,7 +614,7 @@ OS:WeatherFile,
   E23378AA;                               !- Checksum
 
 OS:BuildingUnit,
-  {60d9a2ca-e807-4776-9087-cd1a02ce6654}, !- Handle
+  {c4ecc2ac-8363-4634-86a5-fce6a7ddb05c}, !- Handle
   EPWWeatherInfo,                         !- Name
   ,                                       !- Rendering Color
   Residential,                            !- Building Unit Type
@@ -650,79 +650,79 @@ OS:BuildingUnit,
   0.81937567683596546,                    !- Building Unit Feature Value 10
   EPWDataAnnualAvgDrybulb,                !- Building Unit Feature Name 11
   Double,                                 !- Building Unit Feature Data Type 11
-  51.575616438356192,                     !- Building Unit Feature Value 11
+  51.575616438356228,                     !- Building Unit Feature Value 11
   EPWDataAnnualMinDrybulb,                !- Building Unit Feature Name 12
   Double,                                 !- Building Unit Feature Data Type 12
-  -2.9200000000000728,                    !- Building Unit Feature Value 12
+  -2.9200000000000017,                    !- Building Unit Feature Value 12
   EPWDataAnnualMaxDrybulb,                !- Building Unit Feature Name 13
   Double,                                 !- Building Unit Feature Data Type 13
-  103.99999999999993,                     !- Building Unit Feature Value 13
+  104,                                    !- Building Unit Feature Value 13
   EPWDataCDD50F,                          !- Building Unit Feature Name 14
   Double,                                 !- Building Unit Feature Data Type 14
-  3072.2924999999827,                     !- Building Unit Feature Value 14
+  3072.2925000000005,                     !- Building Unit Feature Value 14
   EPWDataCDD65F,                          !- Building Unit Feature Name 15
   Double,                                 !- Building Unit Feature Data Type 15
-  883.61999999999205,                     !- Building Unit Feature Value 15
+  883.62000000000035,                     !- Building Unit Feature Value 15
   EPWDataHDD50F,                          !- Building Unit Feature Name 16
   Double,                                 !- Building Unit Feature Data Type 16
-  2497.1925000000201,                     !- Building Unit Feature Value 16
+  2497.1925000000001,                     !- Building Unit Feature Value 16
   EPWDataHDD65F,                          !- Building Unit Feature Name 17
   Double,                                 !- Building Unit Feature Data Type 17
-  5783.5200000000132,                     !- Building Unit Feature Value 17
+  5783.5200000000013,                     !- Building Unit Feature Value 17
   EPWDataAnnualAvgWindspeed,              !- Building Unit Feature Name 18
   Double,                                 !- Building Unit Feature Data Type 18
   3.9165296803649667,                     !- Building Unit Feature Value 18
   EPWDataMonthlyAvgDrybulbs,              !- Building Unit Feature Name 19
   String,                                 !- Building Unit Feature Data Type 19
-  33.41919354838707&#4431.90142857142851&#4443.02620967741929&#4442.4862499999999&#4459.877741935483826&#4473.5757499999999&#4472.07975806451604&#4472.70008064516125&#4466.49199999999995&#4450.07911290322577&#4437.21824999999998&#4434.58217741935478, !- Building Unit Feature Value 19
+  33.4191935483871&#4431.90142857142857&#4443.02620967741937&#4442.48624999999999&#4459.877741935483854&#4473.57574999999997&#4472.07975806451608&#4472.70008064516134&#4466.49200000000006&#4450.079112903225806&#4437.218250000000005&#4434.582177419354835, !- Building Unit Feature Value 19
   EPWDataMainsDailyTemps,                 !- Building Unit Feature Name 20
   String,                                 !- Building Unit Feature Data Type 20
-  50.07624256468849&#4449.96578526971447&#4449.85758155416446&#4449.751663461543956&#4449.64806235849289&#4449.546808925496684&#4449.44793314780048&#4449.351464306529344&#4449.25743097001691&#4449.16586098534516&#4449.07678147009774&#4448.99021880432938&#4448.906198622753664&#4448.82474580715156&#4448.74588447900294&#4448.66963799234318&#4448.59602892684717&#4448.52507908114243&#4448.45680946635379&#4448.391240299881034&#4448.32839099941178&#4448.2682801771711&#4448.21092563440964&#4448.15634435613202&#4448.10455250606682&#4448.0555654218799&#4448.00939761063225&#4447.96606274448391&#4447.92557365664502&#4447.887942337575474&#4447.85317993143398&#4447.82129673277785&#4447.79230218351441&#4447.76620487010479&#4447.743012521021164&#4447.72273200445806&#4447.70536932629837&#4447.69092962833478&#4447.679417186747074&#4447.67083541083578&#4447.66518684201257&#4447.662473153047586&#4447.66269514757412&#4447.66585275985059&#4447.671945054780025&#4447.680970228187&#4447.69292560735188&#4447.707807651802355&#4447.72561195436194&#4447.74633324245504&#4447.769965379668456&#4447.796501367568595&#4447.82593334777396&#4447.85825260428239&#4447.89344956605218&#4447.931513809836474&#4447.972434063269986&#4448.01619820820726&#4448.062793284311255&#4448.11220549289154&#4448.16442020099054&#4448.219421945717&#4448.27719443882517&#4448.33772057153841&#4448.400982419615794&#4448.4669612486602&#4448.53563751966631&#4448.606990894806955&#4448.6810002434559&#4448.75764364844552&#4448.83689841255736&#4448.918741065243694&#4449.0031473695781&#4449.090092329433006&#4449.17955019688205&#4449.27149447982508&#4449.36589794983356&#4449.462732650213994&#4449.561969904287025&#4449.6635803238798&#4449.76753381802895&#4449.87379960189179&#4449.98234620586291&#4450.09314148489366&#4450.20615262801154&#4450.32134616803691&#4450.43868799149395&#4450.55814334871304&#4450.67967686412157&#4450.803252546720046&#4450.92883380074053&#4451.05638343648407&#4451.18586368133415&#4451.31723619094261&#4451.45046206058504&#4451.585501836681985&#4451.722315528482795&#4451.86086261990847&#4452.00110208155013&#4452.14299238281949&#4452.286491504247756&#4452.43155694992926&#4452.57814576010625&#4452.72621452389102&#4452.875719392121596&#4453.026616090347304&#4453.17885993194017&#4453.33240583132849&#4453.487208317348475&#4453.643221546710095&#4453.80039931757317&#4453.95869508322955&#4454.118061965887556&#4454.278452770554324&#4454.43981999901219&#4454.60211586388484&#4454.765292302789085&#4454.92930099256807&#4455.09409336360172&#4455.25962061419019&#4455.425833725006015&#4455.592683473610705&#4455.76012044903154&#4455.92809506639413&#4456.096557581606504&#4456.265458106090385&#4456.43474662155519&#4456.60437299481049&#4456.774286992612446&#4456.944438296539964&#4457.114776517895976&#4457.285251212629575&#4457.455811896274575&#4457.62640805889998&#4457.796989180068046&#4457.96750474379538&#4458.137904253512836&#4458.308137247019545&#4458.478153311426844&#4458.64790209808757&#4458.817333337506334&#4458.98639685422635&#4459.15504258168842&#4459.3232205770577&#4459.49088103601374&#4459.657974307499636&#4459.82445090842566&#4459.990261538323224&#4460.15535709394477&#4460.3196886838052&#4460.483207642660645&#4460.645865545920216&#4460.80761422398648&#4460.96840577652041&#4461.128192586626696&#4461.28692733495492&#4461.44456301371284&#4461.60105294058722&#4461.75635077256843&#4461.91041051967443&#4462.06318655857029&#4462.21463364607911&#4462.36470693258035&#4462.51336197529165&#4462.660554751430084&#4462.80624167124915&#4462.9503795909474&#4463.092925825445136&#4463.23383816102513&#4463.37307486783386&#4463.510594712239374&#4463.64635696904229&#4463.780321433536116&#4463.91244843341354&#4464.04269884051499&#4464.17103408241607&#4464.29741615385042&#4464.42180762796461&#4464.54417166740178&#4464.6644720352106&#4464.78267310557656&#4464.89873987437224&#4465.01263796952337&#4465.12433366118786&#4465.23379387174455&#4465.34098618558886&#4465.44587885873229&#4465.54844082820318&#4465.64864172124571&#4465.74645186431445&#4465.84184229186192&#4465.93478475491652&#4466.02525172944812&#4466.11321642451904&#4466.19865279021803&#4466.2815355253746&#4466.36184008505171&#4466.43954268781468&#4466.51462032277362&#4466.58705075639804&#4466.65681253910107&#4466.7238850115915&#4466.78824831099188&#4466.8498833767207&#4466.90877195613702&#4466.96489660994582&#4467.01824071736247&#4467.0687884810348&#4467.11652493172134&#4467.1614359327244&#4467.20350818407636&#4467.2427292264785&#4467.27908744499058&#4467.31257207247057&#4467.34317319276317&#4467.37088174363649&#4467.39568951946556&#4467.41758917366259&#4467.4365742208524&#4467.45263903879307&#4467.46577887004094&#4467.47598982335943&#4467.48326887487143&#4467.48761386895477&#4467.48902351888061&#4467.4874974071945&#4467.48303598583993&#4467.47564057602459&#4467.46531336782905&#4467.45205741955822&#4467.43587665683559&#4467.4167758714408&#4467.39476071989056&#4467.36983772176345&#4467.3420142577693&#4467.31129856756348&#4467.2776997473067&#4467.24122774697133&#4467.20189336739486&#4467.1597082570812&#4467.11468490875127&#4467.06683665564319&#4467.01617766756395&#4466.96272294669305&#4466.90648832313975&#4466.84749045025524&#4466.78574679970073&#4466.72127565627355&#4466.65409611249217&#4466.58422806294222&#4466.51169219838478&#4466.43650999962914&#4466.35870373117136&#4466.2782964346009&#4466.19531192177709&#4466.10977476777737&#4466.02171030361976&#4465.9311446087612&#4465.83810450337445&#4465.74261754040548&#4465.64471199741396&#4465.54441686819914&#4465.44176185421358&#4465.3367773557674&#4465.22949446302543&#4465.11994494680023&#4465.00816124914343&#4464.89417647373834&#4464.77802437609657&#4464.65973935356172&#4464.53935643512287&#4464.4169112710411&#4464.29244012229202&#4464.16597984982741&#4464.03756790365917&#4463.90724231176892&#4463.77504166884631&#4463.6410051248596&#4463.505172373461775&#4463.367583640235615&#4463.22827967078128&#4463.087301718649925&#4462.944691533126786&#4462.80049134686757&#4462.65474386339166&#4462.507492244435824&#4462.358780097172314&#4462.20865146129504&#4462.057150795977556&#4461.90432296670695&#4461.750213231997364&#4461.59486722998707&#4461.4383309649232&#4461.28065079353804&#4461.12187341132084&#4460.96204583868952&#4460.80121540706588&#4460.639429744858944&#4460.476736763360236&#4460.31318464255526&#4460.1488218168555&#4459.98369696075506&#4459.817858974416055&#4459.65135696918742&#4459.484240253060975&#4459.316558316069354&#4459.14836081562999&#4458.979697561839565&#4458.81061850272319&#4458.64117370944278&#4458.47141336146898&#4458.30138773172094&#4458.13114717167853&#4457.96074209647115&#4457.79022296994785&#4457.619640289732864&#4457.44904457227127&#4457.27848633786898&#4457.10801609573168&#4456.93768432900698&#4456.76754147983427&#4456.59763793440684&#4456.42802400805043&#4456.258749930322814&#4456.089865830138834&#4455.92142172092519&#4455.75346748580939&#4455.58605286284738&#4455.41922743029409&#4455.253040591921284&#4455.08754156238709&#4454.92277935266159&#4454.758802755512654&#4454.59566033105642&#4454.433400392376676&#4454.27207099121742&#4454.11171990375276&#4453.95239461643851&#4453.794142311949436&#4453.637009855206635&#4453.481043779498876&#4453.32629027270225&#4453.17279516360207&#4453.02060390832103&#4452.86976157685792&#4452.7203128397405&#4452.57230195479675&#4452.42577275404836&#4452.2807686307303&#4452.13733252644026&#4451.995506918421974&#4451.85533380698597&#4451.716854703071526&#4451.580110615953664&#4451.44514204109863&#4451.31198894817149&#4451.18069076919956&#4451.05128638689496&#4450.92381412313984&#4450.79831172763777&#4450.67481636673447&#4450.55336461241139&#4450.43399243145524&#4450.31673517480678&#4450.20162756709195, !- Building Unit Feature Value 20
+  50.07624256468852&#4449.9657852697145&#4449.85758155416448&#4449.751663461543984&#4449.64806235849292&#4449.546808925496705&#4449.447933147800505&#4449.351464306529365&#4449.25743097001694&#4449.16586098534519&#4449.07678147009777&#4448.9902188043294&#4448.906198622753685&#4448.82474580715159&#4448.74588447900296&#4448.66963799234321&#4448.59602892684719&#4448.52507908114245&#4448.45680946635381&#4448.391240299881055&#4448.32839099941181&#4448.26828017717112&#4448.21092563440966&#4448.15634435613204&#4448.10455250606684&#4448.05556542187992&#4448.00939761063228&#4447.96606274448393&#4447.92557365664505&#4447.887942337575495&#4447.853179931434&#4447.82129673277788&#4447.79230218351444&#4447.76620487010481&#4447.743012521021186&#4447.72273200445808&#4447.705369326298396&#4447.6909296283348&#4447.679417186747095&#4447.67083541083581&#4447.665186842012595&#4447.662473153047614&#4447.66269514757414&#4447.66585275985061&#4447.67194505478005&#4447.68097022818702&#4447.6929256073519&#4447.70780765180238&#4447.725611954361966&#4447.746333242455066&#4447.769965379668484&#4447.796501367568624&#4447.82593334777399&#4447.85825260428242&#4447.89344956605221&#4447.931513809836495&#4447.972434063270015&#4448.01619820820728&#4448.06279328431128&#4448.11220549289157&#4448.16442020099056&#4448.21942194571703&#4448.2771944388252&#4448.33772057153844&#4448.40098241961582&#4448.466961248660226&#4448.53563751966634&#4448.606990894806984&#4448.68100024345593&#4448.75764364844555&#4448.83689841255739&#4448.91874106524372&#4449.00314736957813&#4449.090092329433034&#4449.179550196882076&#4449.27149447982511&#4449.36589794983359&#4449.46273265021402&#4449.56196990428706&#4449.663580323879835&#4449.76753381802899&#4449.87379960189182&#4449.98234620586294&#4450.09314148489369&#4450.20615262801157&#4450.32134616803694&#4450.43868799149398&#4450.558143348713074&#4450.679676864121596&#4450.80325254672008&#4450.928833800740556&#4451.056383436484104&#4451.18586368133418&#4451.317236190942644&#4451.450462060585075&#4451.58550183668202&#4451.72231552848283&#4451.8608626199085&#4452.001102081550165&#4452.14299238281953&#4452.28649150424779&#4452.431556949929295&#4452.57814576010629&#4452.72621452389105&#4452.87571939212163&#4453.02661609034733&#4453.1788599319402&#4453.33240583132853&#4453.48720831734851&#4453.64322154671014&#4453.80039931757321&#4453.95869508322959&#4454.11806196588759&#4454.27845277055436&#4454.43981999901223&#4454.60211586388488&#4454.76529230278913&#4454.92930099256811&#4455.09409336360176&#4455.25962061419023&#4455.42583372500605&#4455.59268347361075&#4455.76012044903158&#4455.928095066394164&#4456.09655758160655&#4456.26545810609043&#4456.434746621555234&#4456.60437299481053&#4456.77428699261249&#4456.94443829654001&#4457.11477651789601&#4457.28525121262962&#4457.45581189627462&#4457.626408058900026&#4457.79698918006809&#4457.96750474379542&#4458.13790425351288&#4458.30813724701959&#4458.47815331142689&#4458.64790209808762&#4458.81733333750638&#4458.98639685422639&#4459.15504258168846&#4459.32322057705774&#4459.49088103601378&#4459.65797430749968&#4459.8244509084257&#4459.99026153832327&#4460.155357093944815&#4460.319688683805246&#4460.483207642660695&#4460.645865545920266&#4460.80761422398652&#4460.96840577652046&#4461.12819258662674&#4461.28692733495497&#4461.44456301371288&#4461.601052940587266&#4461.756350772568474&#4461.91041051967448&#4462.06318655857034&#4462.21463364607915&#4462.3647069325804&#4462.513361975291694&#4462.66055475143013&#4462.8062416712492&#4462.95037959094745&#4463.092925825445185&#4463.23383816102518&#4463.37307486783391&#4463.510594712239424&#4463.64635696904234&#4463.780321433536166&#4463.91244843341359&#4464.04269884051503&#4464.17103408241611&#4464.29741615385046&#4464.42180762796467&#4464.54417166740183&#4464.66447203521064&#4464.7826731055766&#4464.89873987437228&#4465.01263796952341&#4465.1243336611879&#4465.23379387174461&#4465.3409861855889&#4465.44587885873234&#4465.54844082820324&#4465.64864172124577&#4465.7464518643145&#4465.84184229186198&#4465.93478475491656&#4466.02525172944816&#4466.1132164245191&#4466.19865279021808&#4466.28153552537464&#4466.36184008505177&#4466.43954268781472&#4466.51462032277367&#4466.5870507563981&#4466.65681253910113&#4466.72388501159155&#4466.78824831099192&#4466.84988337672074&#4466.90877195613707&#4466.96489660994588&#4467.01824071736252&#4467.06878848103484&#4467.1165249317214&#4467.16143593272444&#4467.20350818407641&#4467.24272922647855&#4467.27908744499064&#4467.31257207247062&#4467.34317319276323&#4467.37088174363653&#4467.3956895194656&#4467.41758917366263&#4467.43657422085245&#4467.45263903879312&#4467.46577887004098&#4467.47598982335947&#4467.48326887487147&#4467.48761386895481&#4467.48902351888066&#4467.48749740719454&#4467.48303598583998&#4467.47564057602465&#4467.4653133678291&#4467.45205741955826&#4467.43587665683563&#4467.41677587144085&#4467.3947607198906&#4467.36983772176349&#4467.34201425776935&#4467.31129856756353&#4467.27769974730674&#4467.24122774697138&#4467.2018933673949&#4467.15970825708125&#4467.11468490875131&#4467.06683665564324&#4467.016177667564&#4466.96272294669309&#4466.9064883231398&#4466.84749045025528&#4466.78574679970077&#4466.72127565627359&#4466.65409611249221&#4466.58422806294226&#4466.51169219838482&#4466.43650999962918&#4466.3587037311714&#4466.27829643460095&#4466.19531192177712&#4466.10977476777741&#4466.0217103036198&#4465.93114460876124&#4465.8381045033745&#4465.74261754040552&#4465.64471199741399&#4465.54441686819918&#4465.44176185421362&#4465.33677735576744&#4465.22949446302547&#4465.11994494680027&#4465.00816124914347&#4464.89417647373837&#4464.77802437609661&#4464.65973935356176&#4464.53935643512291&#4464.41691127104114&#4464.29244012229206&#4464.16597984982745&#4464.03756790365921&#4463.907242311768954&#4463.77504166884635&#4463.64100512485964&#4463.50517237346182&#4463.36758364023565&#4463.22827967078132&#4463.08730171864996&#4462.94469153312682&#4462.8004913468676&#4462.65474386339169&#4462.50749224443585&#4462.35878009717235&#4462.20865146129508&#4462.057150795977584&#4461.90432296670698&#4461.75021323199739&#4461.594867229987095&#4461.43833096492323&#4461.280650793538065&#4461.12187341132087&#4460.96204583868955&#4460.80121540706591&#4460.63942974485897&#4460.47673676336026&#4460.313184642555285&#4460.14882181685554&#4459.98369696075508&#4459.81785897441608&#4459.65135696918745&#4459.484240253061&#4459.31655831606938&#4459.14836081563002&#4458.979697561839586&#4458.810618502723216&#4458.6411737094428&#4458.471413361469004&#4458.30138773172097&#4458.131147171678556&#4457.96074209647117&#4457.79022296994788&#4457.61964028973289&#4457.4490445722713&#4457.27848633786901&#4457.10801609573171&#4456.937684329007&#4456.7675414798343&#4456.59763793440687&#4456.42802400805046&#4456.25874993032284&#4456.08986583013886&#4455.92142172092521&#4455.75346748580941&#4455.5860528628474&#4455.419227430294114&#4455.253040591921305&#4455.08754156238711&#4454.92277935266162&#4454.75880275551268&#4454.595660331056436&#4454.4334003923767&#4454.27207099121744&#4454.11171990375278&#4453.95239461643853&#4453.79414231194946&#4453.63700985520665&#4453.481043779498904&#4453.32629027270227&#4453.17279516360208&#4453.02060390832105&#4452.86976157685794&#4452.720312839740515&#4452.57230195479677&#4452.42577275404838&#4452.280768630730314&#4452.13733252644028&#4451.995506918421995&#4451.85533380698598&#4451.71685470307155&#4451.580110615953686&#4451.44514204109864&#4451.31198894817151&#4451.180690769199586&#4451.051286386894986&#4450.92381412313986&#4450.79831172763779&#4450.67481636673449&#4450.553364612411414&#4450.433992431455266&#4450.3167351748068&#4450.20162756709197, !- Building Unit Feature Value 20
   EPWDataMainsMonthlyTemps,               !- Building Unit Feature Name 21
   String,                                 !- Building Unit Feature Data Type 21
-  48.74588447900294&#4447.671945054780025&#4449.17955019688205&#4452.875719392121596&#4457.796989180068046&#4462.660554751430084&#4466.19865279021803&#4467.48902351888061&#4466.19531192177709&#4462.65474386339166&#4457.79022296994785&#4452.86976157685792, !- Building Unit Feature Value 21
+  48.74588447900296&#4447.67194505478005&#4449.179550196882076&#4452.87571939212163&#4457.79698918006809&#4462.66055475143013&#4466.19865279021808&#4467.48902351888066&#4466.19531192177712&#4462.65474386339169&#4457.79022296994788&#4452.86976157685794, !- Building Unit Feature Value 21
   EPWDataMainsAvgTemp,                    !- Building Unit Feature Name 22
   Double,                                 !- Building Unit Feature Data Type 22
-  57.57788958386589,                      !- Building Unit Feature Value 22
+  57.577889583865932,                     !- Building Unit Feature Value 22
   EPWDataGroundMonthlyTemps,              !- Building Unit Feature Name 23
   String,                                 !- Building Unit Feature Data Type 23
-  44.08197290927985&#4440.894885684256934&#4440.63665370518229&#4442.14527383112042&#4448.208935610201856&#4454.24942532920625&#4459.49181860884866&#4462.82111671719588&#4463.11898312643705&#4460.436204288141006&#4455.3433774168231&#4449.488581125820524, !- Building Unit Feature Value 23
+  44.08306285945173&#4440.89570904991865&#4440.64045432632048&#4442.153016571250646&#4448.225111118704206&#4454.268919273837525&#4459.508577937551024&#4462.82777283423508&#4463.10975667174995&#4460.41014950381947&#4455.304105212311526&#4449.445696474514364, !- Building Unit Feature Value 23
   EPWDataWSF,                             !- Building Unit Feature Name 24
   Double,                                 !- Building Unit Feature Data Type 24
   0.58999999999999997,                    !- Building Unit Feature Value 24
   EPWDataMonthlyAvgDailyHighDrybulbs,     !- Building Unit Feature Name 25
   String,                                 !- Building Unit Feature Data Type 25
-  47.4103225806451&#4446.586428571428456&#4455.15032258064512&#4453.70799999999994&#4472.80193548387093&#4488.67599999999996&#4486.18580645161288&#4485.87225806451607&#4482.08199999999992&#4463.18064516129024&#4448.73399999999996&#4448.87935483870961, !- Building Unit Feature Value 25
+  47.41032258064516&#4446.58642857142857&#4455.15032258064517&#4453.708&#4472.80193548387098&#4488.67600000000002&#4486.1858064516129&#4485.87225806451613&#4482.082&#4463.18064516129033&#4448.73400000000001&#4448.87935483870968, !- Building Unit Feature Value 25
   EPWDataMonthlyAvgDailyLowDrybulbs,      !- Building Unit Feature Name 26
   String,                                 !- Building Unit Feature Data Type 26
-  19.347741935483857&#4419.856428571428516&#4430.316129032257997&#4431.111999999999924&#4447.416129032258&#4457.90199999999991&#4459.06387096774191&#4460.956774193548284&#4452.35199999999995&#4438.416129032258&#4427.00199999999998&#4423.029032258064426, !- Building Unit Feature Value 26
+  19.347741935483874&#4419.856428571428573&#4430.316129032258065&#4431.112&#4447.41612903225806&#4457.901999999999994&#4459.063870967741934&#4460.956774193548384&#4452.352000000000004&#4438.41612903225806&#4427.002000000000002&#4423.02903225806451, !- Building Unit Feature Value 26
   EPWDesignHeatingDrybulb,                !- Building Unit Feature Name 27
   Double,                                 !- Building Unit Feature Data Type 27
-  6.7999999999999368,                     !- Building Unit Feature Value 27
+  6.8000000000000007,                     !- Building Unit Feature Value 27
   EPWDesignHeatingWindspeed,              !- Building Unit Feature Name 28
   Double,                                 !- Building Unit Feature Data Type 28
   12,                                     !- Building Unit Feature Value 28
   EPWDesignCoolingDrybulb,                !- Building Unit Feature Name 29
   Double,                                 !- Building Unit Feature Data Type 29
-  91.75999999999992,                      !- Building Unit Feature Value 29
+  91.760000000000005,                     !- Building Unit Feature Value 29
   EPWDesignCoolingWetbulb,                !- Building Unit Feature Name 30
   Double,                                 !- Building Unit Feature Data Type 30
-  60.079999999999977,                     !- Building Unit Feature Value 30
+  60.079999999999998,                     !- Building Unit Feature Value 30
   EPWDesignCoolingHumidityRatio,          !- Building Unit Feature Name 31
   Double,                                 !- Building Unit Feature Data Type 31
-  0.0060503921965714127,                  !- Building Unit Feature Value 31
+  0.006050392196571398,                   !- Building Unit Feature Value 31
   EPWDesignCoolingWindspeed,              !- Building Unit Feature Name 32
   Double,                                 !- Building Unit Feature Data Type 32
   4.2000000000000002,                     !- Building Unit Feature Value 32
   EPWDesignDailyTemperatureRange,         !- Building Unit Feature Name 33
   Double,                                 !- Building Unit Feature Data Type 33
-  27.359999999999996,                     !- Building Unit Feature Value 33
+  27.359999999999999,                     !- Building Unit Feature Value 33
   EPWDesignDehumidDrybulb,                !- Building Unit Feature Name 34
   Double,                                 !- Building Unit Feature Data Type 34
-  67.279999999999973,                     !- Building Unit Feature Value 34
+  67.280000000000001,                     !- Building Unit Feature Value 34
   EPWDesignDehumidHumidityRatio,          !- Building Unit Feature Name 35
   Double,                                 !- Building Unit Feature Data Type 35
-  0.01229542689927101,                    !- Building Unit Feature Value 35
+  0.012295426899271008,                   !- Building Unit Feature Value 35
   EPWDesignCoolingDirectNormal,           !- Building Unit Feature Name 36
   Double,                                 !- Building Unit Feature Data Type 36
   985,                                    !- Building Unit Feature Value 36
@@ -731,7 +731,7 @@ OS:BuildingUnit,
   84;                                     !- Building Unit Feature Value 37
 
 OS:ClimateZones,
-  {a57470e3-1371-468d-9736-cf7782b16ded}, !- Handle
+  {d53182b1-ab62-46cc-bba2-61e6aed9dcaf}, !- Handle
   ,                                       !- Active Institution
   ,                                       !- Active Year
   ,                                       !- Climate Zone Institution Name 1
@@ -744,34 +744,34 @@ OS:ClimateZones,
   Cold;                                   !- Climate Zone Value 2
 
 OS:Site:WaterMainsTemperature,
-  {e38b1bbd-946a-4cdf-9e3d-abd6923108bc}, !- Handle
+  {cb5e00b9-48d4-411a-ac2c-927af5fe2390}, !- Handle
   Correlation,                            !- Calculation Method
   ,                                       !- Temperature Schedule Name
   10.8753424657535,                       !- Annual Average Outdoor Air Temperature {C}
   23.1524007936508;                       !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
 OS:RunPeriodControl:DaylightSavingTime,
-  {625548e3-434c-4e04-8689-3de594577b80}, !- Handle
+  {515681f3-8dff-408a-8b39-847d3c36bb11}, !- Handle
   4/7,                                    !- Start Date
   10/26;                                  !- End Date
 
 OS:Site:GroundTemperature:BuildingSurface,
-  {af10490a-93db-4a09-9c32-ed9f213b6869}, !- Handle
-  6.71220717182217,                       !- January Ground Temperature {C}
-  4.94160315792055,                       !- February Ground Temperature {C}
-  4.79814094732353,                       !- March Ground Temperature {C}
-  5.63626323951138,                       !- April Ground Temperature {C}
-  9.00496422788996,                       !- May Ground Temperature {C}
-  12.3607918495591,                       !- June Ground Temperature {C}
-  15.2732325604715,                       !- July Ground Temperature {C}
-  17.1228426206644,                       !- August Ground Temperature {C}
-  17.2883239591317,                       !- September Ground Temperature {C}
-  15.7978912711895,                       !- October Ground Temperature {C}
-  12.9685430093462,                       !- November Ground Temperature {C}
-  9.71587840323366;                       !- December Ground Temperature {C}
+  {5476cf11-8af4-45eb-a0ee-a841f9cb1c39}, !- Handle
+  6.71281269969541,                       !- January Ground Temperature {C}
+  4.94206058328814,                       !- February Ground Temperature {C}
+  4.80025240351138,                       !- March Ground Temperature {C}
+  5.64056476180591,                       !- April Ground Temperature {C}
+  9.01395062150234,                       !- May Ground Temperature {C}
+  12.3716218187986,                       !- June Ground Temperature {C}
+  15.2825432986395,                       !- July Ground Temperature {C}
+  17.1265404634639,                       !- August Ground Temperature {C}
+  17.2831981509722,                       !- September Ground Temperature {C}
+  15.7834163910108,                       !- October Ground Temperature {C}
+  12.9467251179508,                       !- November Ground Temperature {C}
+  9.69205359695242;                       !- December Ground Temperature {C}
 
 OS:Site:GroundTemperature:Deep,
-  {4137da94-b96e-45fe-8184-bd9edd39e524}, !- Handle
+  {0ac9a952-1acf-40e4-b2ed-cf3e5090949e}, !- Handle
   10.8753424657535,                       !- January Deep Ground Temperature {C}
   10.8753424657535,                       !- February Deep Ground Temperature {C}
   10.8753424657535,                       !- March Deep Ground Temperature {C}
@@ -786,20 +786,20 @@ OS:Site:GroundTemperature:Deep,
   10.8753424657535;                       !- December Deep Ground Temperature {C}
 
 OS:ZoneHVAC:Baseboard:Convective:Electric,
-  {b16fbc93-7a3d-4e03-a941-c474a91859f5}, !- Handle
+  {751fbe74-02bf-4df7-89c9-b7566a7b6a1a}, !- Handle
   residential baseboard living zone convective electric, !- Name
-  {79d0ac55-98cb-434a-a324-a57585e6c162}, !- Availability Schedule
+  {adc2e35f-f0b8-4448-bc88-4f57bf5e0fa3}, !- Availability Schedule
   autosize,                               !- Nominal Capacity {W}
   1;                                      !- Efficiency
 
 OS:Schedule:Constant,
-  {79d0ac55-98cb-434a-a324-a57585e6c162}, !- Handle
+  {adc2e35f-f0b8-4448-bc88-4f57bf5e0fa3}, !- Handle
   Always On Discrete,                     !- Name
-  {03eb34eb-f857-42f4-81d9-de01f2c550ef}, !- Schedule Type Limits Name
+  {9f5fa5d2-8e3d-4211-b16a-77f3477a2728}, !- Schedule Type Limits Name
   1;                                      !- Value
 
 OS:ScheduleTypeLimits,
-  {03eb34eb-f857-42f4-81d9-de01f2c550ef}, !- Handle
+  {9f5fa5d2-8e3d-4211-b16a-77f3477a2728}, !- Handle
   OnOff,                                  !- Name
   0,                                      !- Lower Limit Value
   1,                                      !- Upper Limit Value
