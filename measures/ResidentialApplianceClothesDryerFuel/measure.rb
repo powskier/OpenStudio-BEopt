@@ -158,7 +158,7 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
         if fuel_type == Constants.FuelTypeGas
             msg_f = "#{ann_f.round} therms"
         else
-            msg_f = "#{UnitConversions.btu2gal(UnitConversions.convert(ann_f, "therm", "Btu"), fuel_type).round} gallons"
+            msg_f = "#{UnitConversions.convert(UnitConversions.convert(ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
         end
         msg_e = ""
         if ann_e > 0
@@ -180,7 +180,7 @@ class ResidentialClothesDryerFuel < OpenStudio::Measure::ModelMeasure
         if fuel_type == Constants.FuelTypeGas
             msg_f = "#{tot_ann_f.round} therms"
         else
-            msg_f = "#{UnitConversions.btu2gal(UnitConversions.convert(tot_ann_f, "therm", "Btu"), fuel_type).round} gallons"
+            msg_f = "#{UnitConversions.convert(UnitConversions.convert(tot_ann_f, "therm", "Btu"), "Btu", "gal", fuel_type).round} gallons"
         end
         msg_e = ""
         if tot_ann_e > 0

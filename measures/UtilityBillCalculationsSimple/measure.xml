@@ -2,8 +2,8 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations_simple</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>79c92916-b9d5-41c2-aca7-badb32fb198e</version_id>
-  <version_modified>20180109T160542Z</version_modified>
+  <version_id>3cd6c190-e503-463b-928b-36e70e0203bb</version_id>
+  <version_modified>20180109T224416Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
   <class_name>UtilityBillCalculationsSimple</class_name>
   <display_name>Calculate Simple Utility Bills</display_name>
@@ -31,7 +31,7 @@
       <default_value>auto</default_value>
     </argument>
     <argument>
-      <name>ng_fixed</name>
+      <name>gas_fixed</name>
       <display_name>Natural Gas: Fixed Charge</display_name>
       <description>Monthly fixed charge for natural gas.</description>
       <type>String</type>
@@ -41,7 +41,7 @@
       <default_value>8.0</default_value>
     </argument>
     <argument>
-      <name>ng_rate</name>
+      <name>gas_rate</name>
       <display_name>Natural Gas: Marginal Rate</display_name>
       <description>Price per therm for natural gas.</description>
       <type>String</type>
@@ -108,15 +108,6 @@
       <required>true</required>
       <model_dependent>false</model_dependent>
       <default_value>0.12</default_value>
-    </argument>
-    <argument>
-      <name>enduse_timeseries</name>
-      <display_name>Output: File Path</display_name>
-      <description>Absolute (or relative) directory to timeseries output.</description>
-      <type>String</type>
-      <required>true</required>
-      <model_dependent>false</model_dependent>
-      <default_value></default_value>
     </argument>
   </arguments>
   <outputs>
@@ -228,28 +219,46 @@
       <checksum>3A877070</checksum>
     </file>
     <file>
-      <filename>SFD_Successful_EnergyPlus_Run_TMY_Appl_timeseries.csv</filename>
+      <filename>unit_conversions.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>3E1D973D</checksum>
+    </file>
+    <file>
+      <filename>PV_10kW.csv</filename>
       <filetype>csv</filetype>
       <usage_type>test</usage_type>
-      <checksum>2393B5FA</checksum>
+      <checksum>F805F758</checksum>
+    </file>
+    <file>
+      <filename>PV_1kW.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>test</usage_type>
+      <checksum>27C75972</checksum>
+    </file>
+    <file>
+      <filename>PV_None.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>test</usage_type>
+      <checksum>81DA8CC9</checksum>
+    </file>
+    <file>
+      <filename>SFD_Successful_EnergyPlus_Run_AMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>49D4661F</checksum>
     </file>
     <file>
       <filename>util.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
-      <checksum>4D27E1EF</checksum>
-    </file>
-    <file>
-      <filename>1.csv</filename>
-      <filetype>csv</filetype>
-      <usage_type>test</usage_type>
-      <checksum>4C5F218F</checksum>
+      <checksum>89126B2C</checksum>
     </file>
     <file>
       <filename>utility_bill_calculations_simple_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
-      <checksum>F81FA6D1</checksum>
+      <checksum>59BC9D2B</checksum>
     </file>
     <file>
       <version>
@@ -260,13 +269,7 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>56858F5E</checksum>
-    </file>
-    <file>
-      <filename>unit_conversions.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>9FD6065E</checksum>
+      <checksum>4DFAF18D</checksum>
     </file>
   </files>
 </measure>

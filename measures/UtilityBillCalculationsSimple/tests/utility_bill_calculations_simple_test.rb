@@ -21,7 +21,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     expected_num_del_objects = {}
     expected_num_new_objects = {}
     expected_values = {}
-    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_TMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "USA_CO_Denver_Intl_AP_725650_TMY3.epw", 3, 1)
+    _test_measure_functionality("SFD_Successful_EnergyPlus_Run_AMY_PV.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, __method__, "DuPage_17043_725300_880860.epw", 3, 1)
   end
 
   def test_calculations_0kW_pv_net_metering
@@ -152,10 +152,6 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
   
   def tests_dir(test_name)
     return "#{File.dirname(__FILE__)}/output/#{test_name}/tests"
-  end  
-  
-  def resources_dir(test_name)
-    return "#{run_dir(test_name)}/UtilityBillCalculations/resources"
   end
 
   def model_out_path(osm_file_or_model, test_name)
@@ -208,11 +204,6 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
     if !File.exist?("#{run_dir(test_name)}")
       FileUtils.mkdir_p("#{run_dir(test_name)}")
     end
-    if !File.exist?("#{resources_dir(test_name)}")
-      FileUtils.mkdir_p("#{resources_dir(test_name)}")
-    end
-    FileUtils.cp("#{File.dirname(__FILE__)}/../resources/Natural gas.csv", "#{resources_dir(test_name)}")
-    FileUtils.cp("#{File.dirname(__FILE__)}/../resources/unit_conversions.rb", "#{resources_dir(test_name)}")
     
     cli_path = OpenStudio.getOpenStudioCLI
     cmd = "\"#{cli_path}\" run -w \"#{osw_path}\""
@@ -350,7 +341,7 @@ class UtilityBillCalculationsSimpleTest < MiniTest::Test
       var_name = col[0].split("  ")[0]
       old_units = col[0].split("  ")[1].gsub("[", "").gsub("]", "")
       fuel_type = col[0].split(":")[0]
-      new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, fuel_type)
+      new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, HelperMethods.reverse_openstudio_fuel_map(fuel_type))
       vals = []
       col[1..8760].each do |val|        
         vals << unit_conv * val.to_f

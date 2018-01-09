@@ -58,16 +58,16 @@ class UnitConversions
       elsif from == 'kbtu' and to == 'btu'
         return x * 1000.0
       elsif from == 'btu' and to == 'gal'
-        if fuel_type == "Propane"
+        if fuel_type == Constants.FuelTypePropane
           return x / 91600.0
-        elsif fuel_type == "FuelOil#1"
+        elsif fuel_type == Constants.FuelTypeOil
           return x / 139000.0
         end
         fail "Unhandled unit conversion from #{from} to #{to} for #{fuel_type}."
       elsif from == 'j' and to == 'gal'
-        if fuel_type == "Propane"
+        if fuel_type == Constants.FuelTypePropane
           return x * 3412.141633127942 / 1000.0 / 3600.0 / 91600.0
-        elsif fuel_type == "FuelOil#1"
+        elsif fuel_type == Constants.FuelTypeOil
           return x * 3412.141633127942 / 1000.0 / 3600.0 / 139000.0
         end
         fail "Unhandled unit conversion from #{from} to #{to} for #{fuel_type}."

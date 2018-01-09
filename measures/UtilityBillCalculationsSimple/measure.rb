@@ -236,7 +236,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
         end
 
         old_units = y_timeseries.units
-        new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, fuel_type)
+        new_units, unit_conv = UnitConversions.get_scalar_unit_conversion(var_name, old_units, HelperMethods.reverse_openstudio_fuel_map(fuel_type))
         y_timeseries.dateTimes.each_with_index do |date_time, i|
           y_val = values[i].to_f
           unless unit_conv.nil?
