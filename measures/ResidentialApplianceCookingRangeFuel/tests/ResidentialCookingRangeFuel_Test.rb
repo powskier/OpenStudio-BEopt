@@ -346,6 +346,17 @@ class ResidentialCookingRangeFuelTest < MiniTest::Test
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
 
+  def test_single_family_attached_new_construction_unfinished_basement
+    num_units = 4
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypeGas
+    args_hash["space"] = Constants.UnfinishedBasementSpace
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"ScheduleRuleset"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "OtherEquipment"=>1, "OtherEquipmentDefinition"=>1}
+    expected_values = {"Annual_kwh"=>79.87, "Annual_therm"=>28.53, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Space"=>args_hash["space"]}
+    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end  
+
   def test_multifamily_new_construction
     num_units = 8
     args_hash = {}

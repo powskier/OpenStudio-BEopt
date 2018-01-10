@@ -3308,7 +3308,7 @@ class ProcessHVACSizing < OpenStudio::Measure::ModelMeasure
     
     # Dehumidifier
     dehumids = model.getZoneHVACDehumidifierDXs
-    if dehumids.size > 1
+    if dehumids.size >= 1
         hvac.HasDehumidifier = true
         curve = dehumids[0].waterRemovalCurve.to_CurveBiquadratic.get
         hvac.Dehumidifier_Water_Remove_Cap_Ft_DB_RH = [curve.coefficient1Constant, curve.coefficient2x, curve.coefficient3xPOW2, curve.coefficient4y, curve.coefficient5yPOW2, curve.coefficient6xTIMESY]
