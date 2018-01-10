@@ -151,12 +151,13 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     roof_pitch.setDefaultValue("6:12")
     args << roof_pitch    
     
+    #TODO: Needs more testing
     #make an argument for using zone multipliers
-    use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
-    use_zone_mult.setDisplayName("Use Zone Multipliers?")
-    use_zone_mult.setDescription("Model only one interior unit with its thermal zone multiplier equal to the number of interior units.")
-    use_zone_mult.setDefaultValue(false)
-    args << use_zone_mult
+    #use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
+    #use_zone_mult.setDisplayName("Use Zone Multipliers?")
+    #use_zone_mult.setDescription("Model only one interior unit with its thermal zone multiplier equal to the number of interior units.")
+    #use_zone_mult.setDefaultValue(false)
+    #args << use_zone_mult
     
     return args
   end
@@ -182,7 +183,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     attic_type = runner.getStringArgumentValue("attic_type",user_arguments)
     roof_type = runner.getStringArgumentValue("roof_type",user_arguments)
     roof_pitch = {"1:12"=>1.0/12.0, "2:12"=>2.0/12.0, "3:12"=>3.0/12.0, "4:12"=>4.0/12.0, "5:12"=>5.0/12.0, "6:12"=>6.0/12.0, "7:12"=>7.0/12.0, "8:12"=>8.0/12.0, "9:12"=>9.0/12.0, "10:12"=>10.0/12.0, "11:12"=>11.0/12.0, "12:12"=>12.0/12.0}[runner.getStringArgumentValue("roof_pitch",user_arguments)]    
-    use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
+    use_zone_mult = false #runner.getBoolArgumentValue("use_zone_mult",user_arguments)
     
     if foundation_type == Constants.SlabFoundationType
       foundation_height = 0.0
@@ -712,6 +713,7 @@ class CreateResidentialSingleFamilyAttachedGeometry < OpenStudio::Measure::Model
     OpenStudio::Model.intersectSurfaces(spaces)
     OpenStudio::Model.matchSurfaces(spaces)
     
+    # Apply zone multiplier
     if use_zone_mult and ((num_units > 3 and not has_rear_units) or (num_units > 7 and has_rear_units))
       (2..num_units).to_a.each do |unit_num|
 

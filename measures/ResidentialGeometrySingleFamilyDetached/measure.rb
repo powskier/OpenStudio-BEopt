@@ -752,6 +752,7 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     unit.setBuildingUnitType(Constants.BuildingUnitTypeResidential)
     unit.setName(Constants.ObjectNameBuildingUnit)
     model.getSpaces.each do |space|
+      next if not Geometry.space_is_finished(space)
       space.setBuildingUnit(unit)
     end
     
@@ -771,17 +772,6 @@ class CreateResidentialSingleFamilyDetachedGeometry < OpenStudio::Measure::Model
     # Store the building type
     model.getBuilding.setStandardsBuildingType(Constants.BuildingTypeSingleFamilyDetached)
   
-    # Store info for HVAC Sizing measure
-    if has_garage
-      if num_floors > 1 # garage completely under living space
-        unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, 1.0)
-      elsif attic_type == Constants.FinishedAtticType # garage completely under finished attic
-        unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, 1.0)
-      else # 1-story w/o finished attic
-        unit.setFeature(Constants.SizingInfoGarageFracUnderFinishedSpace, garage_protrusion)
-      end
-    end
-    
     # reporting final condition of model
     runner.registerFinalCondition("The building finished with #{model.getSpaces.size} spaces.")
     

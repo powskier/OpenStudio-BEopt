@@ -71,6 +71,9 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values) 
   end  
   
+  '''
+  # TODO: Zone/floor multiplier arguments currently commented out
+  
   def test_zone_mult_front_units_only
     args_hash = {}
     args_hash["num_units"] = 8
@@ -102,6 +105,8 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     expected_values = {"FinishedFloorArea"=>900*6, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*9, "BuildingHeight"=>8+5.30}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  '''
   
   def test_one_unit_per_floor_with_rear_units
     args_hash = {}

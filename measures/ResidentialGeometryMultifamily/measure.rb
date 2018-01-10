@@ -144,19 +144,21 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     foundation_height.setDefaultValue(3.0)
     args << foundation_height    
     
+    #TODO: Needs more testing
     #make an argument for using zone multipliers
-    use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
-    use_zone_mult.setDisplayName("Use Zone Multipliers?")
-    use_zone_mult.setDescription("Model only one interior unit per floor with its thermal zone multiplier equal to the number of interior units per floor.")
-    use_zone_mult.setDefaultValue(false)
-    args << use_zone_mult
+    #use_zone_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_zone_mult", true)
+    #use_zone_mult.setDisplayName("Use Zone Multipliers?")
+    #use_zone_mult.setDescription("Model only one interior unit per floor with its thermal zone multiplier equal to the number of interior units per floor.")
+    #use_zone_mult.setDefaultValue(false)
+    #args << use_zone_mult
     
+    #TODO: Needs more testing
     #make an argument for using floor multipliers
-    use_floor_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_floor_mult", true)
-    use_floor_mult.setDisplayName("Use Floor Multipliers?")
-    use_floor_mult.setDescription("Model only one interior floor with thermal zone multipliers equal to the number of interior floors.")
-    use_floor_mult.setDefaultValue(false)
-    args << use_floor_mult
+    #use_floor_mult = OpenStudio::Measure::OSArgument::makeBoolArgument("use_floor_mult", true)
+    #use_floor_mult.setDisplayName("Use Floor Multipliers?")
+    #use_floor_mult.setDescription("Model only one interior floor with thermal zone multipliers equal to the number of interior floors.")
+    #use_floor_mult.setDefaultValue(false)
+    #args << use_floor_mult
     
     return args
   end
@@ -183,8 +185,8 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     balc_depth = UnitConversions.convert(runner.getDoubleArgumentValue("balc_depth",user_arguments),"ft","m")
     foundation_type = runner.getStringArgumentValue("foundation_type",user_arguments)
     foundation_height = runner.getDoubleArgumentValue("foundation_height",user_arguments)
-    use_zone_mult = runner.getBoolArgumentValue("use_zone_mult",user_arguments)
-    use_floor_mult = runner.getBoolArgumentValue("use_floor_mult",user_arguments)
+    use_zone_mult = false #runner.getBoolArgumentValue("use_zone_mult",user_arguments)
+    use_floor_mult = false #runner.getBoolArgumentValue("use_floor_mult",user_arguments)
     
     if foundation_type == Constants.SlabFoundationType
       foundation_height = 0.0
@@ -762,6 +764,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
     OpenStudio::Model.intersectSurfaces(spaces)
     OpenStudio::Model.matchSurfaces(spaces)
     
+    # Apply zone multiplier
     if use_zone_mult and ((num_units_per_floor > 3 and not has_rear_units) or (num_units_per_floor > 7 and has_rear_units))
     
       (1..num_units_per_floor).to_a.each do |unit_num_per_floor|
@@ -844,6 +847,7 @@ class CreateResidentialMultifamilyGeometry < OpenStudio::Measure::ModelMeasure
       end # end unit per floor
     end # end zone mult
     
+    # Apply floor multiplier
     if use_floor_mult and building_num_floors > 3
     
       floor_zs = []

@@ -283,6 +283,25 @@ class Geometry
         return space
     end
     
+    def self.get_unit_adjacent_common_spaces(unit)
+      # Returns a list of spaces adjacent to the unit that are not assigned
+      # to a building unit.
+      spaces = []
+      
+      unit.spaces.each do |space|
+        space.surfaces.each do |surface|
+          next if not surface.adjacentSurface.is_initialized
+          adjacent_surface = surface.adjacentSurface.get
+          next if not adjacent_surface.space.is_initialized
+          adjacent_space = adjacent_surface.space.get
+          next if adjacent_space.buildingUnit.is_initialized
+          spaces << adjacent_space
+        end
+      end
+      
+      return spaces.uniq
+    end
+    
     def self.get_floor_area_from_spaces(spaces, apply_multipliers=false, runner=nil)
         floor_area = 0
         spaces.each do |space|
