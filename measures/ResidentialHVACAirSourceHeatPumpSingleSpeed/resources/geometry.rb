@@ -281,6 +281,15 @@ class Geometry
       return spaces.uniq
     end
     
+    def self.get_common_spaces(model)
+      spaces = []
+      model.getSpaces.each do |space|
+        next if space.buildingUnit.is_initialized
+        spaces << space
+      end
+      return spaces
+    end
+    
     def self.get_floor_area_from_spaces(spaces, apply_multipliers=false, runner=nil)
         floor_area = 0
         spaces.each do |space|

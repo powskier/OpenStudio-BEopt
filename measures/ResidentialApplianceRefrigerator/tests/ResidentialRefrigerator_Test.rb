@@ -285,12 +285,12 @@ class ResidentialRefrigeratorTest < MiniTest::Test
     result = runner.result
 
     # show the output
-    show_output(result)
+    #show_output(result)
 
     # assert that it ran correctly
     assert_equal("Success", result.value.valueName)
     assert(result.info.size == num_infos)
-    #assert(result.warnings.size == num_warnings)
+    assert(result.warnings.size == num_warnings)
     assert(result.finalCondition.is_initialized)
     
     # get the final objects in the model

@@ -118,16 +118,11 @@ class ResidentialRefrigerator < OpenStudio::Measure::ModelMeasure
     units.each_with_index do |unit, unit_index|
         
         # Get space
-        runner.registerWarning("unit #{unit.name.to_s}")
-        runner.registerWarning("unit_index #{unit_index.to_s}")
         space = Geometry.get_space_from_string(unit.spaces, space_r)
-        runner.registerWarning("space #{space.to_s}")
         if space.nil? and unit_index == 0 and space_r != Constants.Auto
-            space = Geometry.get_space_from_string(model.getSpaces, space_r)
-            runner.registerWarning("space #{space.to_s}")
+            space = Geometry.get_space_from_string(Geometry.get_common_spaces(model), space_r)
         end
         next if space.nil?
-        runner.registerWarning("continuing")
         
         unit_obj_name = Constants.ObjectNameRefrigerator(unit.name.to_s)
 

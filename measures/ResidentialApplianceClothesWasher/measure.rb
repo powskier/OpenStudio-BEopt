@@ -238,7 +238,7 @@ class ResidentialClothesWasher < OpenStudio::Measure::ModelMeasure
         # Get space
         space = Geometry.get_space_from_string(unit.spaces, space_r)
         if space.nil? and unit_index == 0 and space_r != Constants.Auto
-            space = Geometry.get_space_from_string(model.getSpaces, space_r)
+            space = Geometry.get_space_from_string(Geometry.get_common_spaces(model), space_r)
         end
         next if space.nil?
 
