@@ -30,7 +30,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
   
   def test_two_story_fourplex_front_units
     args_hash = {}
-    args_hash["building_num_floors"] = 2
+    args_hash["num_floors"] = 2
     args_hash["num_units"] = 4
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
@@ -41,7 +41,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
   
   def test_two_story_fourplex_rear_units
     args_hash = {}
-    args_hash["building_num_floors"] = 2
+    args_hash["num_floors"] = 2
     args_hash["num_units"] = 4
     args_hash["has_rear_units"] = "true"
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType    

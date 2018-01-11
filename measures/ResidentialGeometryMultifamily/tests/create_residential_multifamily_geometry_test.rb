@@ -30,7 +30,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_error_no_corr
     args_hash = {}
-    args_hash["corr_width"] = -1
+    args_hash["corridor_width"] = -1
     result = _test_error(nil, args_hash)
     assert_includes(result.errors.map{ |x| x.logMessage }, "Invalid corridor width entered.")
   end  
@@ -46,8 +46,8 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_warning_balc_but_no_inset
     args_hash = {}
-    args_hash["balc_depth"] = 6
-    args_hash["corr_pos"] = "None"
+    args_hash["balcony_depth"] = 6
+    args_hash["corridor_position"] = "None"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>2, "Surface"=>12, "ThermalZone"=>2, "Space"=>2}
     expected_values = {"FinishedFloorArea"=>900*2, "BuildingHeight"=>8}
@@ -56,12 +56,12 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
 
   def test_two_story_double_exterior
     args_hash = {}
-    args_hash["building_num_floors"] = 2
+    args_hash["num_floors"] = 2
     args_hash["num_units_per_floor"] = 4
-    args_hash["corr_pos"] = "Double Exterior"
+    args_hash["corridor_position"] = "Double Exterior"
     args_hash["inset_width"] = 8
     args_hash["inset_depth"] = 6
-    args_hash["balc_depth"] = 6
+    args_hash["balcony_depth"] = 6
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>2*4, "Surface"=>68, "ThermalZone"=>2*4, "Space"=>2*4, "ShadingSurfaceGroup"=>12, "ShadingSurface"=>12}
     expected_values = {"FinishedFloorArea"=>900*2*4, "BuildingHeight"=>2*8}
@@ -70,7 +70,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_multiplex_right_inset
     args_hash = {}
-    args_hash["building_num_floors"] = 8
+    args_hash["num_floors"] = 8
     args_hash["num_units_per_floor"] = 6
     args_hash["inset_width"] = 8
     args_hash["inset_depth"] = 6
@@ -83,12 +83,12 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_multiplex_left_inset
     args_hash = {}
-    args_hash["building_num_floors"] = 8
+    args_hash["num_floors"] = 8
     args_hash["num_units_per_floor"] = 6
     args_hash["inset_width"] = 8
     args_hash["inset_depth"] = 6
-    args_hash["inset_pos"] = "Left"
-    args_hash["balc_depth"] = 6
+    args_hash["inset_position"] = "Left"
+    args_hash["balcony_depth"] = 6
     args_hash["foundation_type"] = Constants.UnfinishedBasementFoundationType
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>8*6, "Surface"=>538, "ThermalZone"=>8*6+1+1, "Space"=>8*6+1+8, "ShadingSurface"=>8*6, "ShadingSurfaceGroup"=>8*6}
@@ -98,9 +98,9 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_crawl_single_exterior
     args_hash = {}
-    args_hash["building_num_floors"] = 2
+    args_hash["num_floors"] = 2
     args_hash["num_units_per_floor"] = 12
-    args_hash["corr_pos"] = "Single Exterior (Front)"
+    args_hash["corridor_position"] = "Single Exterior (Front)"
     args_hash["foundation_type"] = Constants.CrawlFoundationType
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>2*12, "Surface"=>194, "ThermalZone"=>2*12+1, "Space"=>2*12+1, "ShadingSurface"=>2, "ShadingSurfaceGroup"=>2}
@@ -134,7 +134,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_zone_mult_front_units_only
     args_hash = {}
     args_hash["num_units_per_floor"] = 8
-    args_hash["corr_width"] = 0
+    args_hash["corridor_width"] = 0
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>3, "Surface"=>18, "ThermalZone"=>3, "Space"=>3}
@@ -155,7 +155,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   def test_zone_mult_with_rear_units_odd
     args_hash = {}
     args_hash["num_units_per_floor"] = 9
-    args_hash["corr_pos"] = "Double Exterior"
+    args_hash["corridor_position"] = "Double Exterior"
     args_hash["use_zone_mult"] = "true"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>6, "Surface"=>36, "ThermalZone"=>6, "Space"=>6, "ShadingSurface"=>2, "ShadingSurfaceGroup"=>2}
@@ -165,7 +165,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_floor_mult
     args_hash = {}
-    args_hash["building_num_floors"] = 12
+    args_hash["num_floors"] = 12
     args_hash["num_units_per_floor"] = 8
     args_hash["use_floor_mult"] = "true"
     expected_num_del_objects = {}
@@ -185,7 +185,7 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_two_units_per_floor_with_rear_units
     args_hash = {}
-    args_hash["building_num_floors"] = 4
+    args_hash["num_floors"] = 4
     args_hash["num_units_per_floor"] = 2
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>8, "Surface"=>72, "ThermalZone"=>8+1, "Space"=>12}
@@ -195,9 +195,9 @@ class CreateResidentialMultifamilyGeometryTest < MiniTest::Test
   
   def test_one_unit_per_floor_with_no_rear_units
     args_hash = {}
-    args_hash["building_num_floors"] = 4
+    args_hash["num_floors"] = 4
     args_hash["num_units_per_floor"] = 1
-    args_hash["corr_pos"] = "None"
+    args_hash["corridor_position"] = "None"
     expected_num_del_objects = {}
     expected_num_new_objects = {"BuildingUnit"=>4, "Surface"=>24, "ThermalZone"=>4, "Space"=>4}
     expected_values = {"FinishedFloorArea"=>900*4, "BuildingHeight"=>4*8}
