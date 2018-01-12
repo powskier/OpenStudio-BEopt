@@ -307,6 +307,17 @@ class ResidentialClothesDryerFuelTest < MiniTest::Test
     _test_measure("SFA_4units_1story_FB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end  
 
+  def test_single_family_attached_new_construction_unfinished_basement
+    num_units = 4
+    args_hash = {}
+    args_hash["fuel_type"] = Constants.FuelTypeGas
+    args_hash["space"] = Constants.UnfinishedBasementSpace
+    expected_num_del_objects = {}
+    expected_num_new_objects = {"OtherEquipment"=>1, "OtherEquipmentDefinition"=>1, "ElectricEquipment"=>1, "ElectricEquipmentDefinition"=>1, "ScheduleRuleset"=>1}
+    expected_values = {"Annual_kwh"=>80.98, "Annual_therm"=>36.71, "Annual_gal"=>0, "FuelType"=>Constants.FuelTypeGas, "Space"=>args_hash["space"]}
+    _test_measure("SFA_4units_1story_UB_UA_3Beds_2Baths_Denver_ElecWHTank_ClothesWasher.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
+  end  
+
   def test_multifamily_new_construction
     num_units = 8
     args_hash = {}

@@ -30,7 +30,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
   
   def test_two_story_fourplex_front_units
     args_hash = {}
-    args_hash["building_num_floors"] = 2
+    args_hash["num_floors"] = 2
     args_hash["num_units"] = 4
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType
     expected_num_del_objects = {}
@@ -41,7 +41,7 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
   
   def test_two_story_fourplex_rear_units
     args_hash = {}
-    args_hash["building_num_floors"] = 2
+    args_hash["num_floors"] = 2
     args_hash["num_units"] = 4
     args_hash["has_rear_units"] = "true"
     args_hash["foundation_type"] = Constants.FinishedBasementFoundationType    
@@ -70,6 +70,9 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     expected_values = {"FinishedFloorArea"=>900*4, "CrawlspaceHeight"=>3, "CrawlspaceFloorArea"=>900*4, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*4, "BuildingHeight"=>3+8+5.30}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values) 
   end  
+  
+  '''
+  # TODO: Zone/floor multiplier arguments currently commented out
   
   def test_zone_mult_front_units_only
     args_hash = {}
@@ -102,6 +105,8 @@ class CreateResidentialSingleFamilyAttachedGeometryTest < MiniTest::Test
     expected_values = {"FinishedFloorArea"=>900*6, "UnfinishedAtticHeight"=>5.30, "UnfinishedAtticFloorArea"=>900*9, "BuildingHeight"=>8+5.30}
     _test_measure(nil, args_hash, expected_num_del_objects, expected_num_new_objects, expected_values)
   end
+  
+  '''
   
   def test_one_unit_per_floor_with_rear_units
     args_hash = {}

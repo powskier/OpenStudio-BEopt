@@ -1211,6 +1211,28 @@ class ProcessHVACSizingTest < MiniTest::Test
     _test_measure("SFD_HVACSizing_Load_1story_PB_UA_Vented_ASHP_DuctsInUA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
   end  
   
+  def test_loads_single_family_attached
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    # TODO
+    expected_values = {
+                      }
+    _test_measure("SFA_HVACSizing_Load_4units_1story_FB_UA.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
+  end  
+  
+  def test_loads_multifamily
+    args_hash = {}
+    args_hash["show_debug_info"] = true
+    expected_num_del_objects = {}
+    expected_num_new_objects = {}
+    # TODO
+    expected_values = {
+                      }
+    _test_measure("MF_HVACSizing_Load_8units_1story_UB.osm", args_hash, expected_num_del_objects, expected_num_new_objects, expected_values, false)
+  end  
+  
   def test_equip_ASHP_one_speed_autosize
     args_hash = {}
     args_hash["show_debug_info"] = true
