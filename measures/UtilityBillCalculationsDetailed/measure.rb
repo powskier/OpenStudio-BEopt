@@ -233,7 +233,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       end
     elsif tariff_label != "Autoselect Tariff(s)"      
       Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
-        tariff = JSON.parse(zip_file.read(tariff_label), :symbolize_names=>true)[:items][0]
+        tariff = JSON.parse(zip_file.read("#{tariff_label}.json"), :symbolize_names=>true)[:items][0]
       end
     else # autoselect tariff based on distance to simulation epw location
       weather_file = model.getSite.weatherFile.get
