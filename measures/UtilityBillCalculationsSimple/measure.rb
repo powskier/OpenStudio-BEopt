@@ -21,7 +21,7 @@ class UtilityBillCalculationsSimple < OpenStudio::Measure::ReportingMeasure
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calculate utility bills based on user-entered fixed charges and marginal rates. If '#{Constants.Auto}' is selected for marginal rates, the state average is used."
+    return "Calculate utility bills based on fixed charges for electric and gas, and marginal rates for all fuel types. If '#{Constants.Auto}' is selected for marginal rates, the state average is used. User can also specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
   end 
   
   def fuel_types

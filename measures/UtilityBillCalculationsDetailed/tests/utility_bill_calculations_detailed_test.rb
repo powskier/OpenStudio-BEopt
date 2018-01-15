@@ -27,7 +27,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
   
   def test_functionality_feed_in_tariff_select_tariff
     args_hash = {}
-    args_hash["tariff_label"] = "34_539fc3c4ec4f024c27d8bf7f.json"
+    args_hash["tariff_label"] = "4-County Electric Power Assn - Residential"
     args_hash["pv_compensation_type"] = "Feed-In Tariff"
     expected_num_del_objects = {}
     expected_num_new_objects = {}
@@ -142,7 +142,32 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     expected_values = {Constants.FuelTypeElectric=>96, Constants.FuelTypeGas=>414, Constants.FuelTypePropane=>62, Constants.FuelTypeOil=>344}
     _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
   end
-  
+=begin
+  def test_all_tariffs
+    require 'zip'
+    Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
+      zip_file.each_with_index do |entry, i|
+        next unless entry.file?
+        puts i, entry.name
+        args_hash = {}
+        args_hash["tariff_label"] = "Custom Tariff"
+        args_hash["custom_tariff"] = entry.name
+        args_hash["gas_fixed"] = "8.0"
+        args_hash["gas_rate"] = Constants.Auto
+        args_hash["oil_rate"] = Constants.Auto
+        args_hash["prop_rate"] = Constants.Auto
+        args_hash["pv_compensation_type"] = "Feed-In Tariff"
+        args_hash["pv_sellback_rate"] = "0.03"
+        args_hash["pv_tariff_rate"] = "0.12"
+        timeseries = get_timeseries(File.expand_path("../PV_10kW.csv", __FILE__))
+        expected_num_del_objects = {}
+        expected_num_new_objects = {}
+        expected_values = {}
+        _test_measure_calculations(timeseries, args_hash, "CO", expected_values, 4)
+      end
+    end
+  end
+=end
   private
 
   def model_in_path_default(osm_file_or_model)
@@ -311,7 +336,7 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     # get arguments
     arguments = measure.arguments()
     argument_map = OpenStudio::Measure.convertOSArgumentVectorToMap(arguments)
-
+    
     # populate argument with specified hash value if specified
     arguments.each do |arg|
       temp_arg_var = arg.clone
@@ -328,7 +353,13 @@ class UtilityBillCalculationsDetailedTest < MiniTest::Test
     elsif args_hash["pv_compensation_type"] == "Feed-In Tariff"
       pv_rate = args_hash["pv_tariff_rate"]
     end
-    tariff = JSON.parse(File.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]
+    begin
+      tariff = JSON.parse(File.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]
+    rescue
+      Zip::File.open("#{File.dirname(__FILE__)}/../resources/tariffs.zip") do |zip_file|
+        tariff = JSON.parse(zip_file.read(args_hash["custom_tariff"]), :symbolize_names=>true)[:items][0]
+      end
+    end
     measure.calculate_utility_bills(runner, timeseries, weather_file_state, marginal_rates, fixed_rates, args_hash["pv_compensation_type"], pv_rate, tariff)
 
     result = runner.result

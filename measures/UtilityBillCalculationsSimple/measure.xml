@@ -2,13 +2,13 @@
   <schema_version>3.0</schema_version>
   <name>utility_bill_calculations_simple</name>
   <uid>872cd20c-55df-459e-9ac9-f42c93ab665c</uid>
-  <version_id>3cd6c190-e503-463b-928b-36e70e0203bb</version_id>
-  <version_modified>20180109T224416Z</version_modified>
+  <version_id>19499b14-9c4d-43aa-9170-50ad93db7301</version_id>
+  <version_modified>20180114T005032Z</version_modified>
   <xml_checksum>6159342E</xml_checksum>
   <class_name>UtilityBillCalculationsSimple</class_name>
   <display_name>Calculate Simple Utility Bills</display_name>
   <description>Calculate utility bills using a simple method.</description>
-  <modeler_description>Calculate utility bills based on user-entered fixed charges and marginal rates. If 'auto' is selected for marginal rates, the state average is used.</modeler_description>
+  <modeler_description>Calculate utility bills based on fixed charges for electric and gas, and marginal rates for all fuel types. If 'auto' is selected for marginal rates, the state average is used. User can also specify net metering or feed-in tariff PV compensation types, along with corresponding rates.</modeler_description>
   <arguments>
     <argument>
       <name>elec_fixed</name>
@@ -153,10 +153,27 @@
   </attributes>
   <files>
     <file>
-      <filename>USA_CO_Denver_Intl_AP_725650_TMY3.epw</filename>
-      <filetype>epw</filetype>
-      <usage_type>test</usage_type>
-      <checksum>E23378AA</checksum>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>2.0.5</identifier>
+        <min_compatible>2.0.5</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>3306C118</checksum>
+    </file>
+    <file>
+      <filename>constants.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>022C15E2</checksum>
+    </file>
+    <file>
+      <filename>Electricity.csv</filename>
+      <filetype>csv</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>6C2CC8FC</checksum>
     </file>
     <file>
       <filename>Natural gas.csv</filename>
@@ -177,24 +194,6 @@
       <checksum>D205D809</checksum>
     </file>
     <file>
-      <filename>Electricity.csv</filename>
-      <filetype>csv</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>6C2CC8FC</checksum>
-    </file>
-    <file>
-      <filename>DuPage_17043_725300_880860.epw</filename>
-      <filetype>epw</filetype>
-      <usage_type>test</usage_type>
-      <checksum>335AE046</checksum>
-    </file>
-    <file>
-      <filename>constants.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>022C15E2</checksum>
-    </file>
-    <file>
       <filename>sam-sdk-2017-1-17-r1.zip</filename>
       <filetype>zip</filetype>
       <usage_type>resource</usage_type>
@@ -213,16 +212,22 @@
       <checksum>DD7DE19B</checksum>
     </file>
     <file>
-      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
-      <filetype>osm</filetype>
-      <usage_type>test</usage_type>
-      <checksum>3A877070</checksum>
-    </file>
-    <file>
       <filename>unit_conversions.rb</filename>
       <filetype>rb</filetype>
       <usage_type>resource</usage_type>
       <checksum>3E1D973D</checksum>
+    </file>
+    <file>
+      <filename>util.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>resource</usage_type>
+      <checksum>89126B2C</checksum>
+    </file>
+    <file>
+      <filename>DuPage_17043_725300_880860.epw</filename>
+      <filetype>epw</filetype>
+      <usage_type>test</usage_type>
+      <checksum>335AE046</checksum>
     </file>
     <file>
       <filename>PV_10kW.csv</filename>
@@ -249,27 +254,22 @@
       <checksum>49D4661F</checksum>
     </file>
     <file>
-      <filename>util.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>resource</usage_type>
-      <checksum>89126B2C</checksum>
+      <filename>SFD_Successful_EnergyPlus_Run_TMY_PV.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>3A877070</checksum>
+    </file>
+    <file>
+      <filename>USA_CO_Denver_Intl_AP_725650_TMY3.epw</filename>
+      <filetype>epw</filetype>
+      <usage_type>test</usage_type>
+      <checksum>E23378AA</checksum>
     </file>
     <file>
       <filename>utility_bill_calculations_simple_test.rb</filename>
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
       <checksum>59BC9D2B</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>2.0.5</identifier>
-        <min_compatible>2.0.5</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>4DFAF18D</checksum>
     </file>
   </files>
 </measure>

@@ -512,19 +512,40 @@ def get_osms_listed_in_test(testrb)
     return osms.uniq
 end
 
-desc 'update urdb tariffs in utility bill measure'
+desc 'update urdb tariffs'
 task :update_tariffs do
   require 'csv'
   require 'net/https'
-  require 'openstudio'
+  require 'zip'
 
   tariffs_path = "./resources/tariffs"
-  result = get_tariff_json_files(tariffs_path)  
-  if result
-    zip_file = OpenStudio::ZipFile.new(tariffs_zip, false)
-    zip_file.addDirectory(tariffs_path, OpenStudio::toPath("/"))
+  tariffs_zip = "#{tariffs_path}.zip"
+  
+  if not File.exists?(tariffs_path)
+    FileUtils.mkdir_p("./resources/tariffs")  
   end
-  FileUtils.rm_rf(tariffs_path)
+  
+  if File.exists?(tariffs_zip)
+    Zip::File.open(tariffs_zip) do |zip_file|
+      zip_file.each do |entry|
+        next unless entry.file?
+        entry_path = File.join(tariffs_path, entry.name)
+        zip_file.extract(entry, entry_path) unless File.exists?(entry_path)
+      end
+    end
+    FileUtils.rm_rf(tariffs_zip)
+  end
+  
+  result = get_tariff_json_files(tariffs_path)
+  
+  if result
+    Zip::File.open(tariffs_zip, Zip::File::CREATE) do |zip_file|
+        Dir[File.join(tariffs_path, "*")].each do |entry|
+          zip_file.add(entry.sub(tariffs_path + "/", ""), entry)
+        end
+    end
+    FileUtils.rm_rf(tariffs_path)
+  end
 
 end
 
@@ -533,15 +554,11 @@ def get_tariff_json_files(tariffs_path)
   STDOUT.puts "Enter API Key:"
   api_key = STDIN.gets.strip
   return false if api_key.empty?
-
-  tariffs_zip = "#{tariffs_path}.zip"
-  unzip_file = OpenStudio::UnzipFile.new(tariffs_zip)
-  if not File.exists?(tariffs_path)
-    puts "Extracting #{tariffs_zip} to #{tariffs_path} ..."
-    unzip_file.extractAllFiles(OpenStudio::toPath(tariffs_path))
-  end
-  if !File.exists?(tariffs_path)
-    FileUtils.mkdir_p(tariffs_path)
+  STDOUT.puts "<ENTER> for Add, 1 for Update:"
+  function = STDIN.gets.strip
+  update = false
+  if function == "1"
+    update = true
   end
 
   url = URI.parse("https://api.openei.org/utility_rates?")
@@ -557,9 +574,14 @@ def get_tariff_json_files(tariffs_path)
     size += 1
     next if i == 0
     utility, eiaid, name, label = row
-    tariff_file_name = File.join(tariffs_path, "#{eiaid}_#{label}.json")
     
-    # next if File.file?(tariff_file_name) # just add, don't update
+    entry_path = File.join(tariffs_path, clean_filename("#{utility} - #{name}.json"))
+    if not update
+      if File.exists?(entry_path)
+        puts "Skipping #{entry_path}: already exists."
+        next
+      end
+    end
 
     params = { 'version' => 3, 'format' => 'json', 'detail' => 'full', 'getpage' => label, 'api_key' => api_key }
     url.query = URI.encode_www_form(params)
@@ -568,21 +590,26 @@ def get_tariff_json_files(tariffs_path)
     response = JSON.parse(response.body, :symbolize_names=>true)
 
     if response.keys.include? :error
-      puts "#{eiaid}_#{label}: #{response[:error][:message]}."
+      puts "#{response[:error][:message]}."
       if response[:error][:message].include? "exceeded your rate limit"
         return false
       end
       next
     end
+    
+    if response[:items].empty?
+      puts "Skipping #{entry_path}: empty response."
+      next
+    end
 
-    if not File.file?(tariff_file_name)
-      puts "Added #{tariff_file_name} to #{tariffs_path}."
-      File.open(tariff_file_name, "w") do |f|
+    if not File.exists?(entry_path)
+      puts "Added #{entry_path}."
+      File.open(entry_path, "w") do |f|
         f.write(response.to_json)
       end
-    elsif not JSON.parse(File.read(tariff_file_name), :symbolize_names=>true) == response
-      puts "Updated #{tariff_file_name} to #{tariffs_path}."
-      File.open(tariff_file_name, "w") do |f|
+    elsif not JSON.parse(File.read(entry_path), :symbolize_names=>true) == response
+      puts "Updated #{entry_path}."
+      File.open(entry_path, "w") do |f|
         f.write(response.to_json)
       end
     end
@@ -593,10 +620,21 @@ def get_tariff_json_files(tariffs_path)
     end
     progress = new_progress
 
-  end    
+  end
   
   return true
 
+end
+
+def clean_filename(name)
+  name = name.gsub("/", "_")
+  name = name.gsub(",", "")
+  name = name.gsub(":", " ")
+  name = name.gsub('"', "")
+  name = name.gsub(">", "")
+  name = name.gsub("<", "")
+  name = name.gsub("*", "")
+  return name.strip
 end
 
 def get_os_cli

@@ -3,7 +3,6 @@
 
 require 'csv'
 require 'matrix'
-require 'zip'
 require "#{File.dirname(__FILE__)}/resources/constants"
 require "#{File.dirname(__FILE__)}/resources/unit_conversions"
 require "#{File.dirname(__FILE__)}/resources/util"
@@ -18,12 +17,12 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
 
   # human readable description
   def description
-    return "Calls the SAM SDK for calculating utility bills."
+    return "Calculate utility bills using a detailed method."
   end
 
   # human readable description of modeling approach
   def modeler_description
-    return "Calls the utilityrate3 module in the SAM SDK."
+    return "Calculate electric utility bills based on tariffs from the URDB. Calculate other utility bills based on fixed charges for gas, and marginal rates for gas, oil, and propane. If '#{Constants.Auto}' is selected for marginal rates, the state average is used. User can also specify net metering or feed-in tariff PV compensation types, along with corresponding rates."
   end 
   
   def fuel_types
@@ -53,15 +52,15 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     tariffs = OpenStudio::StringVector.new
     tariffs << "Autoselect Tariff(s)"
     tariffs << "Custom Tariff"
-    Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
-      zip_file.each do |entry|
-        next unless entry.file?
-        tariffs << entry.name
-      end
+    CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).each_with_index do |row, i|
+      next if i == 0
+      utility = row[0]
+      name = row[2]
+      tariffs << clean_filename("#{utility} - #{name}")
     end
     arg = OpenStudio::Measure::OSArgument::makeChoiceArgument("tariff_label", tariffs, true)
     arg.setDisplayName("Electricity: Tariff")
-    arg.setDescription("The tariff(s) to use.")
+    arg.setDescription("The tariff(s) to base the utility bill calculations on.")
     arg.setDefaultValue("Autoselect Tariff(s)")
     args << arg
     
@@ -168,6 +167,8 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       return false
     end
     
+    require 'zip'
+    
     # Assign the user inputs to variables
     tariff_label = runner.getStringArgumentValue("tariff_label", user_arguments)
     custom_tariff = runner.getOptionalStringArgumentValue("custom_tariff", user_arguments)
@@ -230,7 +231,7 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       if File.exists?(File.expand_path(custom_tariff))
         tariff = JSON.parse(File.read(custom_tariff), :symbolize_names=>true)[:items][0]
       end
-    elsif tariff_label != "Autoselect Tariff(s)"
+    elsif tariff_label != "Autoselect Tariff(s)"      
       Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
         tariff = JSON.parse(zip_file.read(tariff_label), :symbolize_names=>true)[:items][0]
       end
@@ -238,51 +239,51 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
       weather_file = model.getSite.weatherFile.get
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/by_nsrdb.csv").transpose
       closest_usaf = closest_usaf_to_epw(weather_file.latitude, weather_file.longitude, cols.transpose) # minimize distance to simulation epw
-      runner.registerInfo("Nearest usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")
-      
+      runner.registerInfo("Nearest usaf to #{File.basename(weather_file.url.get)}: #{closest_usaf}")      
       usafs = cols[1].collect { |i| i.to_s }
-      indexes = usafs.each_index.select{|i| usafs[i] == closest_usaf}
-      utility_ids = {}
-      indexes.each do |ix|
+      usaf_ixs = usafs.each_index.select{|i| usafs[i] == closest_usaf}
+      utilityid_to_nsrdbid = {} # {eiaid: [grid_cell, ...], ...}
+      usaf_ixs.each do |ix|
         next if cols[4][ix].nil?
-        cols[4][ix].split("|").each do |utility_id|
-          next if utility_id == "no data"
-          if utility_ids.keys.include? utility_id
-            utility_ids[utility_id] << cols[0][ix]
+        cols[4][ix].split("|").each do |utilityid|
+          next if utilityid == "no data"
+          if utilityid_to_nsrdbid.keys.include? utilityid
+            utilityid_to_nsrdbid[utilityid] << cols[0][ix]
           else
-            utility_ids[utility_id] = [cols[0][ix]]
+            utilityid_to_nsrdbid[utilityid] = [cols[0][ix]]
           end
         end
       end
 
-      rate_ids = {}
+      utilityid_to_filename = {} # {eiaid: {utility - name, ...}, ...}
       cols = CSV.read("#{File.dirname(__FILE__)}/resources/utilities.csv", {:encoding=>'ISO-8859-1'}).transpose
       cols.each do |col|
         next unless col[0].include? "eiaid"
-        utility_ids.keys.each do |utility_id|
-          utility_ixs = col.each_index.select{|i| col[i] == utility_id}
-          utility_ixs.each do |utility_ix|
-            if rate_ids.keys.include? utility_id
-              rate_ids[utility_id] << cols[3][utility_ix]
+        utilityid_to_nsrdbid.keys.each do |utilityid|
+          eiaid_ixs = col.each_index.select{|i| col[i] == utilityid}
+          eiaid_ixs.each do |ix|
+            utility = cols[0][ix].gsub("/", "_").gsub(",", " ").gsub(":", " ").gsub('"', "").gsub(">", "").gsub("<", "").gsub("*", "").strip
+            name = cols[2][ix].gsub("/", "_").gsub(",", " ").gsub(":", " ").gsub('"', "").gsub(">", "").gsub("<", "").gsub("*", "").strip
+            filename = "#{utility} - #{name}"
+            if utilityid_to_filename.keys.include? utilityid
+              utilityid_to_filename[utilityid] << filename
             else
-              rate_ids[utility_id] = [cols[3][utility_ix]]
+              utilityid_to_filename[utilityid] = [filename]
             end
           end
         end
       end
-
+      
       tariffs = []
-      rate_ids.each do |utility_id, getpages|
-        getpages.each do |getpage|    
-    
+      utilityid_to_filename.each do |utilityid, filenames|
+        filenames.each do |filename|    
           Zip::File.open("#{File.dirname(__FILE__)}/resources/tariffs.zip") do |zip_file|
-            tariffs << JSON.parse(zip_file.read("#{utility_id}_#{getpage}.json"), :symbolize_names=>true)[:items][0]
+            tariffs << JSON.parse(zip_file.read("#{filename}.json"), :symbolize_names=>true)[:items][0]
           end
-
         end          
       end
       
-      tariff = tariffs[0] # FIXME: average these? register all of them?
+      tariff = tariffs[0] # FIXME: there can be multiple tariffs: multiple labels in multiple eiaids per usaf. average these? register all of them?
     end
 
     timeseries = {}
@@ -485,6 +486,17 @@ class UtilityBillCalculationsDetailed < OpenStudio::Measure::ReportingMeasure
     c = 2 * Math.asin(Math.sqrt(a)) 
     km = 6367 * c
     return km
+  end
+  
+  def clean_filename(name)
+    name = name.gsub("/", "_")
+    name = name.gsub(",", "")
+    name = name.gsub(":", " ")
+    name = name.gsub('"', "")
+    name = name.gsub(">", "")
+    name = name.gsub("<", "")
+    name = name.gsub("*", "")
+    return name.strip
   end
 
 end
